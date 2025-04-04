@@ -60,17 +60,17 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
-    def get_hik_camera_node(package, plugin):
-        return ComposableNode(
-            package=package,
-            plugin=plugin,
-            name='hik_camera',
-            parameters=[LaunchConfiguration('params_file'), {
-                'camera_info_url': LaunchConfiguration('camera_info_url'),
-                'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
-            }],
-            extra_arguments=[{'use_intra_process_comms': True}]
-        )
+    #def get_hik_camera_node(package, plugin):
+    #    return ComposableNode(
+    #        package=package,
+    #        plugin=plugin,
+    #        name='hik_camera',
+    #        parameters=[LaunchConfiguration('params_file'), {
+    #            'camera_info_url': LaunchConfiguration('camera_info_url'),
+    #            'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
+    #        }],
+    #        extra_arguments=[{'use_intra_process_comms': True}]
+    #    )
 
     def get_camera_detector_container(nodes):
         return ComposableNodeContainer(
@@ -85,7 +85,7 @@ def generate_launch_description():
         )
 
     # 创建节点描述
-    hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
+    #hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
     radar_detect_node = get_radar_detect_node('tdt_vision', 'tdt_radar::Detect')
     radar_resolve_node = get_radar_resolve_node('tdt_vision', 'tdt_radar::Resolve')
     foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
@@ -93,7 +93,7 @@ def generate_launch_description():
 
     # 创建节点容器，确保 hik_camera_node 是第一个
     nodes = [
-        hik_camera_node,
+        #hik_camera_node,
         radar_detect_node,
         radar_resolve_node,
         foxglove_node,

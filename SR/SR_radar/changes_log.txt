@@ -1,1 +1,0 @@
-calib_rosbag.launch.py相机标定使用rosbag的画面，修改rosbag中相机画面的话题名称为rosbag_image，相机采集到的实时画面的话题名称camera_image区分开
