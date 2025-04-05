@@ -10,6 +10,8 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <fstream>
+#include <radar_interface/msg/match_result.hpp>
+#include <radar_interface/msg/matched_target.hpp>
 namespace tdt_radar {
     class DebugMap : public rclcpp::Node {
     public:
@@ -19,13 +21,27 @@ namespace tdt_radar {
                 "/kalman_detect", 10, std::bind(&DebugMap::callback, this, std::placeholders::_1));
             camera_detect_sub = this->create_subscription<vision_interface::msg::DetectResult>(
                 "/resolve_result", rclcpp::SensorDataQoS(), std::bind(&DebugMap::camera_callback, this, std::placeholders::_1));
+            // 新增：用于生成MatchResult的专用订阅者
+            match_result_sub = this->create_subscription<vision_interface::msg::DetectResult>(
+                "/kalman_detect", 10, std::bind(&DebugMap::match_result_callback, this, std::placeholders::_1));
             map = cv::imread("config/RM2025.png");
             match_info_sub = this->create_subscription<vision_interface::msg::MatchInfo>(
                 "/match_info", 10, std::bind(&DebugMap::save_match_info, this, std::placeholders::_1));
             radar_warn_pub = this->create_publisher<vision_interface::msg::RadarWarn>("/hero_state", 10);
             debug_map_pub = this->create_publisher<sensor_msgs::msg::Image>("/map_2d", 10);
             radar2sentry_pub = this->create_publisher<vision_interface::msg::Radar2Sentry>("/Radar2Sentry", rclcpp::SensorDataQoS());
+            match_result_pub = this->create_publisher<radar_interface::msg::MatchResult>("matcher/match_result", rclcpp::SystemDefaultsQoS());
             cv::resize(map, map, cv::Size(28*38, 15*38));
+
+            // 初始化relax相关参数
+            for(int i = 0; i < 6; i++){
+                relax[i] = false;
+                relax_time[i] = 0.0;
+                blue_time[i] = 0.0;
+                red_time[i] = 0.0;
+                blue_update[i] = 0.0;
+                red_update[i] = 0.0;
+            }
         }
         void save_match_info(const std::shared_ptr<vision_interface::msg::MatchInfo> msg){
             this->match_info = *msg;
@@ -207,11 +223,116 @@ namespace tdt_radar {
             }
             radar2sentry_pub->publish(radar2sentry);
         }
+
+        // 将DetectResult转换为MatchResult并发布的回调函数
+        void match_result_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg) {
+            auto now = std::chrono::system_clock::now();
+            double time = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()/1000.0;
+            
+            // 更新位置数据
+            for (int i = 0; i < 6; i++) {
+                if (msg->blue_x[i] * msg->blue_y[i]) {
+                    blue_point[i] = cv::Point2f(msg->blue_x[i], msg->blue_y[i]);
+                    blue_time[i] = time;
+                    blue_update[i] = time;
+                }
+                if (msg->red_x[i] * msg->red_y[i]) {
+                    red_point[i] = cv::Point2f(msg->red_x[i], msg->red_y[i]);
+                    red_time[i] = time;
+                    red_update[i] = time;
+                }
+            }
+            
+            radar_interface::msg::MatchResult match_result;
+            
+            // 填充红蓝双方的数据
+            for (int i = 0; i < 6; i++) {
+                // 蓝方数据
+                match_result.blue[i].id = -1; // 默认为-1，表示没有匹配到
+                if (blue_point[i].x * blue_point[i].y != 0) { // 检查坐标是否有效
+                    bool should_publish = false;
+                    
+                    // 应用与radar2sentry相同的发送机制
+                    if (!relax[i]) {
+                        if (match_info.marks[i] >= 117) {
+                            relax[i] = true;
+                            relax_time[i] = time;
+                        } else {
+                            if (time - blue_update[i] < 2) { // 检查时效性（2秒内更新）
+                                should_publish = true;
+                            }
+                        }
+                    } else {
+                        // 休息状态下处理逻辑
+                        if (match_info.marks[i] < 105) {
+                            relax[i] = false;
+                            if (time - blue_update[i] < 2) {
+                                should_publish = true;
+                            }
+                        } else if (time - relax_time[i] > 0.35) { // 发送频率控制（休息状态下0.35秒一次）
+                            relax_time[i] = time;
+                            if (time - blue_update[i] < 2) {
+                                should_publish = true;
+                            }
+                        }
+                    }
+                    
+                    if (should_publish) {
+                        match_result.blue[i].id = i; // 设置ID
+                        match_result.blue[i].position[0] = blue_point[i].x;
+                        match_result.blue[i].position[1] = blue_point[i].y;
+                    }
+                }
+                
+                // 红方数据
+                match_result.red[i].id = -1; // 默认为-1，表示没有匹配到
+                if (red_point[i].x * red_point[i].y != 0) { // 检查坐标是否有效
+                    bool should_publish = false;
+                    
+                    // 应用与radar2sentry相同的发送机制
+                    if (!relax[i]) {
+                        if (match_info.marks[i] >= 117) {
+                            relax[i] = true;
+                            relax_time[i] = time;
+                        } else {
+                            if (time - red_update[i] < 2) { // 检查时效性（2秒内更新）
+                                should_publish = true;
+                            }
+                        }
+                    } else {
+                        // 休息状态下处理逻辑
+                        if (match_info.marks[i] < 105) {
+                            relax[i] = false;
+                            if (time - red_update[i] < 2) {
+                                should_publish = true;
+                            }
+                        } else if (time - relax_time[i] > 0.35) { // 发送频率控制（休息状态下0.35秒一次）
+                            relax_time[i] = time;
+                            if (time - red_update[i] < 2) {
+                                should_publish = true;
+                            }
+                        }
+                    }
+                    
+                    if (should_publish) {
+                        match_result.red[i].id = i; // 设置ID
+                        match_result.red[i].position[0] = red_point[i].x;
+                        match_result.red[i].position[1] = red_point[i].y;
+                    }
+                }
+            }
+            
+            // 发布结果
+            match_result_pub->publish(match_result);
+        }
+
         rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr detect_result_sub;
         rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr camera_detect_sub;
+        rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr match_result_sub;
         rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr debug_map_pub;
         rclcpp::Publisher<vision_interface::msg::RadarWarn>::SharedPtr radar_warn_pub;
         rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar2sentry_pub;
+        rclcpp::Publisher<radar_interface::msg::MatchResult>::SharedPtr match_result_pub;
         rclcpp::Subscription<vision_interface::msg::MatchInfo>::SharedPtr match_info_sub;//打标用
 
         double blue_time[6];//单位s

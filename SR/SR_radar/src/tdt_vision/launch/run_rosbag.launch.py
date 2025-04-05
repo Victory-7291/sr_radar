@@ -22,6 +22,18 @@ def generate_launch_description():
 
     camera_info_url = 'package://hik_camera/config/camera_info.yaml'
 
+    # 定义JudgeBridgeNode节点
+    judge_bridge_node = Node(
+        package='judge_bridge',
+        executable='judge_bridge',
+        name='judge_bridge_node',
+        output='screen',
+        parameters=[{
+            'serial_port': '/dev/ttyUSB0',
+            'enable_recorder': False
+        }]
+    )
+
     # 定义节点
     def get_rosbag_player_node(package, plugin):
         return ComposableNode(
@@ -108,6 +120,8 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        # 首先启动JudgeBridgeNode节点
+        judge_bridge_node,
         DeclareLaunchArgument(name='params_file',
                               default_value=params_file),
         DeclareLaunchArgument(name='camera_info_url',
