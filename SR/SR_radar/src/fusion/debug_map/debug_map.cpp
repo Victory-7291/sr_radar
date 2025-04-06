@@ -15,22 +15,19 @@
 namespace tdt_radar {
     class DebugMap : public rclcpp::Node {
     public:
-        explicit DebugMap(const rclcpp::NodeOptions & options)
-            : Node("debug_map", options){
-            detect_result_sub = this->create_subscription<vision_interface::msg::DetectResult>(
-                "/kalman_detect", 10, std::bind(&DebugMap::callback, this, std::placeholders::_1));
-            camera_detect_sub = this->create_subscription<vision_interface::msg::DetectResult>(
-                "/resolve_result", rclcpp::SensorDataQoS(), std::bind(&DebugMap::camera_callback, this, std::placeholders::_1));
+        explicit DebugMap(const rclcpp::NodeOptions & options) : Node("debug_map", options){
+            detect_result_sub = this->create_subscription<vision_interface::msg::DetectResult>("/kalman_detect", 10, std::bind(&DebugMap::callback, this, std::placeholders::_1));
+            //camera_detect_sub = this->create_subscription<vision_interface::msg::DetectResult>(
+            //    "/resolve_result", rclcpp::SensorDataQoS(), std::bind(&DebugMap::camera_callback, this, std::placeholders::_1));
             // 新增：用于生成MatchResult的专用订阅者
-            match_result_sub = this->create_subscription<vision_interface::msg::DetectResult>(
-                "/kalman_detect", 10, std::bind(&DebugMap::match_result_callback, this, std::placeholders::_1));
-            map = cv::imread("config/RM2025.png");
-            match_info_sub = this->create_subscription<vision_interface::msg::MatchInfo>(
-                "/match_info", 10, std::bind(&DebugMap::save_match_info, this, std::placeholders::_1));
+            match_result_sub = this->create_subscription<vision_interface::msg::DetectResult>("/kalman_detect", 10, std::bind(&DebugMap::match_result_callback, this, std::placeholders::_1));
+            match_info_sub = this->create_subscription<vision_interface::msg::MatchInfo>("/match_info", 10, std::bind(&DebugMap::save_match_info, this, std::placeholders::_1));
             radar_warn_pub = this->create_publisher<vision_interface::msg::RadarWarn>("/hero_state", 10);
-            debug_map_pub = this->create_publisher<sensor_msgs::msg::Image>("/map_2d", 10);
+            //debug_map_pub = this->create_publisher<sensor_msgs::msg::Image>("/map_2d", 10);
             radar2sentry_pub = this->create_publisher<vision_interface::msg::Radar2Sentry>("/Radar2Sentry", rclcpp::SensorDataQoS());
             match_result_pub = this->create_publisher<radar_interface::msg::MatchResult>("matcher/match_result", rclcpp::SystemDefaultsQoS());
+            
+            map = cv::imread("config/RM2025.png");
             cv::resize(map, map, cv::Size(28*38, 15*38));
 
             // 初始化relax相关参数
@@ -42,6 +39,12 @@ namespace tdt_radar {
                 blue_update[i] = 0.0;
                 red_update[i] = 0.0;
             }
+            
+            // 创建30Hz的定时器用于更新地图显示
+            double timer_period = 1.0 / 25.0; // 30Hz，约33.3ms
+            map_timer = this->create_wall_timer(
+                std::chrono::duration<double>(timer_period),
+                std::bind(&DebugMap::show_map, this));
         }
         void save_match_info(const std::shared_ptr<vision_interface::msg::MatchInfo> msg){
             this->match_info = *msg;
@@ -70,31 +73,31 @@ namespace tdt_radar {
             cv::imshow("map", clone_map);
             cv::waitKey(1);
         }
-        void camera_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg){
-            auto now = std::chrono::system_clock::now();
-            double time = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()/1000.0;
-            for(int i=0;i<6;i++){
-                if(msg->blue_x[i]*msg->blue_y[i]){//如果是蓝色，所有坐标都要转换
-                    if(time - blue_time[i] > 5){
-                        blue_point[i] = cv::Point2f(msg->blue_x[i], msg->blue_y[i]);
-                        if(!match_info.self_color){
-                            blue_point[i] = cv::Point2f(28-msg->blue_x[i], 15-msg->blue_y[i]);
-                        }
-                        blue_update[i] = time;
-                    }
-                }
-                if(msg->red_x[i]*msg->red_y[i]){
-                    if(time - red_time[i] > 5){
-                        red_point[i] = cv::Point2f(msg->red_x[i], msg->red_y[i]);
-                        if(!match_info.self_color){
-                            red_point[i] = cv::Point2f(28-msg->red_x[i], 15-msg->red_y[i]);
-                        }
-                        red_update[i] = time;
-                    }
-                }
-            }
-            show_map();
-        }
+        //void camera_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg){
+        //    auto now = std::chrono::system_clock::now();
+        //    double time = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()/1000.0;
+        //    for(int i=0;i<6;i++){
+        //        if(msg->blue_x[i]*msg->blue_y[i]){//如果是蓝色，所有坐标都要转换
+        //            if(time - blue_time[i] > 5){
+        //                blue_point[i] = cv::Point2f(msg->blue_x[i], msg->blue_y[i]);
+        //                if(!match_info.self_color){
+        //                    blue_point[i] = cv::Point2f(28-msg->blue_x[i], 15-msg->blue_y[i]);
+        //                }
+        //                blue_update[i] = time;
+        //            }
+        //        }
+        //        if(msg->red_x[i]*msg->red_y[i]){
+        //            if(time - red_time[i] > 5){
+        //                red_point[i] = cv::Point2f(msg->red_x[i], msg->red_y[i]);
+        //                if(!match_info.self_color){
+        //                    red_point[i] = cv::Point2f(28-msg->red_x[i], 15-msg->red_y[i]);
+        //                }
+        //                red_update[i] = time;
+        //            }
+        //        }
+        //    }
+        //    show_map();
+        //}
 
         void callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg){
             auto now = std::chrono::system_clock::now();
@@ -112,7 +115,7 @@ namespace tdt_radar {
                     red_update[i] = time;
                 }
             }
-            show_map();
+            // 移除对show_map的调用，让定时器处理地图更新
             vision_interface::msg::RadarWarn radar_warn;
             if(hero_count1>10){
                 radar_warn.hero_state = 1;
@@ -327,13 +330,14 @@ namespace tdt_radar {
         }
 
         rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr detect_result_sub;
-        rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr camera_detect_sub;
+        //rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr camera_detect_sub;
         rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr match_result_sub;
-        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr debug_map_pub;
+        //rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr debug_map_pub;
         rclcpp::Publisher<vision_interface::msg::RadarWarn>::SharedPtr radar_warn_pub;
         rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar2sentry_pub;
         rclcpp::Publisher<radar_interface::msg::MatchResult>::SharedPtr match_result_pub;
         rclcpp::Subscription<vision_interface::msg::MatchInfo>::SharedPtr match_info_sub;//打标用
+        rclcpp::TimerBase::SharedPtr map_timer; // 用于定时更新地图的定时器
 
         double blue_time[6];//单位s
         double red_time[6];//单位s
