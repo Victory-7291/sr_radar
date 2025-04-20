@@ -112,6 +112,14 @@ def generate_launch_description():
     rosbag_player_node = get_rosbag_player_node('rosbag_player', 'RosbagPlayer')
     kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
 
+    # 定义 dv_trigger 节点
+    dv_trigger_node = Node(
+        package='dv_trigger',
+        executable='dv_trigger_node', # 假设可执行文件名为 dv_trigger_node
+        name='dv_trigger_node',
+        output='screen'
+    )
+
     # 创建节点容器，确保 hik_camera_node 是第一个
     nodes = [
         hik_camera_node,
@@ -132,6 +140,7 @@ def generate_launch_description():
     return LaunchDescription([
         # 首先启动JudgeBridgeNode节点
         #judge_bridge_node,
+        dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
         DeclareLaunchArgument(name='params_file',
                               default_value=params_file),
         DeclareLaunchArgument(name='camera_info_url',
@@ -139,5 +148,5 @@ def generate_launch_description():
         DeclareLaunchArgument(name='use_sensor_data_qos',
                               default_value='false'),
         cam_detector,
-        plugin_map_launch_cmd
+        plugin_map_launch_cmd,
     ])
