@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-cmake_policy(SET CMP0079 NEW)
+cMAKE_policy(SET CMP0079 NEW)
+cMAKE_policy(SET CMP0104 NEW)
 
-#set(CMAKE_CUDA_ARCHITECTURES 50 52 61 75)
+set(CMAKE_CUDA_ARCHITECTURES 50 52 61 75)
 #set(CMAKE_CUDA_COMPILER /usr/local/cuda-12.4/bin/nvcc)
 #set(nvinfer_LIBRARY "/home/wan/TensorRT-10.7.0.23/lib/libnvinfer.so")
 #set(nvinfer_INCLUDE_DIRS "/home/wan/TensorRT-10.7.0.23/include")

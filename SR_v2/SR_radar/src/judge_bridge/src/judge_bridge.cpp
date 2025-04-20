@@ -235,7 +235,7 @@ void JudgeBridgeNode::send_sentry_data(const radar_interface::msg::MatchResult& 
 void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResult& msg)
 {
     map_robot_data_t map_robot_data;
-    constexpr uint16_t default_red_x = 210, default_red_y = 110;
+    // constexpr uint16_t default_red_x = 210, default_red_y = 110; // Removed unused variables
     constexpr uint16_t default_blue_x = 2800 - 210, default_blue_y = 1500 - 110;
     RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
     //switch (color) {

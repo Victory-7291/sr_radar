@@ -2,6 +2,7 @@
 
 cmake_minimum_required(VERSION 3.5)
 project(livox_ros2_driver)
+cmake_policy(SET CMP0074 NEW)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
