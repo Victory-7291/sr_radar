@@ -62,7 +62,8 @@ ament_target_dependencies(${RADAR_DETECT}
   "sensor_msgs"
   "cv_bridge"
   "image_transport"
-  "tdt_interfaces"
+  "vision_interface"
+  "geometry_msgs"
 )
 
 find_package(CUDA)
@@ -117,10 +118,6 @@ ament_target_dependencies(${RADAR_RESOLVE}
   "image_transport"
   "vision_interface"
   "geometry_msgs"
-  "tf2"
-  "tf2_msgs"
-  "tf2_geometry_msgs" 
-  "visualization_msgs"
 )
 
 # 设置组件属性
@@ -152,10 +149,6 @@ ament_target_dependencies(${RADAR_CALIBRATE}
   "image_transport"
   "vision_interface"
   "geometry_msgs"
-  "tf2"
-  "tf2_msgs"
-  "tf2_geometry_msgs" 
-  "visualization_msgs"
 )
 
 # 设置组件属性
