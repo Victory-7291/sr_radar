@@ -34,6 +34,11 @@ link_directories(/usr/local/cuda-12.4/lib64)
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+add_subdirectory(OCSort)
+
 file(GLOB_RECURSE RADAR_UTILS_SRCS "radar_utils/*.cpp")
 
 ament_auto_add_library(radar_utils SHARED
@@ -44,6 +49,11 @@ set(RADAR_DETECT "radar_detect")
 file(GLOB_RECURSE RADAR_DETECT_SRCS "detect/src/*.cpp")
 ament_auto_add_library(${RADAR_DETECT} SHARED
     ${RADAR_DETECT_SRCS}
+)
+target_link_libraries(${RADAR_DETECT} PRIVATE
+    libocsort
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
 )
 find_package(CUDA)
 include(${PROJECT_SOURCE_DIR}/cmake/modules/libnvinferConfig.cmake)

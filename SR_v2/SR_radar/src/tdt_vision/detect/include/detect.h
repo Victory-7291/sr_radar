@@ -14,6 +14,9 @@
 #include "geometry_msgs/msg/vector3.hpp"
 #include "vision_interface/msg/detect_result.hpp"
 #include "sensor_msgs/msg/compressed_image.hpp"
+#include <Eigen/Dense>
+#include "OCSort.hpp" // Assuming OCSort.hpp is in an include path or relative
+
 namespace tdt_radar {
 
 class Detect final : public rclcpp::Node {
@@ -27,6 +30,7 @@ class Detect final : public rclcpp::Node {
   std::shared_ptr<yolo::Infer> yolo;
   std::shared_ptr<yolo::Infer> armor_yolo;
   std::shared_ptr<classify::Infer> classifier;
+  std::shared_ptr<ocsort::OCSort> tracker; // Add OCSort tracker
   // densenet121::densenet121_classifier* densenet121;
   rclcpp::Publisher<vision_interface::msg::DetectResult>::SharedPtr pub;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub;
@@ -34,7 +38,7 @@ class Detect final : public rclcpp::Node {
 
   bool if_rosbag=false;
   int EnemyColor;//0为蓝色 2为红色
-  int debug;
+  bool debug = false; // Initialize debug flag
   std::string yolo_path;
   std::string armor_path;
   std::string classify_path;
