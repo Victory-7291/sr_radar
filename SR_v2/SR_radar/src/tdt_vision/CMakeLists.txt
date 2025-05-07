@@ -47,8 +47,22 @@ ament_auto_add_library(radar_utils SHARED
 
 set(RADAR_DETECT "radar_detect")
 file(GLOB_RECURSE RADAR_DETECT_SRCS "detect/src/*.cpp")
-ament_auto_add_library(${RADAR_DETECT} SHARED
+add_library(${RADAR_DETECT} SHARED
     ${RADAR_DETECT_SRCS}
+)
+target_include_directories(${RADAR_DETECT} PUBLIC
+  "detect/include"
+)
+
+# 添加ament依赖
+ament_target_dependencies(${RADAR_DETECT}
+  "rclcpp"
+  "rclcpp_components"
+  "std_msgs"
+  "sensor_msgs"
+  "cv_bridge"
+  "image_transport"
+  "tdt_interfaces"
 )
 
 find_package(CUDA)
@@ -61,7 +75,7 @@ include_directories(${nvinfer_INCLUDE_DIRS})
 add_subdirectory(yolo)
 include_directories(${PROJECT_SOURCE_DIR}/yolo)
 
-target_link_libraries(${RADAR_DETECT} PRIVATE
+target_link_libraries(${RADAR_DETECT}
     libocsort
     Eigen3::Eigen
     ${OpenCV_LIBS}
@@ -71,6 +85,12 @@ target_link_libraries(${RADAR_DETECT} PRIVATE
     nvonnxparser 
     fmt 
     ${PCL_LIBRARIES}
+)
+
+# 确保组件属性正确设置
+set_target_properties(${RADAR_DETECT} PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME}"
 )
 rclcpp_components_register_node(${RADAR_DETECT}
     PLUGIN "tdt_radar::Detect"
