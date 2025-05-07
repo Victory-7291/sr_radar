@@ -118,6 +118,9 @@ ament_target_dependencies(${RADAR_RESOLVE}
   "image_transport"
   "vision_interface"
   "geometry_msgs"
+  "PCL"
+  "pcl_msgs"
+  "pcl_conversions"
 )
 
 # 设置组件属性
@@ -149,6 +152,10 @@ ament_target_dependencies(${RADAR_CALIBRATE}
   "image_transport"
   "vision_interface"
   "geometry_msgs"
+  "tf2"
+  "tf2_msgs"
+  "tf2_geometry_msgs"
+  "visualization_msgs"
 )
 
 # 设置组件属性
