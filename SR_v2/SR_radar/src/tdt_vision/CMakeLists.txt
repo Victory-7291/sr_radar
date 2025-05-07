@@ -65,7 +65,7 @@ include_directories(${nvinfer_INCLUDE_DIRS})
 add_subdirectory(yolo)
 include_directories(${PROJECT_SOURCE_DIR}/yolo)
 
-target_link_libraries(${RADAR_DETECT}
+target_link_libraries(${RADAR_DETECT} PRIVATE
     yolo 
     ${nvinfer_LIBRARY} 
     cudart 
