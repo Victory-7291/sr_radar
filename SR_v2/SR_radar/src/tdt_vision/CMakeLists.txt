@@ -37,6 +37,11 @@ ament_auto_find_build_dependencies()
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+find_package(PCL REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 add_subdirectory(OCSort)
 
 file(GLOB_RECURSE RADAR_UTILS_SRCS "radar_utils/*.cpp")
@@ -118,10 +123,8 @@ ament_target_dependencies(${RADAR_RESOLVE}
   "image_transport"
   "vision_interface"
   "geometry_msgs"
-  "PCL"
-  "pcl_msgs"
-  "pcl_conversions"
 )
+target_link_libraries(${RADAR_RESOLVE} ${PCL_LIBRARIES})
 
 # 设置组件属性
 set_target_properties(${RADAR_RESOLVE} PROPERTIES
@@ -171,4 +174,14 @@ rclcpp_components_register_node(${RADAR_CALIBRATE}
 ament_auto_package(
     INSTALL_TO_SHARE
     launch
+)
+
+# 手动添加安装规则，确保库被正确安装
+install(TARGETS
+  ${RADAR_DETECT}
+  ${RADAR_RESOLVE}
+  ${RADAR_CALIBRATE}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
