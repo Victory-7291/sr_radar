@@ -21,7 +21,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
 
 # note：test with yolo inference
-add_executable(test mutilthread.cpp ../detector/inference.h ../detector/inference.cpp)
-target_link_libraries(test PUBLIC Eigen3::Eigen ${PROJECT_NAME} OpenCV::opencv_core OpenCV::opencv_highgui OpenCV::opencv_imgproc)
+add_executable(ocsort_test mutilthread.cpp ../detector/inference.h ../detector/inference.cpp)
+target_link_libraries(ocsort_test PUBLIC Eigen3::Eigen ${PROJECT_NAME} OpenCV::opencv_core OpenCV::opencv_highgui OpenCV::opencv_imgproc)
 
 
