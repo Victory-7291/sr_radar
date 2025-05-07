@@ -50,11 +50,7 @@ file(GLOB_RECURSE RADAR_DETECT_SRCS "detect/src/*.cpp")
 ament_auto_add_library(${RADAR_DETECT} SHARED
     ${RADAR_DETECT_SRCS}
 )
-target_link_libraries(${RADAR_DETECT} PRIVATE
-    libocsort
-    Eigen3::Eigen
-    ${OpenCV_LIBS}
-)
+
 find_package(CUDA)
 include(${PROJECT_SOURCE_DIR}/cmake/modules/libnvinferConfig.cmake)
 message("Using Cuda Version: ${CUDA_VERSION} and TensorRT Version: ${nvinfer_VERSION}")
@@ -66,13 +62,16 @@ add_subdirectory(yolo)
 include_directories(${PROJECT_SOURCE_DIR}/yolo)
 
 target_link_libraries(${RADAR_DETECT} PRIVATE
+    libocsort
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
     yolo 
     ${nvinfer_LIBRARY} 
     cudart 
     nvonnxparser 
     fmt 
     ${PCL_LIBRARIES}
-    )
+)
 rclcpp_components_register_node(${RADAR_DETECT}
     PLUGIN "tdt_radar::Detect"
     EXECUTABLE ${RADAR_DETECT}_node
