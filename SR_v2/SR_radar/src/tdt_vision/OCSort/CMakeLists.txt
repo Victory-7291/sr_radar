@@ -20,8 +20,9 @@ add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
 
+# 注释掉测试程序的构建
 # note：test with yolo inference
-add_executable(ocsort_test mutilthread.cpp ../detector/inference.h ../detector/inference.cpp)
-target_link_libraries(ocsort_test PUBLIC Eigen3::Eigen ${PROJECT_NAME} OpenCV::opencv_core OpenCV::opencv_highgui OpenCV::opencv_imgproc)
+# add_executable(ocsort_test mutilthread.cpp ../detector/inference.h ../detector/inference.cpp)
+# target_link_libraries(ocsort_test PUBLIC Eigen3::Eigen ${PROJECT_NAME} OpenCV::opencv_core OpenCV::opencv_highgui OpenCV::opencv_imgproc)
 
 
