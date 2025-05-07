@@ -100,8 +100,33 @@ rclcpp_components_register_node(${RADAR_DETECT}
 set(RADAR_RESOLVE "radar_resolve")
 file(GLOB_RECURSE RADAR_RESOLVE_SRCS "resolve/src/*.cpp")
 
-ament_auto_add_library(${RADAR_RESOLVE} SHARED
+add_library(${RADAR_RESOLVE} SHARED
     ${RADAR_RESOLVE_SRCS}
+)
+target_include_directories(${RADAR_RESOLVE} PUBLIC
+  "resolve/include"
+)
+
+# 添加ament依赖
+ament_target_dependencies(${RADAR_RESOLVE}
+  "rclcpp"
+  "rclcpp_components"
+  "std_msgs"
+  "sensor_msgs"
+  "cv_bridge"
+  "image_transport"
+  "vision_interface"
+  "geometry_msgs"
+  "tf2"
+  "tf2_msgs"
+  "tf2_geometry_msgs" 
+  "visualization_msgs"
+)
+
+# 设置组件属性
+set_target_properties(${RADAR_RESOLVE} PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME}"
 )
 rclcpp_components_register_node(${RADAR_RESOLVE}
     PLUGIN "tdt_radar::Resolve"
@@ -110,8 +135,33 @@ rclcpp_components_register_node(${RADAR_RESOLVE}
 
 set(RADAR_CALIBRATE "radar_calibrate")
 file(GLOB_RECURSE RADAR_CALIBRATE_SRCS "calibrate/src/*.cpp")
-ament_auto_add_library(${RADAR_CALIBRATE} SHARED
+add_library(${RADAR_CALIBRATE} SHARED
     ${RADAR_CALIBRATE_SRCS}
+)
+target_include_directories(${RADAR_CALIBRATE} PUBLIC
+  "calibrate/include"
+)
+
+# 添加ament依赖
+ament_target_dependencies(${RADAR_CALIBRATE}
+  "rclcpp"
+  "rclcpp_components"
+  "std_msgs"
+  "sensor_msgs"
+  "cv_bridge"
+  "image_transport"
+  "vision_interface"
+  "geometry_msgs"
+  "tf2"
+  "tf2_msgs"
+  "tf2_geometry_msgs" 
+  "visualization_msgs"
+)
+
+# 设置组件属性
+set_target_properties(${RADAR_CALIBRATE} PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME}"
 )
 rclcpp_components_register_node(${RADAR_CALIBRATE}
     PLUGIN "tdt_radar::Calibrate"
