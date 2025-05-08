@@ -19,6 +19,7 @@ include_directories(
   "calibrate/include"
   "radar_utils"
   "yolo"
+  "OCSort/include"
 )
 option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
 set(CMAKE_BUILD_TYPE Debug)
@@ -32,6 +33,7 @@ link_directories(/usr/local/cuda-12.4/lib64)
 #include_directories(/home/wan/TensorRT-10.0.0.6/include)
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(Eigen3 REQUIRED)
 ament_auto_find_build_dependencies()
 
 file(GLOB_RECURSE RADAR_UTILS_SRCS "radar_utils/*.cpp")
@@ -53,15 +55,18 @@ enable_language(CUDA)
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${nvinfer_INCLUDE_DIRS})
 add_subdirectory(yolo)
+add_subdirectory(OCSort)
 include_directories(${PROJECT_SOURCE_DIR}/yolo)
 
 target_link_libraries(${RADAR_DETECT}
     yolo 
+    libocsort
     ${nvinfer_LIBRARY} 
     cudart 
     nvonnxparser 
     fmt 
     ${PCL_LIBRARIES}
+    Eigen3::Eigen
     )
 rclcpp_components_register_node(${RADAR_DETECT}
     PLUGIN "tdt_radar::Detect"
