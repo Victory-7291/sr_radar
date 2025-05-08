@@ -34,16 +34,6 @@ link_directories(/usr/local/cuda-12.4/lib64)
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
-find_package(PCL REQUIRED)
-include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
-
-add_subdirectory(OCSort)
-
 file(GLOB_RECURSE RADAR_UTILS_SRCS "radar_utils/*.cpp")
 
 ament_auto_add_library(radar_utils SHARED
@@ -52,25 +42,9 @@ ament_auto_add_library(radar_utils SHARED
 
 set(RADAR_DETECT "radar_detect")
 file(GLOB_RECURSE RADAR_DETECT_SRCS "detect/src/*.cpp")
-add_library(${RADAR_DETECT} SHARED
+ament_auto_add_library(${RADAR_DETECT} SHARED
     ${RADAR_DETECT_SRCS}
 )
-target_include_directories(${RADAR_DETECT} PUBLIC
-  "detect/include"
-)
-
-# 添加ament依赖
-ament_target_dependencies(${RADAR_DETECT}
-  "rclcpp"
-  "rclcpp_components"
-  "std_msgs"
-  "sensor_msgs"
-  "cv_bridge"
-  "image_transport"
-  "vision_interface"
-  "geometry_msgs"
-)
-
 find_package(CUDA)
 include(${PROJECT_SOURCE_DIR}/cmake/modules/libnvinferConfig.cmake)
 message("Using Cuda Version: ${CUDA_VERSION} and TensorRT Version: ${nvinfer_VERSION}")
@@ -82,22 +56,13 @@ add_subdirectory(yolo)
 include_directories(${PROJECT_SOURCE_DIR}/yolo)
 
 target_link_libraries(${RADAR_DETECT}
-    libocsort
-    Eigen3::Eigen
-    ${OpenCV_LIBS}
     yolo 
     ${nvinfer_LIBRARY} 
     cudart 
     nvonnxparser 
     fmt 
     ${PCL_LIBRARIES}
-)
-
-# 确保组件属性正确设置
-set_target_properties(${RADAR_DETECT} PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME}"
-)
+    )
 rclcpp_components_register_node(${RADAR_DETECT}
     PLUGIN "tdt_radar::Detect"
     EXECUTABLE ${RADAR_DETECT}_node
@@ -106,30 +71,8 @@ rclcpp_components_register_node(${RADAR_DETECT}
 set(RADAR_RESOLVE "radar_resolve")
 file(GLOB_RECURSE RADAR_RESOLVE_SRCS "resolve/src/*.cpp")
 
-add_library(${RADAR_RESOLVE} SHARED
+ament_auto_add_library(${RADAR_RESOLVE} SHARED
     ${RADAR_RESOLVE_SRCS}
-)
-target_include_directories(${RADAR_RESOLVE} PUBLIC
-  "resolve/include"
-)
-
-# 添加ament依赖
-ament_target_dependencies(${RADAR_RESOLVE}
-  "rclcpp"
-  "rclcpp_components"
-  "std_msgs"
-  "sensor_msgs"
-  "cv_bridge"
-  "image_transport"
-  "vision_interface"
-  "geometry_msgs"
-)
-target_link_libraries(${RADAR_RESOLVE} ${PCL_LIBRARIES})
-
-# 设置组件属性
-set_target_properties(${RADAR_RESOLVE} PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME}"
 )
 rclcpp_components_register_node(${RADAR_RESOLVE}
     PLUGIN "tdt_radar::Resolve"
@@ -138,33 +81,8 @@ rclcpp_components_register_node(${RADAR_RESOLVE}
 
 set(RADAR_CALIBRATE "radar_calibrate")
 file(GLOB_RECURSE RADAR_CALIBRATE_SRCS "calibrate/src/*.cpp")
-add_library(${RADAR_CALIBRATE} SHARED
+ament_auto_add_library(${RADAR_CALIBRATE} SHARED
     ${RADAR_CALIBRATE_SRCS}
-)
-target_include_directories(${RADAR_CALIBRATE} PUBLIC
-  "calibrate/include"
-)
-
-# 添加ament依赖
-ament_target_dependencies(${RADAR_CALIBRATE}
-  "rclcpp"
-  "rclcpp_components"
-  "std_msgs"
-  "sensor_msgs"
-  "cv_bridge"
-  "image_transport"
-  "vision_interface"
-  "geometry_msgs"
-  "tf2"
-  "tf2_msgs"
-  "tf2_geometry_msgs"
-  "visualization_msgs"
-)
-
-# 设置组件属性
-set_target_properties(${RADAR_CALIBRATE} PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME}"
 )
 rclcpp_components_register_node(${RADAR_CALIBRATE}
     PLUGIN "tdt_radar::Calibrate"
@@ -174,14 +92,4 @@ rclcpp_components_register_node(${RADAR_CALIBRATE}
 ament_auto_package(
     INSTALL_TO_SHARE
     launch
-)
-
-# 手动添加安装规则，确保库被正确安装
-install(TARGETS
-  ${RADAR_DETECT}
-  ${RADAR_RESOLVE}
-  ${RADAR_CALIBRATE}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
