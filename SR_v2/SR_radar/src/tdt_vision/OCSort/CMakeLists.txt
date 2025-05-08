@@ -25,4 +25,19 @@ target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
 # add_executable(ocsort_test mutilthread.cpp ../detector/inference.h ../detector/inference.cpp)
 # target_link_libraries(ocsort_test PUBLIC Eigen3::Eigen ${PROJECT_NAME} OpenCV::opencv_core OpenCV::opencv_highgui OpenCV::opencv_imgproc)
 
+# 添加安装指令，确保库文件被正确安装
+install(
+    TARGETS ${PROJECT_NAME}
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+# 安装头文件
+install(
+    DIRECTORY include/
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.hpp"
+)
+
 
