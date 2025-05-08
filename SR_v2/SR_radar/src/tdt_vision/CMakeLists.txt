@@ -19,7 +19,7 @@ include_directories(
   "calibrate/include"
   "radar_utils"
   "yolo"
-  "${CMAKE_SOURCE_DIR}/src/3rdparty/OCSort/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/OCSort/include"
 )
 option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
 set(CMAKE_BUILD_TYPE Debug)
@@ -55,7 +55,7 @@ enable_language(CUDA)
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${nvinfer_INCLUDE_DIRS})
 add_subdirectory(yolo)
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/3rdparty/OCSort ${CMAKE_BINARY_DIR}/OCSort)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/OCSort ${CMAKE_BINARY_DIR}/OCSort)
 include_directories(${PROJECT_SOURCE_DIR}/yolo)
 
 target_link_libraries(${RADAR_DETECT}
