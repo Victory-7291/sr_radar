@@ -140,7 +140,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     // For a new instance in the class, ensure OCSort.hpp is included and Eigen is linked.
     // Assuming 'tracker' is a std::shared_ptr<ocsort::OCSort> as defined in detect.h
     try {
-        tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.22136877277096445, 1, "iou", 0.5941737016672115, true);
+        tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.18136877277096445, 1, "giou", 0.5941737016672115, true);
         RCLCPP_INFO(this->get_logger(), "OC-SORT tracker initialized successfully.");
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize OC-SORT tracker: %s", e.what());
@@ -345,10 +345,10 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     for(auto &armor:car.armors){
       if(armor.class_label!=0&&armor.confidence>max_confidence){
         max_rect=cv::Rect(
-          armor.left+car.car.left,
-          armor.top+car.car.top,
-          armor.right-armor.left,
-          armor.bottom-armor.top);
+          car.car.left,
+          car.car.top,
+          car.car.right-car.car.left,
+          car.car.bottom-car.car.top);
         max_confidence=armor.confidence;
         car.number=armor.class_label;
       }
