@@ -345,10 +345,10 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     for(auto &armor:car.armors){
       if(armor.class_label!=0&&armor.confidence>max_confidence){
         max_rect=cv::Rect(
-          car.car.left,
-          car.car.top,
-          car.car.right-car.car.left,
-          car.car.bottom-car.car.top);
+          armor.left+car.car.left,
+          armor.top+car.car.top,
+          armor.right-armor.left,
+          armor.bottom-armor.top);
         max_confidence=armor.confidence;
         car.number=armor.class_label;
       }
