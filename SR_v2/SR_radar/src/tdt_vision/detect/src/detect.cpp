@@ -140,7 +140,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     // For a new instance in the class, ensure OCSort.hpp is included and Eigen is linked.
     // Assuming 'tracker' is a std::shared_ptr<ocsort::OCSort> as defined in detect.h
     try {
-        tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.22136877277096445, 1, "giou", 0.3941737016672115, true);
+        tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.12136877277096445, 1, "giou", 0.5941737016672115, true);
         RCLCPP_INFO(this->get_logger(), "OC-SORT tracker initialized successfully.");
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize OC-SORT tracker: %s", e.what());
@@ -215,7 +215,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
                                       cv::Scalar(0, 255, 255), 2); // Yellow: BGR(0, 255, 255)
                         cv::putText(img, "ID:" + std::to_string(id), 
                                     cv::Point(static_cast<int>(x1), static_cast<int>(y1) - 5), 
-                                    cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 255), 2);
+                                    cv::FONT_HERSHEY_SIMPLEX, 1.25, cv::Scalar(0, 255, 255), 2);
                     }
                 }
             }
@@ -355,7 +355,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     }
     if(max_confidence==0){
         if(debug)
-          cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
+          //cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
           cv::putText(img,"No Armor",cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,255),3);
         continue;
         }
@@ -393,7 +393,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     if(car.color==1){
       if(debug)
       cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
-      cv::putText(img,"No Color",cv::Point(car.car.right,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
+      cv::putText(img,"No Color",cv::Point(car.car.right,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,255),2);
     }
   }
   detect_result.header.stamp=msg->header.stamp;
