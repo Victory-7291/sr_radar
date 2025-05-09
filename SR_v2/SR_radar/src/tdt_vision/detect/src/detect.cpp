@@ -140,7 +140,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     // For a new instance in the class, ensure OCSort.hpp is included and Eigen is linked.
     // Assuming 'tracker' is a std::shared_ptr<ocsort::OCSort> as defined in detect.h
     try {
-        tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.12136877277096445, 1, "giou", 0.5941737016672115, true);
+        tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.22136877277096445, 1, "iou", 0.5941737016672115, true);
         RCLCPP_INFO(this->get_logger(), "OC-SORT tracker initialized successfully.");
     } catch (const std::exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize OC-SORT tracker: %s", e.what());
