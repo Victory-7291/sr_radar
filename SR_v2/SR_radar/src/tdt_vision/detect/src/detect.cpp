@@ -215,7 +215,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
                                       cv::Scalar(0, 255, 255), 2); // Yellow: BGR(0, 255, 255)
                         cv::putText(img, "ID:" + std::to_string(id), 
                                     cv::Point(static_cast<int>(x1), static_cast<int>(y1) - 5), 
-                                    cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 2);
+                                    cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 255), 2);
                     }
                 }
             }
@@ -375,7 +375,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
         }
         if(debug){
         cv::rectangle(img,car.car_rect,cv::Scalar(255,0,0),2);
-        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,255),3);
+        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
         }
     }
     if(car.color==2){
@@ -387,13 +387,13 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
         }
         if(debug){
         cv::rectangle(img,car.car_rect,cv::Scalar(0,0,255),2);
-        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,255),3);
+        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
         }
     }
     if(car.color==1){
       if(debug)
       cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
-      cv::putText(img,"No Color",cv::Point(car.car.right,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,255),3);
+      cv::putText(img,"No Color",cv::Point(car.car.right,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
     }
   }
   detect_result.header.stamp=msg->header.stamp;
