@@ -364,7 +364,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     // cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
 
     car.color=getColor(max_mat);
-    car.center=cv::Point2f(max_rect.x+max_rect.width/2,max_rect.y+max_rect.height/2);
+    car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
     // car.center_rect=cv::Rect(car.center.x-10,car.center.y-10,20,20);
     if(car.color==0){
         detect_result.blue_x[car.number-1]=car.center.x;
@@ -375,6 +375,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
         }
         if(debug){
         cv::rectangle(img,car.car_rect,cv::Scalar(255,0,0),2);
+        cv::circle(img,car.center,5,cv::Scalar(255,0,0),-1);
         cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
         }
     }
@@ -387,6 +388,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
         }
         if(debug){
         cv::rectangle(img,car.car_rect,cv::Scalar(0,0,255),2);
+        cv::circle(img,car.center,5,cv::Scalar(0,0,255),-1);
         cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
         }
     }
