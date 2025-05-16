@@ -23,16 +23,16 @@ def generate_launch_description():
     camera_info_url = 'package://hik_camera/config/camera_info.yaml'
 
     # 定义JudgeBridgeNode节点
-    #judge_bridge_node = Node(
-    #    package='judge_bridge',
-    #    executable='judge_bridge',
-    #    name='judge_bridge_node',
-    #    output='screen',
-    #    parameters=[{
-    #        'serial_port': '/dev/ttyUSB0',
-    #        'enable_recorder': False
-    #    }]
-    #)
+    judge_bridge_node = Node(
+        package='judge_bridge',
+        executable='judge_bridge',
+        name='judge_bridge_node',
+        output='screen',
+        parameters=[{
+            'serial_port': '/dev/ttyUSB0',
+            'enable_recorder': False
+        }]
+    )
 
     # 定义节点
     def get_rosbag_player_node(package, plugin):
@@ -80,17 +80,17 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
-    #def get_hik_camera_node(package, plugin):
-    #    return ComposableNode(
-    #        package=package,
-    #        plugin=plugin,
-    #        name='hik_camera',
-    #        parameters=[LaunchConfiguration('params_file'), {
-    #            'camera_info_url': LaunchConfiguration('camera_info_url'),
-    #            'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
-    #        }],
-    #        extra_arguments=[{'use_intra_process_comms': True}]
-    #    )
+    def get_hik_camera_node(package, plugin):
+        return ComposableNode(
+            package=package,
+            plugin=plugin,
+            name='hik_camera',
+            parameters=[LaunchConfiguration('params_file'), {
+                'camera_info_url': LaunchConfiguration('camera_info_url'),
+                'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
+            }],
+            extra_arguments=[{'use_intra_process_comms': True}]
+        )
 
     def get_camera_detector_container(nodes):
         return ComposableNodeContainer(
@@ -105,7 +105,7 @@ def generate_launch_description():
         )
 
     # 创建节点描述
-    #hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
+    hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
     radar_detect_node = get_radar_detect_node('tdt_vision', 'tdt_radar::Detect')
     radar_resolve_node = get_radar_resolve_node('tdt_vision', 'tdt_radar::Resolve')
     foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
@@ -113,16 +113,16 @@ def generate_launch_description():
     kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
 
     # 定义 dv_trigger 节点
-    #dv_trigger_node = Node(
-    #    package='dv_trigger',
-    #    executable='dv_trigger_node', # 假设可执行文件名为 dv_trigger_node
-    #    name='dv_trigger_node',
-    #    output='screen'
-    #)
+    dv_trigger_node = Node(
+        package='dv_trigger',
+        executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
+        name='dv_trigger_node',
+        output='screen'
+    )
 
     # 创建节点容器，确保 hik_camera_node 是第一个
     nodes = [
-        #hik_camera_node,
+        hik_camera_node,
         radar_detect_node,
         radar_resolve_node,
         foxglove_node,
@@ -139,8 +139,8 @@ def generate_launch_description():
 
     return LaunchDescription([
         # 首先启动JudgeBridgeNode节点
-        #judge_bridge_node,
-        #dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
+        judge_bridge_node,
+        dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
         DeclareLaunchArgument(name='params_file',
                               default_value=params_file),
         DeclareLaunchArgument(name='camera_info_url',

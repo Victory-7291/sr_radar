@@ -48,18 +48,18 @@ cv::Rect getSafeRect(cv::Mat &image, cv::Rect &rect) {
     return save_rect;
 }
 
-Eigen::Matrix<float, Eigen::Dynamic, 6> Vector2Matrix_ocsort(const std::vector<std::vector<float>>& data) {
-    if (data.empty() || data[0].empty()) {
-        return Eigen::Matrix<float, Eigen::Dynamic, 6>(0, 6);
-    }
-    Eigen::Matrix<float, Eigen::Dynamic, 6> matrix(data.size(), data[0].size());
-    for (size_t i = 0; i < data.size(); ++i) {
-        for (size_t j = 0; j < data[0].size(); ++j) {
-            matrix(i, j) = data[i][j];
-        }
-    }
-    return matrix;
-}
+//Eigen::Matrix<float, Eigen::Dynamic, 6> Vector2Matrix_ocsort(const std::vector<std::vector<float>>& data) {
+//    if (data.empty() || data[0].empty()) {
+//        return Eigen::Matrix<float, Eigen::Dynamic, 6>(0, 6);
+//    }
+//    Eigen::Matrix<float, Eigen::Dynamic, 6> matrix(data.size(), data[0].size());
+//    for (size_t i = 0; i < data.size(); ++i) {
+//        for (size_t j = 0; j < data[0].size(); ++j) {
+//            matrix(i, j) = data[i][j];
+//        }
+//    }
+//    return matrix;
+//}
 
 Detect::Detect(const rclcpp::NodeOptions& node_options)
     : Node("radar_detect_node", node_options) {
@@ -139,13 +139,13 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     // Parameters from mutilthread.cpp: ocsort::OCSort tracker = ocsort::OCSort(0, 50, 1, 0.22136877277096445, 1, "giou", 0.3941737016672115, true);
     // For a new instance in the class, ensure OCSort.hpp is included and Eigen is linked.
     // Assuming 'tracker' is a std::shared_ptr<ocsort::OCSort> as defined in detect.h
-    try {
-        tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.18136877277096445, 1, "giou", 0.5941737016672115, true);
-        RCLCPP_INFO(this->get_logger(), "OC-SORT tracker initialized successfully.");
-    } catch (const std::exception& e) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to initialize OC-SORT tracker: %s", e.what());
-        // Handle initialization failure, e.g., by shutting down or disabling tracking
-    }
+    //try {
+    //    tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.18136877277096445, 1, "giou", 0.5941737016672115, true);
+    //    RCLCPP_INFO(this->get_logger(), "OC-SORT tracker initialized successfully.");
+    //} catch (const std::exception& e) {
+    //    RCLCPP_ERROR(this->get_logger(), "Failed to initialize OC-SORT tracker: %s", e.what());
+    //    // Handle initialization failure, e.g., by shutting down or disabling tracking
+    //}
 
     // if(if_rosbag)  
     // compressed_image_sub = this->create_subscription<sensor_msgs::msg::CompressedImage>(
@@ -183,47 +183,47 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   auto result = yolo->forward(image_yolo);
 
   // OC-SORT tracking integration
-  if (tracker && !result.empty()) {
-      std::vector<std::vector<float>> detections_for_ocsort;
-      for (const auto& box : result) {
-          // Assuming yolo::Box provides left, top, right, bottom, confidence, class_label
-          // And OC-SORT expects [x1, y1, x2, y2, score, class_id]
-          std::vector<float> det;
-          det.push_back(box.left);
-          det.push_back(box.top);
-          det.push_back(box.right);
-          det.push_back(box.bottom);
-          det.push_back(box.confidence);
-          det.push_back(static_cast<float>(box.class_label)); // Ensure class_label is float
-          detections_for_ocsort.push_back(det);
-      }
-
-      if (!detections_for_ocsort.empty()) {
-          try {
-            std::vector<Eigen::RowVectorXf> tracks = tracker->update(Vector2Matrix_ocsort(detections_for_ocsort));
-            if (this->debug) { // Check the debug flag
-                for (const auto& track_data : tracks) {
-                    if (track_data.size() >= 5) { // Ensure track_data has enough elements
-                        float x1 = track_data[0];
-                        float y1 = track_data[1];
-                        float x2 = track_data[2];
-                        float y2 = track_data[3];
-                        int id = static_cast<int>(track_data[4]);
-                        // Draw yellow box for OC-SORT tracks
-                        cv::rectangle(img, cv::Point(static_cast<int>(x1), static_cast<int>(y1)), 
-                                      cv::Point(static_cast<int>(x2), static_cast<int>(y2)), 
-                                      cv::Scalar(0, 255, 255), 2); // Yellow: BGR(0, 255, 255)
-                        cv::putText(img, "ID:" + std::to_string(id), 
-                                    cv::Point(static_cast<int>(x1), static_cast<int>(y1) - 5), 
-                                    cv::FONT_HERSHEY_SIMPLEX, 1.25, cv::Scalar(0, 255, 255), 2);
-                    }
-                }
-            }
-          } catch (const std::exception& e) {
-              RCLCPP_ERROR(this->get_logger(), "Error during OC-SORT update: %s", e.what());
-          }
-      }
-  }
+  //if (tracker && !result.empty()) {
+  //    std::vector<std::vector<float>> detections_for_ocsort;
+  //    for (const auto& box : result) {
+  //        // Assuming yolo::Box provides left, top, right, bottom, confidence, class_label
+  //        // And OC-SORT expects [x1, y1, x2, y2, score, class_id]
+  //        std::vector<float> det;
+  //        det.push_back(box.left);
+  //        det.push_back(box.top);
+  //        det.push_back(box.right);
+  //        det.push_back(box.bottom);
+  //        det.push_back(box.confidence);
+  //        det.push_back(static_cast<float>(box.class_label)); // Ensure class_label is float
+  //        detections_for_ocsort.push_back(det);
+  //    }
+//
+  //    if (!detections_for_ocsort.empty()) {
+  //        try {
+  //          std::vector<Eigen::RowVectorXf> tracks = tracker->update(Vector2Matrix_ocsort(detections_for_ocsort));
+  //          if (this->debug) { // Check the debug flag
+  //              for (const auto& track_data : tracks) {
+  //                  if (track_data.size() >= 5) { // Ensure track_data has enough elements
+  //                      float x1 = track_data[0];
+  //                      float y1 = track_data[1];
+  //                      float x2 = track_data[2];
+  //                      float y2 = track_data[3];
+  //                      int id = static_cast<int>(track_data[4]);
+  //                      // Draw yellow box for OC-SORT tracks
+  //                      cv::rectangle(img, cv::Point(static_cast<int>(x1), static_cast<int>(y1)), 
+  //                                    cv::Point(static_cast<int>(x2), static_cast<int>(y2)), 
+  //                                    cv::Scalar(0, 255, 255), 2); // Yellow: BGR(0, 255, 255)
+  //                      cv::putText(img, "ID:" + std::to_string(id), 
+  //                                  cv::Point(static_cast<int>(x1), static_cast<int>(y1) - 5), 
+  //                                  cv::FONT_HERSHEY_SIMPLEX, 1.25, cv::Scalar(0, 255, 255), 2);
+  //                  }
+  //              }
+  //          }
+  //        } catch (const std::exception& e) {
+  //            RCLCPP_ERROR(this->get_logger(), "Error during OC-SORT update: %s", e.what());
+  //        }
+  //    }
+  //}
   // End of OC-SORT integration
 
   if(result.size()==0){
