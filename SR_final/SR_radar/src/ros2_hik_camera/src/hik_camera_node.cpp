@@ -94,9 +94,9 @@ public:
           cv::cvtColor(img, img, cv::COLOR_RGB2BGR);  // 转换为 BGR8
           
           cv::Mat final_img;
-  	  cv::resize(img,final_img,cv::Size(1080, 720));
-  	  cv::imshow("hik_node", final_img);
-  	  cv::waitKey(1);
+  	      cv::resize(img,final_img,cv::Size(1080, 720));
+  	      cv::imshow("hik_node", final_img);
+  	      cv::waitKey(1);
 
           // 更新图像消息
           image_msg_.height = out_frame.stFrameInfo.nHeight;

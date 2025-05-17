@@ -235,11 +235,11 @@ void JudgeBridgeNode::send_sentry_data(const radar_interface::msg::MatchResult& 
 void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResult& msg)
 {
     map_robot_data_t map_robot_data;
-    // constexpr uint16_t default_red_x = 210, default_red_y = 110; // Removed unused variables
+    constexpr uint16_t default_red_x = 210, default_red_y = 110; // Removed unused variables
     constexpr uint16_t default_blue_x = 2800 - 210, default_blue_y = 1500 - 110;
     RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
-    //switch (color) {
-    //case team_color::C_RED:
+    switch (color) {
+    case team_color::C_RED:
         map_robot_data.sentry_position_x = msg.blue[0].id != -1 ? msg.blue[0].position[0] * 100 : default_blue_x;
         map_robot_data.sentry_position_y = msg.blue[0].id != -1 ? msg.blue[0].position[1] * 100 : default_blue_y;
         map_robot_data.hero_position_x = msg.blue[1].id != -1 ? msg.blue[1].position[0] * 100 : default_blue_x;
@@ -252,41 +252,27 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
         map_robot_data.infantry_4_position_y = msg.blue[4].id != -1 ? msg.blue[4].position[1] * 100 : default_blue_y;
         map_robot_data.infantry_5_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
         map_robot_data.infantry_5_position_y = msg.blue[5].id != -1 ? msg.blue[5].position[1] * 100 : default_blue_y;
-    //    break;
-    //case team_color::C_BLUE:
-    //    map_robot_data.sentry_position_x = msg.red[0].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
-    //    map_robot_data.sentry_position_y = msg.red[0].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
-    //    map_robot_data.hero_position_x = msg.red[1].id != -1 ? msg.red[1].position[0] * 100 : default_red_x;
-    //    map_robot_data.hero_position_y = msg.red[1].id != -1 ? msg.red[1].position[1] * 100 : default_red_y;
-    //    map_robot_data.engineer_position_x = msg.red[2].id != -1 ? msg.red[2].position[0] * 100 : default_red_x;
-    //    map_robot_data.engineer_position_y = msg.red[2].id != -1 ? msg.red[2].position[1] * 100 : default_red_y;
-    //    map_robot_data.infantry_3_position_x = msg.red[3].id != -1 ? msg.red[3].position[0] * 100 : default_red_x;
-    //    map_robot_data.infantry_3_position_y = msg.red[3].id != -1 ? msg.red[3].position[1] * 100 : default_red_y;
-    //    map_robot_data.infantry_4_position_x = msg.red[4].id != -1 ? msg.red[4].position[0] * 100 : default_red_x;
-    //    map_robot_data.infantry_4_position_y = msg.red[4].id != -1 ? msg.red[4].position[1] * 100 : default_red_y;
-    //    map_robot_data.infantry_5_position_x = msg.red[5].id != -1 ? msg.red[5].position[0] * 100 : default_red_x;
-    //    map_robot_data.infantry_5_position_y = msg.red[5].id != -1 ? msg.red[5].position[1] * 100 : default_red_y;
-    //    break;
-    //default:
-    //    return;
-    //}
+        break;
+    case team_color::C_BLUE:
+        map_robot_data.sentry_position_x = msg.red[0].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
+        map_robot_data.sentry_position_y = msg.red[0].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
+        map_robot_data.hero_position_x = msg.red[1].id != -1 ? msg.red[1].position[0] * 100 : default_red_x;
+        map_robot_data.hero_position_y = msg.red[1].id != -1 ? msg.red[1].position[1] * 100 : default_red_y;
+        map_robot_data.engineer_position_x = msg.red[2].id != -1 ? msg.red[2].position[0] * 100 : default_red_x;
+        map_robot_data.engineer_position_y = msg.red[2].id != -1 ? msg.red[2].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_3_position_x = msg.red[3].id != -1 ? msg.red[3].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_3_position_y = msg.red[3].id != -1 ? msg.red[3].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_4_position_x = msg.red[4].id != -1 ? msg.red[4].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_4_position_y = msg.red[4].id != -1 ? msg.red[4].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_5_position_x = msg.red[5].id != -1 ? msg.red[5].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_5_position_y = msg.red[5].id != -1 ? msg.red[5].position[1] * 100 : default_red_y;
+        break;
+    default:
+        return;
+    }
     judge_serial->write(CMD_ID::ROBOT_MAP, reinterpret_cast<uint8_t*>(&map_robot_data), sizeof(map_robot_data));
-    //for (unsigned i = 0; i < 12; ++i) {
-    //    std::cout << "map_robot_data.sentry_position_x" << map_robot_data.sentry_position_x << std::endl;
-    //    std::cout << "map_robot_data.sentry_position_y" << map_robot_data.sentry_position_y << std::endl;
-    //    std::cout << "map_robot_data.hero_position_x" << map_robot_data.hero_position_x << std::endl;
-    //    std::cout << "map_robot_data.hero_position_y" << map_robot_data.hero_position_y << std::endl;
-    //    std::cout << "map_robot_data.engineer_position_x" << map_robot_data.engineer_position_x << std::endl;
-    //    std::cout << "map_robot_data.engineer_position_y" << map_robot_data.engineer_position_y << std::endl;
-    //    std::cout << "map_robot_data.infantry_3_position_x" << map_robot_data.infantry_3_position_x << std::endl;
-    //    std::cout << "map_robot_data.infantry_3_position_y" << map_robot_data.infantry_3_position_y << std::endl;
-    //    std::cout << "map_robot_data.infantry_4_position_x" << map_robot_data.infantry_4_position_x << std::endl;
-    //    std::cout << "map_robot_data.infantry_4_position_y" << map_robot_data.infantry_4_position_y << std::endl;
-    //    std::cout << "map_robot_data.infantry_5_position_x" << map_robot_data.infantry_5_position_x << std::endl;
-    //    std::cout << "map_robot_data.infantry_5_position_y" << map_robot_data.infantry_5_position_y << std::endl;
-    //    
-    //}
-    //RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
+    
+    RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
 }
 
 void JudgeBridgeNode::init_serial()

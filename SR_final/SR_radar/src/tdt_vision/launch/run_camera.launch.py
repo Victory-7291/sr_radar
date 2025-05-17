@@ -16,14 +16,23 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
-    # 定义参数文件路径
-    hik_camera_params_file = os.path.join(
+ 
+    params_file = os.path.join(
         get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
-    hik_camera_info_url = 'package://hik_camera/config/camera_info.yaml'
 
-    # 定义 rosbag 参数文件路径
-    rosbag_params_file = os.path.join(
-        get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
+    camera_info_url = 'package://hik_camera/config/camera_info.yaml'
+
+    # 定义JudgeBridgeNode节点
+    judge_bridge_node = Node(
+        package='judge_bridge',
+        executable='judge_bridge',
+        name='judge_bridge_node',
+        output='screen',
+        parameters=[{
+            'serial_port': '/dev/ttyUSB0',
+            'enable_recorder': False
+        }]
+    )
 
     # 定义节点
     def get_rosbag_player_node(package, plugin):
@@ -31,7 +40,7 @@ def generate_launch_description():
             package=package,
             plugin=plugin,
             name='rosbag_player_node',
-            parameters=[rosbag_params_file, {
+            parameters=[{
                 'rosbag_file': '/home/wan/rosbag_test/merged_bag_0.db3'
             }],
             extra_arguments=[{'use_intra_process_comms': True}]
@@ -62,15 +71,23 @@ def generate_launch_description():
             name='radar_resolve_node',
             extra_arguments=[{'use_intra_process_comms': True}]
         )
+    
+    def get_kalman_filter_node(package, plugin):
+        return ComposableNode(
+            package=package,
+            plugin=plugin,
+            name='kalman_filter_node',
+            extra_arguments=[{'use_intra_process_comms': True}]
+        )
 
     def get_hik_camera_node(package, plugin):
         return ComposableNode(
             package=package,
             plugin=plugin,
-            name='hik_camera_node',
-            parameters=[hik_camera_params_file, {
-                'camera_info_url': hik_camera_info_url,
-                'use_sensor_data_qos': False
+            name='hik_camera',
+            parameters=[LaunchConfiguration('params_file'), {
+                'camera_info_url': LaunchConfiguration('camera_info_url'),
+                'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
             }],
             extra_arguments=[{'use_intra_process_comms': True}]
         )
@@ -93,6 +110,15 @@ def generate_launch_description():
     radar_resolve_node = get_radar_resolve_node('tdt_vision', 'tdt_radar::Resolve')
     foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
     rosbag_player_node = get_rosbag_player_node('rosbag_player', 'RosbagPlayer')
+    kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
+
+    # 定义 dv_trigger 节点
+    dv_trigger_node = Node(
+        package='dv_trigger',
+        executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
+        name='dv_trigger_node',
+        output='screen'
+    )
 
     # 创建节点容器，确保 hik_camera_node 是第一个
     nodes = [
@@ -100,7 +126,8 @@ def generate_launch_description():
         radar_detect_node,
         radar_resolve_node,
         foxglove_node,
-        rosbag_player_node
+        rosbag_player_node,
+        kalman_filter_node
     ]
     cam_detector = get_camera_detector_container(nodes)
 
@@ -111,6 +138,15 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        # 首先启动JudgeBridgeNode节点
+        judge_bridge_node,
+        dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
+        DeclareLaunchArgument(name='params_file',
+                              default_value=params_file),
+        DeclareLaunchArgument(name='camera_info_url',
+                              default_value=camera_info_url),
+        DeclareLaunchArgument(name='use_sensor_data_qos',
+                              default_value='false'),
         cam_detector,
-        plugin_map_launch_cmd
+        plugin_map_launch_cmd,
     ])

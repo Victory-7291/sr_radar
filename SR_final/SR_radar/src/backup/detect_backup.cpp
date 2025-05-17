@@ -48,6 +48,19 @@ cv::Rect getSafeRect(cv::Mat &image, cv::Rect &rect) {
     return save_rect;
 }
 
+//Eigen::Matrix<float, Eigen::Dynamic, 6> Vector2Matrix_ocsort(const std::vector<std::vector<float>>& data) {
+//    if (data.empty() || data[0].empty()) {
+//        return Eigen::Matrix<float, Eigen::Dynamic, 6>(0, 6);
+//    }
+//    Eigen::Matrix<float, Eigen::Dynamic, 6> matrix(data.size(), data[0].size());
+//    for (size_t i = 0; i < data.size(); ++i) {
+//        for (size_t j = 0; j < data[0].size(); ++j) {
+//            matrix(i, j) = data[i][j];
+//        }
+//    }
+//    return matrix;
+//}
+
 Detect::Detect(const rclcpp::NodeOptions& node_options)
     : Node("radar_detect_node", node_options) {
     //cv::namedWindow("detect", cv::WINDOW_NORMAL);
@@ -122,12 +135,24 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     // this->yolo = yolo::load(yolo_path, yolo::Type::V5);
     this->yolo = yolo::load(yolo_path, yolo::Type::V5,0.65f,0.45f);
     TDT_INFO("Load yolo engine success!");
+    // Initialize OC-SORT tracker
+    // Parameters from mutilthread.cpp: ocsort::OCSort tracker = ocsort::OCSort(0, 50, 1, 0.22136877277096445, 1, "giou", 0.3941737016672115, true);
+    // For a new instance in the class, ensure OCSort.hpp is included and Eigen is linked.
+    // Assuming 'tracker' is a std::shared_ptr<ocsort::OCSort> as defined in detect.h
+    //try {
+    //    tracker = std::make_shared<ocsort::OCSort>(0, 50, 1, 0.18136877277096445, 1, "giou", 0.5941737016672115, true);
+    //    RCLCPP_INFO(this->get_logger(), "OC-SORT tracker initialized successfully.");
+    //} catch (const std::exception& e) {
+    //    RCLCPP_ERROR(this->get_logger(), "Failed to initialize OC-SORT tracker: %s", e.what());
+    //    // Handle initialization failure, e.g., by shutting down or disabling tracking
+    //}
+
     // if(if_rosbag)  
     // compressed_image_sub = this->create_subscription<sensor_msgs::msg::CompressedImage>(
     //   "compressed_image", rclcpp::SensorDataQoS(),
     //   std::bind(&Detect::compressed_callback, this, std::placeholders::_1));
   image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-      "camera_image", rclcpp::SensorDataQoS(),
+      "rosbag_image", rclcpp::SensorDataQoS(),
       std::bind(&Detect::callback, this, std::placeholders::_1));
   image_pub = this->create_publisher<sensor_msgs::msg::Image>("detect_image", rclcpp::SensorDataQoS());
   pub = this->create_publisher<vision_interface::msg::DetectResult>("detect_result", rclcpp::SensorDataQoS());
@@ -137,16 +162,70 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
 void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   std::cout<<"time: "<<msg->header.stamp.sec<<"."<<msg->header.stamp.nanosec<<std::endl;
   //std::cout<<", Image width: "<<msg->width<<", height: "<<msg->height<<", step: "<<msg->step<<"data size: "<<msg->data.size()<<std::endl;
-  auto img = cv_bridge::toCvShare(msg, "bgr8")->image;
-  //cv::Mat final_img;
+  auto img = cv_bridge::toCvShare(msg, "bgr8")->image.clone(); // Clone to ensure writability for drawing
+  //cv::Mat final_img; // User mentioned final_img, but seems img is used for processing and publishing
   //cv::resize(img,final_img,cv::Size(1536, 1125));
   //cv::imshow("imshow", final_img);
-  //cv::waitKey(1);
+  //cv::waitKey(1); // Key press for debug toggle would need a waitKey loop
+
+  // For debug toggle, assuming 'debug' member is controlled elsewhere or via a ROS parameter/service
+  // Example: Check for a key press if a window is shown for debugging
+  // int key = cv::waitKey(1);
+  // if (key == 'r') { 
+  //   this->debug = !this->debug;
+  //   RCLCPP_INFO(this->get_logger(), "Debug mode: %s", this->debug ? "ON" : "OFF");
+  // }
+
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-  yolo::Image image(img.data, img.cols, img.rows);
+  yolo::Image image_yolo(img.data, img.cols, img.rows);
 
-  auto result = yolo->forward(image);
+  auto result = yolo->forward(image_yolo);
+
+  // OC-SORT tracking integration
+  //if (tracker && !result.empty()) {
+  //    std::vector<std::vector<float>> detections_for_ocsort;
+  //    for (const auto& box : result) {
+  //        // Assuming yolo::Box provides left, top, right, bottom, confidence, class_label
+  //        // And OC-SORT expects [x1, y1, x2, y2, score, class_id]
+  //        std::vector<float> det;
+  //        det.push_back(box.left);
+  //        det.push_back(box.top);
+  //        det.push_back(box.right);
+  //        det.push_back(box.bottom);
+  //        det.push_back(box.confidence);
+  //        det.push_back(static_cast<float>(box.class_label)); // Ensure class_label is float
+  //        detections_for_ocsort.push_back(det);
+  //    }
+//
+  //    if (!detections_for_ocsort.empty()) {
+  //        try {
+  //          std::vector<Eigen::RowVectorXf> tracks = tracker->update(Vector2Matrix_ocsort(detections_for_ocsort));
+  //          if (this->debug) { // Check the debug flag
+  //              for (const auto& track_data : tracks) {
+  //                  if (track_data.size() >= 5) { // Ensure track_data has enough elements
+  //                      float x1 = track_data[0];
+  //                      float y1 = track_data[1];
+  //                      float x2 = track_data[2];
+  //                      float y2 = track_data[3];
+  //                      int id = static_cast<int>(track_data[4]);
+  //                      // Draw yellow box for OC-SORT tracks
+  //                      cv::rectangle(img, cv::Point(static_cast<int>(x1), static_cast<int>(y1)), 
+  //                                    cv::Point(static_cast<int>(x2), static_cast<int>(y2)), 
+  //                                    cv::Scalar(0, 255, 255), 2); // Yellow: BGR(0, 255, 255)
+  //                      cv::putText(img, "ID:" + std::to_string(id), 
+  //                                  cv::Point(static_cast<int>(x1), static_cast<int>(y1) - 5), 
+  //                                  cv::FONT_HERSHEY_SIMPLEX, 1.25, cv::Scalar(0, 255, 255), 2);
+  //                  }
+  //              }
+  //          }
+  //        } catch (const std::exception& e) {
+  //            RCLCPP_ERROR(this->get_logger(), "Error during OC-SORT update: %s", e.what());
+  //        }
+  //    }
+  //}
+  // End of OC-SORT integration
+
   if(result.size()==0){
     RCLCPP_INFO(this->get_logger(), "No Car!");
     return;
@@ -252,7 +331,6 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
       armor_result.erase(armor_result.begin());
       if(debug){
       cv::putText(img,std::to_string(armor.class_label),cv::Point(armor.left+car.car.left,armor.top+car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
-      cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
       }
     }
   }
@@ -277,12 +355,13 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     }
     if(max_confidence==0){
         if(debug)
+          //cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
           cv::putText(img,"No Armor",cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,255),3);
         continue;
         }
     auto safe_rect = getSafeRect(img,max_rect);
     auto max_mat = img(safe_rect);
-    cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
+    // cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
 
     car.color=getColor(max_mat);
     car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
@@ -296,7 +375,8 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
         }
         if(debug){
         cv::rectangle(img,car.car_rect,cv::Scalar(255,0,0),2);
-        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
+        cv::circle(img,car.center,5,cv::Scalar(255,0,0),-1);
+        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
         }
     }
     if(car.color==2){
@@ -308,12 +388,14 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
         }
         if(debug){
         cv::rectangle(img,car.car_rect,cv::Scalar(0,0,255),2);
-        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
+        cv::circle(img,car.center,5,cv::Scalar(0,0,255),-1);
+        cv::putText(img,std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
         }
     }
     if(car.color==1){
       if(debug)
       cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
+      cv::putText(img,"No Color",cv::Point(car.car.right,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,255),2);
     }
   }
   detect_result.header.stamp=msg->header.stamp;
@@ -323,12 +405,12 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   // RCLCPP_INFO(this->get_logger(), "Time used: %fms", time_used.count()*1000);
   std::cout<<"Detect Time: "<<time_used.count()*1000<<"ms"<<std::endl;
   cv::Mat final_img;
-  cv::resize(img,final_img,cv::Size(1536, 1125));
+  cv::resize(img,final_img,cv::Size(983, 720));
   cv::imshow("detect", final_img);
   auto key = cv::waitKey(1);
   if(key=='r'){
-      debug = !debug;
-  }
+     debug = !debug;
+   }
 }
 }// namespace tdt_radar
 RCLCPP_COMPONENTS_REGISTER_NODE(tdt_radar::Detect)
