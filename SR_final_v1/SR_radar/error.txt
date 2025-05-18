@@ -1,0 +1,140 @@
+wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ python3 src/utils/onnx2trt.py \
+--onnx model/ONNX/armor.onnx \
+--saveEngine model/TensorRT/armor.engine \
+--minBatch 1 \
+--optBatch 5 \
+--maxBatch 12 \
+--Shape 192x192 \
+--input_name images
+&&&& RUNNING TensorRT.trtexec [TensorRT v100700] [b23] # /home/wan/TensorRT-10.7.0.23/bin/trtexec --onnx=model/ONNX/armor.onnx --saveEngine=model/TensorRT/armor.engine --minShapes=images:1x3x192x192 --optShapes=images:5x3x192x192 --maxShapes=images:12x3x192x192
+[05/17/2025-21:52:26] [I] TF32 is enabled by default. Add --noTF32 flag to further improve accuracy with some performance cost.
+[05/17/2025-21:52:26] [I] === Model Options ===
+[05/17/2025-21:52:26] [I] Format: ONNX
+[05/17/2025-21:52:26] [I] Model: model/ONNX/armor.onnx
+[05/17/2025-21:52:26] [I] Output:
+[05/17/2025-21:52:26] [I] === Build Options ===
+[05/17/2025-21:52:26] [I] Memory Pools: workspace: default, dlaSRAM: default, dlaLocalDRAM: default, dlaGlobalDRAM: default, tacticSharedMem: default
+[05/17/2025-21:52:26] [I] avgTiming: 8
+[05/17/2025-21:52:26] [I] Precision: FP32
+[05/17/2025-21:52:26] [I] LayerPrecisions: 
+[05/17/2025-21:52:26] [I] Layer Device Types: 
+[05/17/2025-21:52:26] [I] Calibration: 
+[05/17/2025-21:52:26] [I] Refit: Disabled
+[05/17/2025-21:52:26] [I] Strip weights: Disabled
+[05/17/2025-21:52:26] [I] Version Compatible: Disabled
+[05/17/2025-21:52:26] [I] ONNX Plugin InstanceNorm: Disabled
+[05/17/2025-21:52:26] [I] TensorRT runtime: full
+[05/17/2025-21:52:26] [I] Lean DLL Path: 
+[05/17/2025-21:52:26] [I] Tempfile Controls: { in_memory: allow, temporary: allow }
+[05/17/2025-21:52:26] [I] Exclude Lean Runtime: Disabled
+[05/17/2025-21:52:26] [I] Sparsity: Disabled
+[05/17/2025-21:52:26] [I] Safe mode: Disabled
+[05/17/2025-21:52:26] [I] Build DLA standalone loadable: Disabled
+[05/17/2025-21:52:26] [I] Allow GPU fallback for DLA: Disabled
+[05/17/2025-21:52:26] [I] DirectIO mode: Disabled
+[05/17/2025-21:52:26] [I] Restricted mode: Disabled
+[05/17/2025-21:52:26] [I] Skip inference: Disabled
+[05/17/2025-21:52:26] [I] Save engine: model/TensorRT/armor.engine
+[05/17/2025-21:52:26] [I] Load engine: 
+[05/17/2025-21:52:26] [I] Profiling verbosity: 0
+[05/17/2025-21:52:26] [I] Tactic sources: Using default tactic sources
+[05/17/2025-21:52:26] [I] timingCacheMode: local
+[05/17/2025-21:52:26] [I] timingCacheFile: 
+[05/17/2025-21:52:26] [I] Enable Compilation Cache: Enabled
+[05/17/2025-21:52:26] [I] Enable Monitor Memory: Disabled
+[05/17/2025-21:52:26] [I] errorOnTimingCacheMiss: Disabled
+[05/17/2025-21:52:26] [I] Preview Features: Use default preview flags.
+[05/17/2025-21:52:26] [I] MaxAuxStreams: -1
+[05/17/2025-21:52:26] [I] BuilderOptimizationLevel: -1
+[05/17/2025-21:52:26] [I] MaxTactics: -1
+[05/17/2025-21:52:26] [I] Calibration Profile Index: 0
+[05/17/2025-21:52:26] [I] Weight Streaming: Disabled
+[05/17/2025-21:52:26] [I] Runtime Platform: Same As Build
+[05/17/2025-21:52:26] [I] Debug Tensors: 
+[05/17/2025-21:52:26] [I] Input(s)s format: fp32:CHW
+[05/17/2025-21:52:26] [I] Output(s)s format: fp32:CHW
+[05/17/2025-21:52:26] [I] Input build shape (profile 0): images=1x3x192x192+5x3x192x192+12x3x192x192
+[05/17/2025-21:52:26] [I] Input calibration shapes: model
+[05/17/2025-21:52:26] [I] === System Options ===
+[05/17/2025-21:52:26] [I] Device: 0
+[05/17/2025-21:52:26] [I] DLACore: 
+[05/17/2025-21:52:26] [I] Plugins:
+[05/17/2025-21:52:26] [I] setPluginsToSerialize:
+[05/17/2025-21:52:26] [I] dynamicPlugins:
+[05/17/2025-21:52:26] [I] ignoreParsedPluginLibs: 0
+[05/17/2025-21:52:26] [I] 
+[05/17/2025-21:52:26] [I] === Inference Options ===
+[05/17/2025-21:52:26] [I] Batch: Explicit
+[05/17/2025-21:52:26] [I] Input inference shape : images=5x3x192x192
+[05/17/2025-21:52:26] [I] Iterations: 10
+[05/17/2025-21:52:26] [I] Duration: 3s (+ 200ms warm up)
+[05/17/2025-21:52:26] [I] Sleep time: 0ms
+[05/17/2025-21:52:26] [I] Idle time: 0ms
+[05/17/2025-21:52:26] [I] Inference Streams: 1
+[05/17/2025-21:52:26] [I] ExposeDMA: Disabled
+[05/17/2025-21:52:26] [I] Data transfers: Enabled
+[05/17/2025-21:52:26] [I] Spin-wait: Disabled
+[05/17/2025-21:52:26] [I] Multithreading: Disabled
+[05/17/2025-21:52:26] [I] CUDA Graph: Disabled
+[05/17/2025-21:52:26] [I] Separate profiling: Disabled
+[05/17/2025-21:52:26] [I] Time Deserialize: Disabled
+[05/17/2025-21:52:26] [I] Time Refit: Disabled
+[05/17/2025-21:52:26] [I] NVTX verbosity: 0
+[05/17/2025-21:52:26] [I] Persistent Cache Ratio: 0
+[05/17/2025-21:52:26] [I] Optimization Profile Index: 0
+[05/17/2025-21:52:26] [I] Weight Streaming Budget: 100.000000%
+[05/17/2025-21:52:26] [I] Inputs:
+[05/17/2025-21:52:26] [I] Debug Tensor Save Destinations:
+[05/17/2025-21:52:26] [I] === Reporting Options ===
+[05/17/2025-21:52:26] [I] Verbose: Disabled
+[05/17/2025-21:52:26] [I] Averages: 10 inferences
+[05/17/2025-21:52:26] [I] Percentiles: 90,95,99
+[05/17/2025-21:52:26] [I] Dump refittable layers:Disabled
+[05/17/2025-21:52:26] [I] Dump output: Disabled
+[05/17/2025-21:52:26] [I] Profile: Disabled
+[05/17/2025-21:52:26] [I] Export timing to JSON file: 
+[05/17/2025-21:52:26] [I] Export output to JSON file: 
+[05/17/2025-21:52:26] [I] Export profile to JSON file: 
+[05/17/2025-21:52:26] [I] 
+[05/17/2025-21:52:26] [I] === Device Information ===
+[05/17/2025-21:52:26] [I] Available Devices: 
+[05/17/2025-21:52:26] [I]   Device 0: "NVIDIA GeForce RTX 4050 Laptop GPU" UUID: GPU-0dcb03d8-bdc8-93d6-d320-760c64fdc946
+[05/17/2025-21:52:26] [I] Selected Device: NVIDIA GeForce RTX 4050 Laptop GPU
+[05/17/2025-21:52:26] [I] Selected Device ID: 0
+[05/17/2025-21:52:26] [I] Selected Device UUID: GPU-0dcb03d8-bdc8-93d6-d320-760c64fdc946
+[05/17/2025-21:52:26] [I] Compute Capability: 8.9
+[05/17/2025-21:52:26] [I] SMs: 20
+[05/17/2025-21:52:26] [I] Device Global Memory: 5898 MiB
+[05/17/2025-21:52:26] [I] Shared Memory per SM: 100 KiB
+[05/17/2025-21:52:26] [I] Memory Bus Width: 96 bits (ECC disabled)
+[05/17/2025-21:52:26] [I] Application Compute Clock Rate: 2.355 GHz
+[05/17/2025-21:52:26] [I] Application Memory Clock Rate: 8.001 GHz
+[05/17/2025-21:52:26] [I] 
+[05/17/2025-21:52:26] [I] Note: The application clock rates do not reflect the actual clock rates that the GPU is currently running at.
+[05/17/2025-21:52:26] [I] 
+[05/17/2025-21:52:26] [I] TensorRT version: 10.7.0
+[05/17/2025-21:52:26] [I] Loading standard plugins
+[05/17/2025-21:52:26] [I] [TRT] [MemUsageChange] Init CUDA: CPU +2, GPU +0, now: CPU 21, GPU 93 (MiB)
+[05/17/2025-21:52:29] [I] [TRT] [MemUsageChange] Init builder kernel library: CPU +2284, GPU +440, now: CPU 2461, GPU 533 (MiB)
+[05/17/2025-21:52:29] [I] Start parsing network model.
+[05/17/2025-21:52:29] [I] [TRT] ----------------------------------------------------------------
+[05/17/2025-21:52:29] [I] [TRT] Input filename:   model/ONNX/armor.onnx
+[05/17/2025-21:52:29] [I] [TRT] ONNX IR version:  0.0.7
+[05/17/2025-21:52:29] [I] [TRT] Opset version:    12
+[05/17/2025-21:52:29] [I] [TRT] Producer name:    pytorch
+[05/17/2025-21:52:29] [I] [TRT] Producer version: 1.13.1
+[05/17/2025-21:52:29] [I] [TRT] Domain:           
+[05/17/2025-21:52:29] [I] [TRT] Model version:    0
+[05/17/2025-21:52:29] [I] [TRT] Doc string:       
+[05/17/2025-21:52:29] [I] [TRT] ----------------------------------------------------------------
+[05/17/2025-21:52:29] [I] Finished parsing network model. Parse time: 0.0232552
+[05/17/2025-21:52:29] [E] Static model does not take explicit shapes since the shape of inference tensors will be determined by the model itself
+[05/17/2025-21:52:29] [E] Network And Config setup failed
+[05/17/2025-21:52:29] [E] Building engine failed
+[05/17/2025-21:52:29] [E] Failed to create engine from model or file.
+[05/17/2025-21:52:29] [E] Engine set up failed
+&&&& FAILED TensorRT.trtexec [TensorRT v100700] [b23] # /home/wan/TensorRT-10.7.0.23/bin/trtexec --onnx=model/ONNX/armor.onnx --saveEngine=model/TensorRT/armor.engine --minShapes=images:1x3x192x192 --optShapes=images:5x3x192x192 --maxShapes=images:12x3x192x192
+wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ 
+
+
+

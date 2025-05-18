@@ -84,7 +84,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     if(!file2.good()) {
         system("python3 src/utils/onnx2trt.py "
         "--onnx=model/ONNX/armor.onnx "
-        "--saveEngine=model/TensorRT/armor_yolo.engine "
+        "--saveEngine=model/TensorRT/armor.engine "
         "--minBatch 1 "
         "--optBatch 5 "
         "--maxBatch 12 "
@@ -103,7 +103,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     TDT_INFO("Load yolo engine success!");
 
   image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-      "camera_image", rclcpp::SensorDataQoS(),
+      "rosbag_image", rclcpp::SensorDataQoS(),
       std::bind(&Detect::callback, this, std::placeholders::_1));
   image_pub = this->create_publisher<sensor_msgs::msg::Image>("detect_image", rclcpp::SensorDataQoS());
   pub = this->create_publisher<vision_interface::msg::DetectResult>("detect_result", rclcpp::SensorDataQoS());
@@ -173,7 +173,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     if(car.armors.size()==0){continue;}
     for(auto &armor:car.armors){
       if(debug){
-        cv::putText(img,std::to_string(armor.class_label),cv::Point(armor.left+car.car.left,armor.top+car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,255,0),2);
+        //cv::putText(img,std::to_string(armor.class_label),cv::Point(armor.left+car.car.left,armor.top+car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,255,0),2);
         cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
       }
     }
@@ -207,25 +207,17 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
 
     if (best_armor_class_label >= 0 && best_armor_class_label <= 5) {
         car.color = 0;
-        if (best_armor_class_label <= 4) {
-            car.number = best_armor_class_label + 1;
-        } else {
-            car.number = 7;
-        }
+        car.number = best_armor_class_label + 1;
     } else if (best_armor_class_label >= 6 && best_armor_class_label <= 11) {
         car.color = 2;
-        if ((best_armor_class_label - 6) <= 4) {
-            car.number = (best_armor_class_label - 6) + 1;
-        } else {
-            car.number = 7;
-        }
+        car.number = best_armor_class_label - 5;
     } else {
         if(debug) cv::putText(img,"Unknown Class",cv::Point(car.car.left,car.car.bottom-20),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,0,0),2);
         continue;
     }
     
     auto safe_rect = getSafeRect(img,max_rect);
-    cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
+    //cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
 
     car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
     
