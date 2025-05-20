@@ -10,7 +10,6 @@ Resolve::Resolve(const rclcpp::NodeOptions& node_options) : Node("radar_resolve_
   
   point_sub = this->create_subscription<geometry_msgs::msg::Vector3>("camera_point2D", rclcpp::SensorDataQoS(),std::bind(&Resolve::callback, this, std::placeholders::_1));
   pub = this->create_publisher<sensor_msgs::msg::PointCloud2>("camera_point3D", rclcpp::SensorDataQoS());
-  //match_info_sub = this->create_subscription<vision_interface::msg::MatchInfo>("/match_info", rclcpp::SensorDataQoS(),std::bind(&Resolve::MatchInfoCallback, this, std::placeholders::_1));
   detect_sub = this->create_subscription<vision_interface::msg::DetectResult>("detect_result", rclcpp::SensorDataQoS(),std::bind(&Resolve::DetectCallback, this, std::placeholders::_1));
   pub_radar=this->create_publisher<vision_interface::msg::DetectResult>("/resolve_result",rclcpp::SensorDataQoS());
   

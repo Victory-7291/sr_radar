@@ -24,22 +24,21 @@ namespace tdt_radar
         std::cout<<"Resolve camera"<<camera_matrix<<std::endl;
         std::cout<<"Resolve dist"<<dist_coeffs<<std::endl;
 
-        points_map["Middle_Line"]       = new Parser_Points("Middle_Line");
-        points_map["Left_Road"]         = new Parser_Points("Left_Road");
-        points_map["Right_Road"]        = new Parser_Points("Right_Road");
-        points_map["Self_Ring_High"]    = new Parser_Points("Self_Ring_High");
-        points_map["Enemy_Ring_High"]   = new Parser_Points("Enemy_Ring_High");
-        points_map["Enemy_Left_High"]   = new Parser_Points("Enemy_Left_High");
-        points_map["Enemy_Right_High"]  = new Parser_Points("Enemy_Right_High");
-        points_map["Enemy_Buff"]        = new Parser_Points("Enemy_Buff");
+        points_map["Center_Highland"]         = new Parser_Points("Center_Highland");
+        points_map["Self_Highland"]        = new Parser_Points("Self_Highland");
+        points_map["Enemy_Highland"]    = new Parser_Points("Enemy_Highland");
+        points_map["Right_Road"]   = new Parser_Points("Right_Road");
+        points_map["Left_Road"]   = new Parser_Points("Left_Road");
+        points_map["Self_Fortress"]  = new Parser_Points("Self_Fortress");
+        points_map["Enemy_Fortress"]  = new Parser_Points("Enemy_Fortress");
 
-        points_map["Left_Road"]         ->Height=0.2;
-        points_map["Right_Road"]        ->Height=0.2;
-        points_map["Self_Ring_High"]    ->Height=0.6;
-        points_map["Enemy_Ring_High"]   ->Height=0.6;
-        points_map["Enemy_Left_High"]   ->Height=0.4;
-        points_map["Enemy_Right_High"]  ->Height=0.4;
-        points_map["Enemy_Buff"]        ->Height=0.8;
+        points_map["Center_Highland"]         ->Height=0.3;
+        points_map["Self_Highland"]        ->Height=0.6;
+        points_map["Enemy_Highland"]    ->Height=0.6;
+        points_map["Right_Road"]   ->Height=0.2;
+        points_map["Left_Road"]   ->Height=0.2;
+        points_map["Self_Fortress"]  ->Height=0.15;
+        points_map["Enemy_Fortress"]  ->Height=0.15;
     }
     void parser::Change_Matrix()
     {
@@ -58,16 +57,13 @@ namespace tdt_radar
     {
         for(auto &points:points_map)
         {
-            cv::polylines(img, points.second->Points_2D, points.first != "Middle_Line", cv::Scalar(255,255,255));
+            cv::polylines(img, points.second->Points_2D, true, cv::Scalar(255,255,255));
         }
     }
     cv::Point2f parser::parse(cv::Point2f &input_point)
     {
         float temp_height = get_height(input_point);
         // std::cout<<temp_height<<"!!!"<<std::endl;
-        if(temp_height>0.79){
-            // std::cout<<"Buff!!"<<std::endl;
-            return cv::Point2f(19.322,-1.915);}
         return get_2d(input_point, temp_height);
     }
     float parser::get_height(cv::Point2f &input_point)
@@ -105,7 +101,7 @@ namespace tdt_radar
         return srcPointMat.at<cv::Point2f>(0, 0);
     }
     std::vector<cv::Point3f> Parser_Points::ReadPoints(const std::string &points_name){
-    cv::FileStorage fs("./config/RM2024_Points.yaml", cv::FileStorage::READ); // 打开YAML文件
+    cv::FileStorage fs("./config/RM2025_Points.yaml", cv::FileStorage::READ); // 打开YAML文件
 
     if (!fs.isOpened()) {
         std::cout << "无法打开文件" << std::endl;
