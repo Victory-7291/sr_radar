@@ -9,11 +9,9 @@ from launch_ros.descriptions import ComposableNode
 from launch_ros.actions import ComposableNodeContainer, Node
 from launch.actions import TimerAction, Shutdown
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+
 def generate_launch_description():
 
     def get_hik_camera_node(package, plugin):
@@ -40,6 +38,15 @@ def generate_launch_description():
     #    )  
 
   
+    def get_video_player_node(package, plugin):
+        return ComposableNode(
+            package=package,
+            plugin=plugin,
+            name='video_player_node',
+            parameters=[{'video_file_path': '/home/wan/video.mp4'}], # 您可能需要修改此路径
+            extra_arguments=[{'use_intra_process_comms': True}]
+        )
+
     def get_radar_calib_node(package, plugin):
         return ComposableNode(
             package=package,
@@ -48,7 +55,7 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
-    def get_camera_detector_container(hik_camera_node,radar_calib_node,):
+    def get_camera_detector_container(hik_camera_node, radar_calib_node, video_player_node,):
         return ComposableNodeContainer(
             name='camera_detector_container',
             namespace='',
@@ -58,6 +65,7 @@ def generate_launch_description():
                 #变向设置启动顺序
                 hik_camera_node,
                 radar_calib_node,
+                video_player_node,
                 #ros_bag_player_node
             ],
             output='both',
@@ -67,12 +75,14 @@ def generate_launch_description():
     # 创建节点描述
     hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
     radar_calib_node = get_radar_calib_node('tdt_vision', 'tdt_radar::Calibrate')
+    video_player_node = get_video_player_node('video_player', 'video_player::VideoPlayerNode') # 包名和插件名已更正
     #ros_bag_player_node = get_rosbag_player_node('rosbag_player', 'RosbagPlayer')
 
     # 创建节点容器
     cam_detector = get_camera_detector_container(
         hik_camera_node,
         radar_calib_node,
+        video_player_node,
         #ros_bag_player_node
 
     )
