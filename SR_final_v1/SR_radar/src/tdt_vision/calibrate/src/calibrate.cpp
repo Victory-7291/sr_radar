@@ -53,11 +53,11 @@ namespace tdt_radar {
 
         if(usechessborad){
         image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-                "rosbag_image", rclcpp::SensorDataQoS(),
+                "camera_image", rclcpp::SensorDataQoS(),
                 std::bind(&Calibrate::ChessboardCallback, this, std::placeholders::_1));}
         else{
         image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-                "rosbag_image", rclcpp::SensorDataQoS(),
+                "camera_image", rclcpp::SensorDataQoS(),
                 std::bind(&Calibrate::callback, this, std::placeholders::_1));}
         compressed_image_sub = this->create_subscription<sensor_msgs::msg::CompressedImage>(
                 "compressed_image", rclcpp::SensorDataQoS(),

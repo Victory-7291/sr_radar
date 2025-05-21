@@ -32,11 +32,11 @@ namespace tdt_radar {
     class Calibrate final : public rclcpp::Node {
     public:
         std::vector<cv::Point3f> real_points;
-        cv::Point3f self_R0TL   = cv::Point3f(8.67 , -5.715, 0.120 + 0.3);
-        cv::Point3f self_R0TR   = cv::Point3f(8.67 , -5.715 - 0.4, 0.120 + 0.3);
-        cv::Point3f self_Tower = cv::Point3f(11.1865, -12.419, 1.003+0.118);
-        cv::Point3f enemy_Base  = cv::Point3f(26.153, -7.5, 1.043+0.2);
-        cv::Point3f enemy_Tower =cv::Point3f(16.64, -2.4215, 1.331+0.118);
+        cv::Point3f self_R0TL   = cv::Point3f(9.375 , -6.750, 0.0008);
+        cv::Point3f self_R0TR   = cv::Point3f(9.375 , -8.250, 0.0008);
+        cv::Point3f self_Tower = cv::Point3f(10.92806, -11.19736, 1.40711);
+        cv::Point3f enemy_Base  = cv::Point3f(25.44468, -7.72339, 1.034);
+        cv::Point3f enemy_Tower =cv::Point3f(16.90734, -3.64301, 1.74537);
         //切记前哨站和基地有底座
         
         void change_outmatrix(double x,double y,double z);

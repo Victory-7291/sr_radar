@@ -12,8 +12,27 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
-
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
+
+    params_file = os.path.join(
+        get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
+
+    camera_info_url = 'package://hik_camera/config/camera_info.yaml'
+
+    def get_hik_camera_node(package, plugin):
+        return ComposableNode(
+            package=package,
+            plugin=plugin,
+            name='hik_camera',
+            parameters=[LaunchConfiguration('params_file'), {
+                'camera_info_url': LaunchConfiguration('camera_info_url'),
+                'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
+            }],
+            extra_arguments=[{'use_intra_process_comms': True}]
+        )
+
         
     def get_rosbag_player_node(package, plugin):
         return ComposableNode(
@@ -36,7 +55,7 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
-    def get_camera_detector_container(radar_calib_node,ros_bag_player_node):
+    def get_camera_detector_container(hik_camera_node,radar_calib_node,ros_bag_player_node):
         return ComposableNodeContainer(
             name='camera_detector_container',
             namespace='',
@@ -44,6 +63,7 @@ def generate_launch_description():
             executable='component_container',
             composable_node_descriptions=[
                 #变向设置启动顺序
+                hik_camera_node,
                 radar_calib_node,
                 ros_bag_player_node
             ],
@@ -52,17 +72,26 @@ def generate_launch_description():
             on_exit=Shutdown(),
         )
     # 创建节点描述
+    hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
     radar_calib_node = get_radar_calib_node('tdt_vision', 'tdt_radar::Calibrate')
     ros_bag_player_node = get_rosbag_player_node('rosbag_player', 'RosbagPlayer')
 
     # 创建节点容器
-    cam_detector = get_camera_detector_container(radar_calib_node,ros_bag_player_node)
-    # debug_container = get_debug_container(tdt_debug_node)
+    cam_detector = get_camera_detector_container(
+        hik_camera_node,
+        radar_calib_node,
+        ros_bag_player_node
+
+    )
+    #debug_container = get_debug_container(tdt_debug_node)
     plugin_map_launch_cmd = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory('tdt_vision'), 'launch', 'map_server_launch.py')]),
              )
     return LaunchDescription([
+            DeclareLaunchArgument(name='params_file',default_value=params_file),
+            DeclareLaunchArgument(name='camera_info_url',default_value=camera_info_url),
+            DeclareLaunchArgument(name='use_sensor_data_qos',default_value='false'),
             cam_detector,
             plugin_map_launch_cmd
         ])
