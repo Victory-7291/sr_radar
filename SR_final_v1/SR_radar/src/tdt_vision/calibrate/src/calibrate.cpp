@@ -124,6 +124,7 @@ namespace tdt_radar {
         // publish_tf();
     }
     void Calibrate::callback(const sensor_msgs::msg::Image::SharedPtr msg) {
+        RCLCPP_INFO(this->get_logger(),"callback");
         auto img = cv_bridge::toCvCopy(msg, "bgr8")->image;
         cv::Mat calib_img;
         cv::resize(img, calib_img, cv::Size(1536, 1125));
@@ -156,7 +157,8 @@ namespace tdt_radar {
                 break;
         }       
     }
-        void Calibrate::compressed_callback(const sensor_msgs::msg::CompressedImage::SharedPtr msg) {
+    void Calibrate::compressed_callback(const sensor_msgs::msg::CompressedImage::SharedPtr msg) {
+        RCLCPP_INFO(this->get_logger(),"compressed_callback");
         auto img = cv::imdecode(msg->data, cv::IMREAD_COLOR);
         cv::Mat calib_img;
         cv::resize(img, calib_img, cv::Size(1536, 1125));
