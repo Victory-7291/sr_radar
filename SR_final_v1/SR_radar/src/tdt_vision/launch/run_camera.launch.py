@@ -9,18 +9,10 @@ from launch_ros.descriptions import ComposableNode
 from launch_ros.actions import ComposableNodeContainer, Node
 from launch.actions import TimerAction, Shutdown
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
- 
-    params_file = os.path.join(
-        get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
-
-    camera_info_url = 'package://hik_camera/config/camera_info.yaml'
 
     # 定义JudgeBridgeNode节点
     judge_bridge_node = Node(
@@ -80,15 +72,24 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
+    #def get_hik_camera_node(package, plugin):
+    #    return ComposableNode(
+    #        package=package,
+    #        plugin=plugin,
+    #        name='hik_camera',
+    #        parameters=[LaunchConfiguration('params_file'), {
+    #            'camera_info_url': LaunchConfiguration('camera_info_url'),
+    #            'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
+    #        }],
+    #        extra_arguments=[{'use_intra_process_comms': True}]
+    #    )
     def get_hik_camera_node(package, plugin):
+        params_file = os.path.join(get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
         return ComposableNode(
             package=package,
             plugin=plugin,
             name='hik_camera',
-            parameters=[LaunchConfiguration('params_file'), {
-                'camera_info_url': LaunchConfiguration('camera_info_url'),
-                'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
-            }],
+            parameters=[params_file],
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
@@ -132,21 +133,15 @@ def generate_launch_description():
     cam_detector = get_camera_detector_container(nodes)
 
     # 包含 map_server_launch.py
-    plugin_map_launch_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('tdt_vision'), 'launch', 'map_server_launch.py')]),
-    )
+    #plugin_map_launch_cmd = IncludeLaunchDescription(
+    #    PythonLaunchDescriptionSource([os.path.join(
+    #        get_package_share_directory('tdt_vision'), 'launch', 'map_server_launch.py')]),
+    #)
 
     return LaunchDescription([
         # 首先启动JudgeBridgeNode节点
         judge_bridge_node,
         dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
-        DeclareLaunchArgument(name='params_file',
-                              default_value=params_file),
-        DeclareLaunchArgument(name='camera_info_url',
-                              default_value=camera_info_url),
-        DeclareLaunchArgument(name='use_sensor_data_qos',
-                              default_value='false'),
         cam_detector,
-        plugin_map_launch_cmd,
+        #plugin_map_launch_cmd,
     ])
