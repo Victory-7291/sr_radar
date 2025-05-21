@@ -16,33 +16,14 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
- 
-    params_file = os.path.join(
-        get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
-
-    camera_info_url = 'package://hik_camera/config/camera_info.yaml'
-
        # 定义节点
-    def get_foxglove_node(package, plugin):
-        return ComposableNode(
-            package=package,
-            plugin=plugin,
-            name='foxglove_bridge_node',
-            parameters=[{'send_buffer_limit': 1000000000}],
-            extra_arguments=[{'use_intra_process_comms': True},
-                             {'use_multi_threaded_executor': True}]
-        )
-
- 
     def get_hik_camera_node(package, plugin):
+        params_file = os.path.join(get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
         return ComposableNode(
             package=package,
             plugin=plugin,
             name='hik_camera',
-            parameters=[LaunchConfiguration('params_file'), {
-                'camera_info_url': LaunchConfiguration('camera_info_url'),
-                'use_sensor_data_qos': LaunchConfiguration('use_sensor_data_qos'),
-            }],
+            parameters=[params_file],
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
@@ -60,21 +41,13 @@ def generate_launch_description():
 
     # 创建节点描述
     hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
-    foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
 
     # 创建节点容器，确保 hik_camera_node 是第一个
     nodes = [
         hik_camera_node,  
-        foxglove_node,
     ]
     cam_detector = get_camera_detector_container(nodes)
 
     return LaunchDescription([
-        DeclareLaunchArgument(name='params_file',
-                              default_value=params_file),
-        DeclareLaunchArgument(name='camera_info_url',
-                              default_value=camera_info_url),
-        DeclareLaunchArgument(name='use_sensor_data_qos',
-                              default_value='false'),
         cam_detector,
     ])

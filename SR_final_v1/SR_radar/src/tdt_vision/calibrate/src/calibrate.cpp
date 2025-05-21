@@ -59,9 +59,6 @@ namespace tdt_radar {
         image_sub = this->create_subscription<sensor_msgs::msg::Image>(
                 "camera_image", rclcpp::SensorDataQoS(),
                 std::bind(&Calibrate::callback, this, std::placeholders::_1));}
-        compressed_image_sub = this->create_subscription<sensor_msgs::msg::CompressedImage>(
-                "compressed_image", rclcpp::SensorDataQoS(),
-                std::bind(&Calibrate::compressed_callback, this, std::placeholders::_1));
         std::cout<<"Calibrate end"<<std::endl;
     }
 
@@ -86,48 +83,10 @@ namespace tdt_radar {
         broadcaster_->sendTransform(transformStamped);
     }
 
-    void Calibrate::change_outmatrix(double x,double y,double z){
-        cv::FileStorage fs;
-        fs.open("./config/out_matrix.yaml", cv::FileStorage::READ);
-        cv::Mat world_rvec;
-        fs["world_rvec"] >> world_rvec;
-        // std::cout<<world_rvec<<std::endl;
-        fs.release();
-        fs.open("./config/out_matrix.yaml", cv::FileStorage::WRITE);
-        //将xyz变换加到rvec上
-        cv::Mat input(3, 1, CV_64F);
-        input.at<double>(0, 0) = x;
-        input.at<double>(1, 0) = y;
-        input.at<double>(2, 0) = z;
-        world_rvec += input;
-        fs << "world_rvec" << world_rvec;
-        cv::Mat tvec(3, 1, CV_64F);
-        if(EnemyColor==2){
-            tvec.at<double>(0, 0) = -1.2;
-            tvec.at<double>(1, 0) = -5.4;
-            tvec.at<double>(2, 0) = 4.1;
-
-        }else{
-            tvec.at<double>(0, 0) = 29.2;
-            tvec.at<double>(1, 0) = -9.6;
-            tvec.at<double>(2, 0) = 4.1;
-        }
-        // std::cout<<tvec<<std::endl;
-        cv::Mat Rmat;
-        cv::Rodrigues(world_rvec, Rmat);
-        // auto Rmat_inv=Rmat.t();
-        auto tvec_inv=-Rmat*tvec;
-        std::cout<<tvec_inv<<std::endl;
-        fs << "world_tvec" << tvec_inv;
-        fs.release();
-        parser_->Change_Matrix();
-        // publish_tf();
-    }
     void Calibrate::callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-        RCLCPP_INFO(this->get_logger(),"callback");
         auto img = cv_bridge::toCvCopy(msg, "bgr8")->image;
         cv::Mat calib_img;
-        cv::resize(img, calib_img, cv::Size(1536, 1125));
+        cv::resize(img, calib_img, cv::Size(1536, 1024));
         cvimage_ = calib_img;
         if(is_calibrating){
             cv::putText(img, std::to_string(pick_points.size()), cv::Point(50, 200), cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0, 0, 255), 2);
@@ -143,43 +102,11 @@ namespace tdt_radar {
             cv::putText(img,"Press Enter to Calibrate !!!",cv::Point(50,200),cv::FONT_HERSHEY_SIMPLEX,3,cv::Scalar(0,0,255),2);
         }
         auto temp = img.clone();
-        cv::resize(img, img, cv::Size(1536, 1125));
+        cv::resize(img, img, cv::Size(1536, 1024));
         cv::imshow("calibrate", img);
         //按下回车键，开始标定
         auto key =cv::waitKey(10);
         // auto key = cv::pollKey();
-        switch (key)
-        {
-            case 13:
-                is_calibrating = true;
-                break;
-            default:
-                break;
-        }       
-    }
-    void Calibrate::compressed_callback(const sensor_msgs::msg::CompressedImage::SharedPtr msg) {
-        RCLCPP_INFO(this->get_logger(),"compressed_callback");
-        auto img = cv::imdecode(msg->data, cv::IMREAD_COLOR);
-        cv::Mat calib_img;
-        cv::resize(img, calib_img, cv::Size(1536, 1125));
-        cvimage_ = calib_img;
-        if(is_calibrating){
-            cv::putText(img, std::to_string(pick_points.size()), cv::Point(50, 200), cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0, 0, 255), 2);
-            if(pick_points.size() == real_points.size()){
-            solve();
-            parser_->Change_Matrix();
-            // publish_tf();
-            }
-        }
-        else{
-            parser_->draw_ui(img);
-            cv::putText(img,"Press Enter to Calibrate !!!",cv::Point(50,200),cv::FONT_HERSHEY_SIMPLEX,3,cv::Scalar(0,0,255),2);
-        }
-        auto temp = img.clone();
-        cv::resize(img, img, cv::Size(1536, 1125));
-        cv::imshow("calibrate", img);
-        //按下回车键，开始标定
-        auto key =cv::waitKey(10);
         switch (key)
         {
             case 13:
@@ -195,7 +122,7 @@ namespace tdt_radar {
         cv::putText(img,"Press Enter to Calibrate !!!",cv::Point(50,200),cv::FONT_HERSHEY_SIMPLEX,3,cv::Scalar(0,0,255),2);
         cv::Mat show_img;
         // parser_->draw_ui(img);
-        cv::resize(img, show_img, cv::Size(1536, 1125));
+        cv::resize(img, show_img, cv::Size(1536, 1024));
         cv::imshow("calibrate", show_img);
         if(cv::waitKey(10) == 13){
             std::vector<cv::Point2f> corners;
@@ -232,7 +159,7 @@ namespace tdt_radar {
             fs << "world_rvec" << world_rvec;
             fs << "world_tvec" << world_tvec;
             fs.release();
-            cv::resize(img, show_img, cv::Size(1536, 1125));
+            cv::resize(img, show_img, cv::Size(1536, 1024));
             cv::imshow("calibrate", show_img);
             cv::waitKey(0);
         }
@@ -273,8 +200,8 @@ namespace tdt_radar {
                 while (temp_key != 'n'); // 按'n'退出循环
 
 
-                x *= 1.3333333333 * 2;
-                y *= 1.3333333333 * 2;
+                x *= 1.0 * 2;
+                y *= 1.0 * 2;
                 std::cout << "x:" << x << " y:" << y << std::endl;
                 pick_points.push_back(cv::Point2f(x, y));
             }
