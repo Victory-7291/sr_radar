@@ -17,10 +17,12 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
 
     def get_hik_camera_node(package, plugin):
+        params_file = os.path.join(get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
         return ComposableNode(
             package=package,
             plugin=plugin,
             name='hik_camera',
+            parameters=[params_file],
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
