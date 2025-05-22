@@ -12,7 +12,7 @@ VideoPlayerNode::VideoPlayerNode(const rclcpp::NodeOptions & options)
   RCLCPP_INFO(this->get_logger(), "VideoPlayerNode created");
 
   this->declare_parameter<std::string>("video_file_path", "");
-  this->get_parameter("video_file_path", video_file_path_);
+  this->get_parameter("video_file_path", video_path_);
 
   if (video_file_path_.empty()) {
     RCLCPP_ERROR(this->get_logger(), "Video file path is not set.");
