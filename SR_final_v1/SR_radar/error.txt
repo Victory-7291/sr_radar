@@ -1,62 +1,45 @@
-wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ colcon build
-Starting >>> radar_interface
-Starting >>> vision_interface
-Starting >>> hik_camera
-Starting >>> libocsort
-Starting >>> video_player
-Finished <<< libocsort [0.09s]
-Finished <<< hik_camera [0.11s]                                          
-Finished <<< vision_interface [0.32s]                                     
-Starting >>> rosbag_player
-Finished <<< radar_interface [0.34s]
-Starting >>> debug_map
-Starting >>> dv_trigger
-Starting >>> judge_bridge
-Starting >>> kalman_filter
-Starting >>> radar_decision
-Starting >>> tdt_vision
-Finished <<< radar_decision [0.07s]                               
-Finished <<< debug_map [0.13s]
-Finished <<< rosbag_player [0.15s]
-Finished <<< kalman_filter [0.15s]
-Finished <<< dv_trigger [0.16s]                                   
-Finished <<< judge_bridge [0.17s]
-Finished <<< tdt_vision [0.21s]
---- stderr: video_player                               
-/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp: In constructor ‘video_player::VideoPlayerNode::VideoPlayerNode(const rclcpp::NodeOptions&)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:17:7: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
-   17 |   if (video_file_path_.empty()) {
-      |       ^~~~~~~~~~~~~~~~
-      |       video_path_
-In file included from /opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategies.hpp:18,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/executor_options.hpp:20,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/executor.hpp:37,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155,
-                 from /home/wan/SR_final_v1/SR_radar/src/utils/video_player/include/video_player/video_player_node.hpp:4,
-                 from /home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:1:
-/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:23:61: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
-   23 |   RCLCPP_INFO(this->get_logger(), "Opening video file: %s", video_file_path_.c_str());
-      |                                                             ^~~~~~~~~~~~~~~~
-/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:24:13: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
-   24 |   cap_.open(video_file_path_);
-      |             ^~~~~~~~~~~~~~~~
-      |             video_path_
-gmake[2]: *** [CMakeFiles/video_player_node.dir/build.make:76: CMakeFiles/video_player_node.dir/src/video_player_node.cpp.o] Error 1
-gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/video_player_node.dir/all] Error 2
-gmake: *** [Makefile:146: all] Error 2
----
-Failed   <<< video_player [4.51s, exited with code 2]
+wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ ros2 launch tdt_vision calib_rosbag.launch.py 
+[INFO] [launch]: All log files can be found below /home/wan/.ros/log/2025-05-22-15-33-35-845727-wan-Predator-PHN16-71-6192
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [component_container-1]: process started with pid [6204]
+[component_container-1] [INFO] [1747899216.182137995] [camera_detector_container]: Load Library: /home/wan/SR_final_v1/SR_radar/install/tdt_vision/lib/libradar_calibrate.so
+[component_container-1] [INFO] [1747899216.466800634] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Calibrate>
+[component_container-1] [INFO] [1747899216.466863874] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Calibrate>
+[component_container-1] Calibrate start
+[component_container-1] [-8.084797652722209;
+[component_container-1]  3.308550047631711;
+[component_container-1]  9.914300447855721]
+[component_container-1] [1.472702981759967;
+[component_container-1]  -1.576365321399126;
+[component_container-1]  1.119260627612431]
+[component_container-1] Resolve camera[3574.789997539575, 0, 2035.516221639947;
+[component_container-1]  0, 3570.152216895105, 1512.394106392463;
+[component_container-1]  0, 0, 1]
+[component_container-1] Resolve dist[]
+[component_container-1] [INFO] [1747899216.517882938] [radar_calib_node]: 
+[component_container-1]       ┏━┓       ┏━┓
+[component_container-1]     ┏━┛ ┻━━━━━━━┛ ┻━┓
+[component_container-1]     ┃               ┃
+[component_container-1]     ┃       ━       ┃
+[component_container-1]     ┃  ┳━┛     ┗━┳  ┃
+[component_container-1]     ┃               ┃
+[component_container-1]     ┃      ━┻━      ┃
+[component_container-1]     ┃               ┃
+[component_container-1]     ┗━━━┓       ┏━━━┛
+[component_container-1]         ┃       ┃
+[component_container-1]         ┃       ┃
+[component_container-1]         ┃       ┃
+[component_container-1]         ┃       ┃
+[component_container-1]         ┃       ┗━━━━━━━┓
+[component_container-1]         ┃               ┣━━┓
+[component_container-1]         ┃              ┏┛
+[component_container-1]         ┗━┓┓┏━━━━━━━┳┓┏┛
+[component_container-1]           ┃┫┫       ┃┫┫
+[component_container-1]           ┗┻┛       ┗┻┛
+[component_container-1] Calibrate end
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/radar_calib_node' in container '/camera_detector_container'
+[component_container-1] [ERROR] [1747899216.527752624] [camera_detector_container]: Could not find requested resource in ament index
+[ERROR] [launch_ros.actions.load_composable_nodes]: Failed to load node 'video_player_node' of type 'video_player::VideoPlayerNode' in container '/camera_detector_container': Could not find requested resource in ament index
 
-Summary: 11 packages finished [4.70s]
-  1 package failed: video_player
-  1 package had stderr output: video_player
-wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ 
 
 
