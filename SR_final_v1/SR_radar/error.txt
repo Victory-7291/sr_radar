@@ -5,36 +5,56 @@ Starting >>> hik_camera
 Starting >>> libocsort
 Starting >>> video_player
 Finished <<< libocsort [0.09s]
-Finished <<< hik_camera [0.10s]                                          
-Finished <<< vision_interface [0.26s]                                     
+Finished <<< hik_camera [0.11s]                                          
+Finished <<< vision_interface [0.32s]                                     
 Starting >>> rosbag_player
-Finished <<< radar_interface [0.27s]
+Finished <<< radar_interface [0.34s]
 Starting >>> debug_map
 Starting >>> dv_trigger
 Starting >>> judge_bridge
 Starting >>> kalman_filter
 Starting >>> radar_decision
 Starting >>> tdt_vision
-Finished <<< radar_decision [0.06s]                               
-Finished <<< debug_map [0.10s]
-Finished <<< dv_trigger [0.11s]
-Finished <<< rosbag_player [0.13s]
-Finished <<< judge_bridge [0.12s]
-Finished <<< kalman_filter [0.13s]                                
-Finished <<< tdt_vision [0.17s]
+Finished <<< radar_decision [0.07s]                               
+Finished <<< debug_map [0.13s]
+Finished <<< rosbag_player [0.15s]
+Finished <<< kalman_filter [0.15s]
+Finished <<< dv_trigger [0.16s]                                   
+Finished <<< judge_bridge [0.17s]
+Finished <<< tdt_vision [0.21s]
 --- stderr: video_player                               
 /home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp: In constructor ‘video_player::VideoPlayerNode::VideoPlayerNode(const rclcpp::NodeOptions&)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:15:42: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
-   15 |   this->get_parameter("video_file_path", video_file_path_);
-      |                                          ^~~~~~~~~~~~~~~~
-      |                                          video_path_
+/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:17:7: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
+   17 |   if (video_file_path_.empty()) {
+      |       ^~~~~~~~~~~~~~~~
+      |       video_path_
+In file included from /opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategies.hpp:18,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor_options.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor.hpp:37,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155,
+                 from /home/wan/SR_final_v1/SR_radar/src/utils/video_player/include/video_player/video_player_node.hpp:4,
+                 from /home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:23:61: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
+   23 |   RCLCPP_INFO(this->get_logger(), "Opening video file: %s", video_file_path_.c_str());
+      |                                                             ^~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:24:13: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
+   24 |   cap_.open(video_file_path_);
+      |             ^~~~~~~~~~~~~~~~
+      |             video_path_
 gmake[2]: *** [CMakeFiles/video_player_node.dir/build.make:76: CMakeFiles/video_player_node.dir/src/video_player_node.cpp.o] Error 1
 gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/video_player_node.dir/all] Error 2
 gmake: *** [Makefile:146: all] Error 2
 ---
-Failed   <<< video_player [3.39s, exited with code 2]
+Failed   <<< video_player [4.51s, exited with code 2]
 
-Summary: 11 packages finished [3.55s]
+Summary: 11 packages finished [4.70s]
   1 package failed: video_player
   1 package had stderr output: video_player
 wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ 
