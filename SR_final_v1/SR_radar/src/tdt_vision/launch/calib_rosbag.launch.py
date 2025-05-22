@@ -39,11 +39,15 @@ def generate_launch_description():
 
   
     def get_video_player_node(package, plugin):
+        # 使用相对于工作空间的路径
+        workspace_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        video_path = os.path.join(workspace_path, 'test.mp4')
+        
         return ComposableNode(
             package=package,
             plugin=plugin,
             name='video_player_node',
-            parameters=[{'video_file_path': '/home/wan/SR_final_v1/SR_radar/test.mp4'}], # 您可能需要修改此路径
+            parameters=[{'video_file_path': video_path}],
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
