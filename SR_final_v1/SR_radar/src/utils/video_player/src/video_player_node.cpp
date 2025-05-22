@@ -14,16 +14,16 @@ VideoPlayerNode::VideoPlayerNode(const rclcpp::NodeOptions & options)
   this->declare_parameter<std::string>("video_file_path", "");
   this->get_parameter("video_file_path", video_path_);
 
-  if (video_file_path_.empty()) {
+  if (video_path_.empty()) {
     RCLCPP_ERROR(this->get_logger(), "Video file path is not set.");
     rclcpp::shutdown();
     return;
   }
 
-  RCLCPP_INFO(this->get_logger(), "Opening video file: %s", video_file_path_.c_str());
-  cap_.open(video_file_path_);
+  RCLCPP_INFO(this->get_logger(), "Opening video file: %s", video_path_.c_str());
+  cap_.open(video_path_);
   if (!cap_.isOpened()) {
-    RCLCPP_ERROR(this->get_logger(), "Error opening video file: %s", video_file_path_.c_str());
+    RCLCPP_ERROR(this->get_logger(), "Error opening video file: %s", video_path_.c_str());
     rclcpp::shutdown();
     return;
   }
