@@ -66,17 +66,6 @@ def generate_launch_description():
             name='radar_resolve_node',
             extra_arguments=[{'use_intra_process_comms': True}]
         )
-    
-    def get_video_player_node(package, plugin):
-        return ComposableNode(
-            package=package,
-            plugin=plugin,
-            name='video_player_node',
-            parameters=[{
-                'video_file_path': '/Users/wan/Documents/sr_radar/SR_final_v1/SR_radar/Video_20250514133209116.avi'
-            }],
-            extra_arguments=[{'use_intra_process_comms': True}]
-        )
 
     def get_kalman_filter_node(package, plugin):
         return ComposableNode(
@@ -98,6 +87,14 @@ def generate_launch_description():
     #        extra_arguments=[{'use_intra_process_comms': True}]
     #    )
 
+    # 定义 dv_trigger 节点
+    #dv_trigger_node = Node(
+    #    package='dv_trigger',
+    #    executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
+    #    name='dv_trigger_node',
+    #    output='screen'
+    #)
+
     def get_camera_detector_container(nodes):
         return ComposableNodeContainer(
             name='camera_detector_container',
@@ -116,16 +113,8 @@ def generate_launch_description():
     radar_resolve_node = get_radar_resolve_node('tdt_vision', 'tdt_radar::Resolve')
     foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
     rosbag_player_node = get_rosbag_player_node('rosbag_player', 'RosbagPlayer')
-    video_player_node = get_video_player_node('video_player', 'video_player::VideoPlayerNode')
     kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
 
-    # 定义 dv_trigger 节点
-    #dv_trigger_node = Node(
-    #    package='dv_trigger',
-    #    executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
-    #    name='dv_trigger_node',
-    #    output='screen'
-    #)
 
     # 创建节点容器，确保 hik_camera_node 是第一个
     nodes = [
@@ -134,7 +123,6 @@ def generate_launch_description():
         radar_resolve_node,
         foxglove_node,
         rosbag_player_node,
-        video_player_node, # Add video_player_node here
         kalman_filter_node
     ]
     cam_detector = get_camera_detector_container(nodes)
