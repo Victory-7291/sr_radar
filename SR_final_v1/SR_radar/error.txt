@@ -1,39 +1,42 @@
 wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ colcon build
-Starting &gt;&gt;&gt; radar_interface
-Starting &gt;&gt;&gt; vision_interface
-Starting &gt;&gt;&gt; hik_camera
-Starting &gt;&gt;&gt; libocsort
-Starting &gt;&gt;&gt; video_player
-Finished &lt;&lt;&lt; libocsort [0.10s]                                           
-Finished &lt;&lt;&lt; hik_camera [0.11s]
-Finished &lt;&lt;&lt; radar_interface [0.27s]                                      
-Starting &gt;&gt;&gt; dv_trigger
-Starting &gt;&gt;&gt; judge_bridge
-Starting &gt;&gt;&gt; radar_decision
-Finished &lt;&lt;&lt; vision_interface [0.28s]
-Starting &gt;&gt;&gt; debug_map
-Starting &gt;&gt;&gt; kalman_filter
-Starting &gt;&gt;&gt; rosbag_player
-Starting &gt;&gt;&gt; tdt_vision
-Finished &lt;&lt;&lt; radar_decision [0.06s]                               
-Finished &lt;&lt;&lt; dv_trigger [0.09s]
-Finished &lt;&lt;&lt; debug_map [0.08s]
-Finished &lt;&lt;&lt; rosbag_player [0.11s]
-Finished &lt;&lt;&lt; kalman_filter [0.12s]                                
-Finished &lt;&lt;&lt; judge_bridge [0.15s]
-Finished &lt;&lt;&lt; tdt_vision [0.17s]
---- stderr: video_player                           
-/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:1:10: fatal error: video_player/video_player_node.hpp: No such file or directory
-    1 | #include "video_player/video_player_node.hpp"
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
+Starting >>> radar_interface
+Starting >>> vision_interface
+Starting >>> hik_camera
+Starting >>> libocsort
+Starting >>> video_player
+Finished <<< libocsort [0.09s]
+Finished <<< hik_camera [0.10s]                                          
+Finished <<< vision_interface [0.26s]                                     
+Starting >>> rosbag_player
+Finished <<< radar_interface [0.27s]
+Starting >>> debug_map
+Starting >>> dv_trigger
+Starting >>> judge_bridge
+Starting >>> kalman_filter
+Starting >>> radar_decision
+Starting >>> tdt_vision
+Finished <<< radar_decision [0.06s]                               
+Finished <<< debug_map [0.10s]
+Finished <<< dv_trigger [0.11s]
+Finished <<< rosbag_player [0.13s]
+Finished <<< judge_bridge [0.12s]
+Finished <<< kalman_filter [0.13s]                                
+Finished <<< tdt_vision [0.17s]
+--- stderr: video_player                               
+/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp: In constructor ‘video_player::VideoPlayerNode::VideoPlayerNode(const rclcpp::NodeOptions&)’:
+/home/wan/SR_final_v1/SR_radar/src/utils/video_player/src/video_player_node.cpp:15:42: error: ‘video_file_path_’ was not declared in this scope; did you mean ‘video_path_’?
+   15 |   this->get_parameter("video_file_path", video_file_path_);
+      |                                          ^~~~~~~~~~~~~~~~
+      |                                          video_path_
 gmake[2]: *** [CMakeFiles/video_player_node.dir/build.make:76: CMakeFiles/video_player_node.dir/src/video_player_node.cpp.o] Error 1
 gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/video_player_node.dir/all] Error 2
 gmake: *** [Makefile:146: all] Error 2
 ---
-Failed   &lt;&lt;&lt; video_player [1.02s, exited with code 2]
+Failed   <<< video_player [3.39s, exited with code 2]
 
-Summary: 11 packages finished [1.23s]
+Summary: 11 packages finished [3.55s]
   1 package failed: video_player
   1 package had stderr output: video_player
 wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ 
+
+
