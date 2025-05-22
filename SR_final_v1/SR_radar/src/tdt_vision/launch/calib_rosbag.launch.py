@@ -13,41 +13,25 @@ from launch import LaunchDescription
 from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
-
-    #def get_hik_camera_node(package, plugin):
-    #    params_file = os.path.join(get_package_share_directory('hik_camera'), 'config', 'camera_params.yaml')
-    #    return ComposableNode(
-    #        package=package,
-    #        plugin=plugin,
-    #        name='hik_camera',
-    #        parameters=[params_file],
-    #        extra_arguments=[{'use_intra_process_comms': True}]
-    #    )
-
-        
-    #def get_rosbag_player_node(package, plugin):
-    #    return ComposableNode(
-    #        package=package,
-    #        plugin=plugin,
-    #        name='rosbag_player_node',
-    #        parameters=[ {'rosbag_file': 
-    #            '/home/wan/rosbag_test/merged_bag_0.db3'
-    #            #'/home/shenxw/Rosbag/适应性录像第二把/merged_bag/merged_bag_0.db3'
-    #            }],
-    #        extra_arguments=[{'use_intra_process_comms': True}]
-    #    )  
-
-  
+    # 定义视频和rosbag路径
+    workspace_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    video_path = os.path.join(workspace_path, 'test.mp4')
+    rosbag_path = os.path.join(workspace_path, 'test_video_bag')
+    
+    # 视频播放器节点 - 使用rosbag作为源
     def get_video_player_node(package, plugin):
-        # 使用相对于工作空间的路径
-        workspace_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        video_path = os.path.join(workspace_path, 'test.mp4')
-        
         return ComposableNode(
             package=package,
             plugin=plugin,
             name='video_player_node',
-            parameters=[{'video_file_path': video_path}],
+            parameters=[{
+                'source_type': 'rosbag',
+                'rosbag_file_path': rosbag_path,
+                'rosbag_topic': '/video_image',
+                'topic_name': 'video_image',
+                'loop': True,
+                'frame_rate': 30.0
+            }],
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
@@ -88,14 +72,8 @@ def generate_launch_description():
         radar_calib_node,
         video_player_node,
         #ros_bag_player_node
-
     )
-    #debug_container = get_debug_container(tdt_debug_node)
-    #plugin_map_launch_cmd = IncludeLaunchDescription(
-    #            PythonLaunchDescriptionSource([os.path.join(
-    #                get_package_share_directory('tdt_vision'), 'launch', 'map_server_launch.py')]),
-    #         )
+    
     return LaunchDescription([
             cam_detector,
-            #plugin_map_launch_cmd
         ])
