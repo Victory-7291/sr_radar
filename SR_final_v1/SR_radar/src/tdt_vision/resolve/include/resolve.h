@@ -24,13 +24,11 @@ namespace tdt_radar {
 class Resolve final : public rclcpp::Node {
  public:
   explicit Resolve(const rclcpp::NodeOptions& options);
-  void callback(const std::shared_ptr<geometry_msgs::msg::Vector3> msg);
   void DetectCallback(const vision_interface::msg::DetectResult::SharedPtr msg);
   void RadarMarkDataCallback(const radar_interface::msg::RadarMarkData::SharedPtr msg);
   void GameRobotHPCallback(const radar_interface::msg::GameRobotHP::SharedPtr msg);
   void RemainTimeCallback(const std_msgs::msg::UInt16::SharedPtr msg);
   
-  rclcpp::Subscription<geometry_msgs::msg::Vector3>::SharedPtr point_sub;
   rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr detect_sub;
   rclcpp::Subscription<radar_interface::msg::RadarMarkData>::SharedPtr radar_mark_data_sub;
   rclcpp::Subscription<radar_interface::msg::GameRobotHP>::SharedPtr game_robot_hp_sub;
@@ -38,14 +36,11 @@ class Resolve final : public rclcpp::Node {
   
   parser* parser_;
   int EnemyColor=1;
-  cv::Mat minimap;
   int markers[6];
   int16_t match_time;
   uint8_t robot_hp[16];
 
  private:
-  // pub PointXYZRGBA
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub;
   rclcpp::Publisher<vision_interface::msg::DetectResult>::SharedPtr pub_radar;
 };
 
