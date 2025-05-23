@@ -240,32 +240,32 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
     switch (color) {
     case team_color::C_RED:
-        map_robot_data.sentry_position_x = msg.blue[0].id != -1 ? msg.blue[0].position[0] * 100 : default_blue_x;
-        map_robot_data.sentry_position_y = msg.blue[0].id != -1 ? msg.blue[0].position[1] * 100 : default_blue_y;
-        map_robot_data.hero_position_x = msg.blue[1].id != -1 ? msg.blue[1].position[0] * 100 : default_blue_x;
-        map_robot_data.hero_position_y = msg.blue[1].id != -1 ? msg.blue[1].position[1] * 100 : default_blue_y;
-        map_robot_data.engineer_position_x = msg.blue[2].id != -1 ? msg.blue[2].position[0] * 100 : default_blue_x;
-        map_robot_data.engineer_position_y = msg.blue[2].id != -1 ? msg.blue[2].position[1] * 100 : default_blue_y;
-        map_robot_data.infantry_3_position_x = msg.blue[3].id != -1 ? msg.blue[3].position[0] * 100 : default_blue_x;
-        map_robot_data.infantry_3_position_y = msg.blue[3].id != -1 ? msg.blue[3].position[1] * 100 : default_blue_y;
-        map_robot_data.infantry_4_position_x = msg.blue[4].id != -1 ? msg.blue[4].position[0] * 100 : default_blue_x;
-        map_robot_data.infantry_4_position_y = msg.blue[4].id != -1 ? msg.blue[4].position[1] * 100 : default_blue_y;
-        map_robot_data.infantry_5_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
-        map_robot_data.infantry_5_position_y = msg.blue[5].id != -1 ? msg.blue[5].position[1] * 100 : default_blue_y;
+        map_robot_data.hero_position_x = msg.blue[0].id != -1 ? msg.blue[0].position[0] * 100 : default_blue_x;
+        map_robot_data.hero_position_y = msg.blue[0].id != -1 ? msg.blue[0].position[1] * 100 : default_blue_y;
+        map_robot_data.engineer_position_x = msg.blue[1].id != -1 ? msg.blue[1].position[0] * 100 : default_blue_x;
+        map_robot_data.engineer_position_y = msg.blue[1].id != -1 ? msg.blue[1].position[1] * 100 : default_blue_y;
+        map_robot_data.infantry_3_position_x = msg.blue[2].id != -1 ? msg.blue[2].position[0] * 100 : default_blue_x;
+        map_robot_data.infantry_3_position_y = msg.blue[2].id != -1 ? msg.blue[2].position[1] * 100 : default_blue_y;
+        map_robot_data.infantry_4_position_x = msg.blue[3].id != -1 ? msg.blue[3].position[0] * 100 : default_blue_x;
+        map_robot_data.infantry_4_position_y = msg.blue[3].id != -1 ? msg.blue[3].position[1] * 100 : default_blue_y;
+        map_robot_data.infantry_5_position_x = msg.blue[4].id != -1 ? msg.blue[4].position[0] * 100 : default_blue_x;
+        map_robot_data.infantry_5_position_y = msg.blue[4].id != -1 ? msg.blue[4].position[1] * 100 : default_blue_y;
+        map_robot_data.sentry_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
+        map_robot_data.sentry_position_y = msg.blue[5].id != -1 ? msg.blue[5].position[1] * 100 : default_blue_y;
         break;
     case team_color::C_BLUE:
-        map_robot_data.sentry_position_x = msg.red[0].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
-        map_robot_data.sentry_position_y = msg.red[0].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
-        map_robot_data.hero_position_x = msg.red[1].id != -1 ? msg.red[1].position[0] * 100 : default_red_x;
-        map_robot_data.hero_position_y = msg.red[1].id != -1 ? msg.red[1].position[1] * 100 : default_red_y;
-        map_robot_data.engineer_position_x = msg.red[2].id != -1 ? msg.red[2].position[0] * 100 : default_red_x;
-        map_robot_data.engineer_position_y = msg.red[2].id != -1 ? msg.red[2].position[1] * 100 : default_red_y;
-        map_robot_data.infantry_3_position_x = msg.red[3].id != -1 ? msg.red[3].position[0] * 100 : default_red_x;
-        map_robot_data.infantry_3_position_y = msg.red[3].id != -1 ? msg.red[3].position[1] * 100 : default_red_y;
-        map_robot_data.infantry_4_position_x = msg.red[4].id != -1 ? msg.red[4].position[0] * 100 : default_red_x;
-        map_robot_data.infantry_4_position_y = msg.red[4].id != -1 ? msg.red[4].position[1] * 100 : default_red_y;
-        map_robot_data.infantry_5_position_x = msg.red[5].id != -1 ? msg.red[5].position[0] * 100 : default_red_x;
-        map_robot_data.infantry_5_position_y = msg.red[5].id != -1 ? msg.red[5].position[1] * 100 : default_red_y;
+        map_robot_data.hero_position_x = msg.red[0].id != -1 ? msg.red[1].position[0] * 100 : default_red_x;
+        map_robot_data.hero_position_y = msg.red[0].id != -1 ? msg.red[1].position[1] * 100 : default_red_y;
+        map_robot_data.engineer_position_x = msg.red[1].id != -1 ? msg.red[2].position[0] * 100 : default_red_x;
+        map_robot_data.engineer_position_y = msg.red[1].id != -1 ? msg.red[2].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_3_position_x = msg.red[2].id != -1 ? msg.red[3].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_3_position_y = msg.red[2].id != -1 ? msg.red[3].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_4_position_x = msg.red[3].id != -1 ? msg.red[4].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_4_position_y = msg.red[3].id != -1 ? msg.red[4].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_5_position_x = msg.red[4].id != -1 ? msg.red[5].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_5_position_y = msg.red[4].id != -1 ? msg.red[5].position[1] * 100 : default_red_y;
+        map_robot_data.sentry_position_x = msg.red[5].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
+        map_robot_data.sentry_position_y = msg.red[5].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
         break;
     default:
         return;
