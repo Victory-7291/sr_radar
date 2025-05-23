@@ -65,11 +65,11 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     
     // 更新机器人位置数据
     for (int i = 0; i < 6; i++) {
-        if (msg->blue_x[i] * msg->blue_y[i]) {
+        if (msg->blue_x[i] && msg->blue_y[i]) {
             blue_point[i] = cv::Point2f(msg->blue_x[i], msg->blue_y[i]);
             blue_update[i] = current_time;
         }
-        if (msg->red_x[i] * msg->red_y[i]) {
+        if (msg->red_x[i] && msg->red_y[i]) {
             red_point[i] = cv::Point2f(msg->red_x[i], msg->red_y[i]);
             red_update[i] = current_time;
         }

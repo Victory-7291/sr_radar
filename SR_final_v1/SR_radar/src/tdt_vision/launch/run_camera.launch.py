@@ -26,6 +26,14 @@ def generate_launch_description():
         }]
     )
 
+    # 定义RadarWarn节点
+    radar_warn_node = Node(
+        package='radar_warn',
+        executable='radar_warn',
+        name='radar_warn_node',
+        output='screen'
+    )
+
     # 定义节点
     def get_rosbag_player_node(package, plugin):
         return ComposableNode(
@@ -141,6 +149,7 @@ def generate_launch_description():
     return LaunchDescription([
         # 首先启动JudgeBridgeNode节点
         judge_bridge_node,
+        radar_warn_node,  # 添加radar_warn节点
         dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
         cam_detector,
         #plugin_map_launch_cmd,

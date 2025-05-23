@@ -18,16 +18,23 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
 
     # 定义JudgeBridgeNode节点
-    #judge_bridge_node = Node(
-    #    package='judge_bridge',
-    #    executable='judge_bridge',
-    #    name='judge_bridge_node',
-    #    output='screen',
-    #    parameters=[{
-    #        'serial_port': '/dev/ttyUSB0',
-    #        'enable_recorder': False
-    #    }]
-    #)
+    judge_bridge_node = Node(
+        package='judge_bridge',
+        executable='judge_bridge',
+        name='judge_bridge_node',
+        output='screen',
+        parameters=[{
+            'serial_port': '/dev/ttyUSB0',
+            'enable_recorder': False
+        }]
+    )
+    # 定义RadarWarn节点
+    radar_warn_node = Node(
+        package='radar_warn',
+        executable='radar_warn',
+        name='radar_warn_node',
+        output='screen'
+    )
 
     # 定义节点
     def get_rosbag_player_node(package, plugin):
@@ -88,12 +95,12 @@ def generate_launch_description():
     #    )
 
     # 定义 dv_trigger 节点
-    #dv_trigger_node = Node(
-    #    package='dv_trigger',
-    #    executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
-    #    name='dv_trigger_node',
-    #    output='screen'
-    #)
+    dv_trigger_node = Node(
+        package='dv_trigger',
+        executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
+        name='dv_trigger_node',
+        output='screen'
+    )
 
     def get_camera_detector_container(nodes):
         return ComposableNodeContainer(
@@ -135,8 +142,9 @@ def generate_launch_description():
 
     return LaunchDescription([
         # 首先启动JudgeBridgeNode节点
-        #judge_bridge_node,
-        #dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
+        judge_bridge_node,
+        dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
+        radar_warn_node,  # 添加radar_warn节点
         cam_detector,
         #plugin_map_launch_cmd,
     ])
