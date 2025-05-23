@@ -10,6 +10,7 @@ find_package(Boost COMPONENTS locale date_time filesystem iostreams REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)  # 添加 std_msgs 依赖
+find_package(vision_interface REQUIRED)  # 添加 vision_interface 依赖
 
 ament_auto_find_build_dependencies(REQUIRED)
 

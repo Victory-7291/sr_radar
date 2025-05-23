@@ -33,18 +33,18 @@ void JudgeBridgeNode::filter_handler(JudgeSerial::JudgePair message){
     case CMD_ID::ROBOT_STATUS:
         robot_status_callback(*reinterpret_cast<robot_status_t*>(message.second.data()));
         break;
-    case CMD_ID::MAP_COMMAND:
-        map_command_callback(*reinterpret_cast<map_command_t*>(message.second.data()));
-        break;
+    //case CMD_ID::MAP_COMMAND:
+    //    map_command_callback(*reinterpret_cast<map_command_t*>(message.second.data()));
+    //    break;
     case CMD_ID::GAME_STATUS:
         game_status_callback(*reinterpret_cast<game_status_t*>(message.second.data()));
         break;
     case CMD_ID::GAME_ROBOT_HP:
         game_robot_hp_callback(*reinterpret_cast<game_robot_HP_t*>(message.second.data()));
         break;
-    case CMD_ID::INTERACTION_DATA:
-        interaction_data_callback(message.second);
-        break;
+    //case CMD_ID::INTERACTION_DATA:
+    //    interaction_data_callback(message.second);
+    //    break;
     default:
         RCLCPP_DEBUG(rclcpp::get_logger("command"), "redundant commands");           
         return;
@@ -84,12 +84,12 @@ void JudgeBridgeNode::send_custom_info(const std::string& str)
     judge_serial->write(CMD_ID::SEND_CUSTOM_INFO, reinterpret_cast<uint8_t*>(&custom_info), sizeof(custom_info));
 }
 
-void JudgeBridgeNode::map_command_callback(const map_command_t& cmd)
-{
-    RCLCPP_INFO(get_logger(), "keyboard: %#x "
-                              "x: %f, y: %f, id: %#x",
-        cmd.cmd_keyboard, cmd.target_position_x, cmd.target_position_y, cmd.target_robot_id);
-}
+//void JudgeBridgeNode::map_command_callback(const map_command_t& cmd)
+//{
+//    RCLCPP_INFO(get_logger(), "keyboard: %#x "
+//                              "x: %f, y: %f, id: %#x",
+//        cmd.cmd_keyboard, cmd.target_position_x, cmd.target_position_y, cmd.target_robot_id);
+//}
 
 void JudgeBridgeNode::robot_status_callback(const robot_status_t& robot_data)
 {
@@ -151,36 +151,36 @@ void JudgeBridgeNode::game_robot_hp_callback(const game_robot_HP_t& hp)
     pub_game_robot_hp->publish(msg);
 }
 
-void JudgeBridgeNode::interaction_data_callback(const std::vector<uint8_t>& data)
-{
-    auto header = reinterpret_cast<const robot_interaction_header_t*>(data.data());
-    if (header->data_cmd_id == INTERACTION_CMD::MAP_KEYBOARD) {
-        auto map_interaction = reinterpret_cast<const robot_interaction_map_data_t*>(data.data());
-        radar_interface::msg::MapCommand msg;
-        msg.target_position_x = map_interaction->map_cmd.target_position_x;
-        msg.target_position_y = map_interaction->map_cmd.target_position_y;
-        msg.target_robot_id = map_interaction->map_cmd.target_robot_id;
-        msg.cmd_keyboard = map_interaction->map_cmd.cmd_keyboard;
-        msg.cmd_source = map_interaction->map_cmd.cmd_source;
-        pub_map_keyboard->publish(msg);
-        RCLCPP_INFO(get_logger(), "Transferred Key: %d", map_interaction->map_cmd.cmd_keyboard);
-    } else if (header->data_cmd_id == INTERACTION_CMD::UWB_DATA) {
-        auto uwb = reinterpret_cast<const robot_interaction_uwb_t*>(data.data());
-        radar_interface::msg::UwbData msg;
-        msg.hero_x = uwb->hero_x;
-        msg.hero_y = uwb->hero_y;
-        msg.engineer_x = uwb->engineer_x;
-        msg.engineer_y = uwb->engineer_y;
-        msg.standard_3_x = uwb->standard_3_x;
-        msg.standard_3_y = uwb->standard_3_y;
-        msg.standard_4_x = uwb->standard_4_x;
-        msg.standard_4_y = uwb->standard_4_y;
-        msg.standard_5_x = uwb->standard_5_x;
-        msg.standard_5_y = uwb->standard_5_y;
-        pub_uwb_data->publish(msg);
-        RCLCPP_INFO(get_logger(), "UWB Received");
-    }
-}
+//void JudgeBridgeNode::interaction_data_callback(const std::vector<uint8_t>& data)
+//{
+//    auto header = reinterpret_cast<const robot_interaction_header_t*>(data.data());
+//    if (header->data_cmd_id == INTERACTION_CMD::MAP_KEYBOARD) {
+//        auto map_interaction = reinterpret_cast<const robot_interaction_map_data_t*>(data.data());
+//        radar_interface::msg::MapCommand msg;
+//        msg.target_position_x = map_interaction->map_cmd.target_position_x;
+//        msg.target_position_y = map_interaction->map_cmd.target_position_y;
+//        msg.target_robot_id = map_interaction->map_cmd.target_robot_id;
+//        msg.cmd_keyboard = map_interaction->map_cmd.cmd_keyboard;
+//        msg.cmd_source = map_interaction->map_cmd.cmd_source;
+//        pub_map_keyboard->publish(msg);
+//        RCLCPP_INFO(get_logger(), "Transferred Key: %d", map_interaction->map_cmd.cmd_keyboard);
+//    } else if (header->data_cmd_id == INTERACTION_CMD::UWB_DATA) {
+//        auto uwb = reinterpret_cast<const robot_interaction_uwb_t*>(data.data());
+//        radar_interface::msg::UwbData msg;
+//        msg.hero_x = uwb->hero_x;
+//        msg.hero_y = uwb->hero_y;
+//        msg.engineer_x = uwb->engineer_x;
+//        msg.engineer_y = uwb->engineer_y;
+//        msg.standard_3_x = uwb->standard_3_x;
+//        msg.standard_3_y = uwb->standard_3_y;
+//        msg.standard_4_x = uwb->standard_4_x;
+//        msg.standard_4_y = uwb->standard_4_y;
+//        msg.standard_5_x = uwb->standard_5_x;
+//        msg.standard_5_y = uwb->standard_5_y;
+//        pub_uwb_data->publish(msg);
+//        RCLCPP_INFO(get_logger(), "UWB Received");
+//    }
+//}
 
 void JudgeBridgeNode::send_sentry_data(const radar_interface::msg::MatchResult& topic_message)
 {
@@ -240,6 +240,8 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
     switch (color) {
     case team_color::C_RED:
+        map_robot_data.sentry_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
+        map_robot_data.sentry_position_y = msg.blue[5].id != -1 ? msg.blue[5].position[1] * 100 : default_blue_y;
         map_robot_data.hero_position_x = msg.blue[0].id != -1 ? msg.blue[0].position[0] * 100 : default_blue_x;
         map_robot_data.hero_position_y = msg.blue[0].id != -1 ? msg.blue[0].position[1] * 100 : default_blue_y;
         map_robot_data.engineer_position_x = msg.blue[1].id != -1 ? msg.blue[1].position[0] * 100 : default_blue_x;
@@ -250,10 +252,10 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
         map_robot_data.infantry_4_position_y = msg.blue[3].id != -1 ? msg.blue[3].position[1] * 100 : default_blue_y;
         map_robot_data.infantry_5_position_x = msg.blue[4].id != -1 ? msg.blue[4].position[0] * 100 : default_blue_x;
         map_robot_data.infantry_5_position_y = msg.blue[4].id != -1 ? msg.blue[4].position[1] * 100 : default_blue_y;
-        map_robot_data.sentry_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
-        map_robot_data.sentry_position_y = msg.blue[5].id != -1 ? msg.blue[5].position[1] * 100 : default_blue_y;
         break;
     case team_color::C_BLUE:
+        map_robot_data.sentry_position_x = msg.red[5].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
+        map_robot_data.sentry_position_y = msg.red[5].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
         map_robot_data.hero_position_x = msg.red[0].id != -1 ? msg.red[1].position[0] * 100 : default_red_x;
         map_robot_data.hero_position_y = msg.red[0].id != -1 ? msg.red[1].position[1] * 100 : default_red_y;
         map_robot_data.engineer_position_x = msg.red[1].id != -1 ? msg.red[2].position[0] * 100 : default_red_x;
@@ -264,8 +266,6 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
         map_robot_data.infantry_4_position_y = msg.red[3].id != -1 ? msg.red[4].position[1] * 100 : default_red_y;
         map_robot_data.infantry_5_position_x = msg.red[4].id != -1 ? msg.red[5].position[0] * 100 : default_red_x;
         map_robot_data.infantry_5_position_y = msg.red[4].id != -1 ? msg.red[5].position[1] * 100 : default_red_y;
-        map_robot_data.sentry_position_x = msg.red[5].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
-        map_robot_data.sentry_position_y = msg.red[5].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
         break;
     default:
         return;
@@ -273,6 +273,87 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     judge_serial->write(CMD_ID::ROBOT_MAP, reinterpret_cast<uint8_t*>(&map_robot_data), sizeof(map_robot_data));
     
     RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
+}
+
+void JudgeBridgeNode::send_standard1_data(const vision_interface::msg::RadarWarn& msg) {
+    if (color == team_color::UNKNOWN) {
+        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵1数据");
+        return;
+    }
+    
+    // 创建交互数据结构体
+    robot_interaction_standard_data_t interaction_data;
+    interaction_data.header.data_cmd_id = INTERACTION_CMD::STANDARD_1;
+    
+    // 根据团队颜色设置发送者和接收者ID
+    if (color == team_color::C_RED) {
+        interaction_data.header.sender_id = RADAR_ID::R_RED;
+        interaction_data.header.receiver_id = STANDARD_1_ID[team_color::C_RED]; // 红队标准步兵1
+    } else {
+        interaction_data.header.sender_id = RADAR_ID::R_BLUE;
+        interaction_data.header.receiver_id = STANDARD_1_ID[team_color::C_BLUE]; // 蓝队标准步兵1
+    }
+    
+    // 设置英雄状态
+    interaction_data.hero_state = msg.hero_state;
+    
+    // 发送数据
+    judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(interaction_data));
+    RCLCPP_INFO(this->get_logger(), "发送hero_state给标准步兵1: %d", msg.hero_state);
+}
+
+void JudgeBridgeNode::send_standard2_data(const vision_interface::msg::RadarWarn& msg) {
+    if (color == team_color::UNKNOWN) {
+        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵2数据");
+        return;
+    }
+    
+    // 创建交互数据结构体
+    robot_interaction_standard_data_t interaction_data;
+    interaction_data.header.data_cmd_id = INTERACTION_CMD::STANDARD_2;
+    
+    // 根据团队颜色设置发送者和接收者ID
+    if (color == team_color::C_RED) {
+        interaction_data.header.sender_id = RADAR_ID::R_RED;
+        interaction_data.header.receiver_id = STANDARD_2_ID[team_color::C_RED]; // 红队标准步兵2
+    } else {
+        interaction_data.header.sender_id = RADAR_ID::R_BLUE;
+        interaction_data.header.receiver_id = STANDARD_2_ID[team_color::C_BLUE]; // 蓝队标准步兵2
+    }
+    
+    // 设置英雄状态
+    interaction_data.hero_state = msg.hero_state;
+    
+    // 发送数据
+    judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(interaction_data));
+    RCLCPP_INFO(this->get_logger(), "发送hero_state给标准步兵2: %d", msg.hero_state);
+}
+
+void JudgeBridgeNode::send_standard3_data(const vision_interface::msg::RadarWarn& msg) {
+    if (color == team_color::UNKNOWN) {
+        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵3数据");
+        return;
+    }
+    
+    // 创建交互数据结构体
+    robot_interaction_standard_data_t interaction_data;
+    interaction_data.header.data_cmd_id = INTERACTION_CMD::STANDARD_3;
+    
+    // 根据团队颜色设置发送者和接收者ID
+    if (color == team_color::C_RED) {
+        interaction_data.header.sender_id = RADAR_ID::R_RED;
+        interaction_data.header.receiver_id = STANDARD_3_ID[team_color::C_RED]; // 红队标准步兵3
+    } else {
+        interaction_data.header.sender_id = RADAR_ID::R_BLUE;
+        interaction_data.header.receiver_id = STANDARD_3_ID[team_color::C_BLUE]; // 蓝队标准步兵3
+    }
+    
+    // 设置英雄状态
+    interaction_data.hero_state = msg.hero_state;
+    
+    // 发送数据
+    judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(interaction_data));
+    RCLCPP_INFO(this->get_logger(), "发送hero_state给标准步兵3: %d", msg.hero_state);
 }
 
 void JudgeBridgeNode::init_serial()
@@ -305,12 +386,23 @@ JudgeBridgeNode::JudgeBridgeNode()
     pub_color = create_publisher<radar_interface::team_color::msg>("judge/color", rclcpp::SystemDefaultsQoS());
     pub_remain_time = create_publisher<std_msgs::msg::UInt16>("judge/remain_time", rclcpp::SystemDefaultsQoS());
     pub_game_robot_hp = create_publisher<radar_interface::msg::GameRobotHP>("judge/game_robot_hp", rclcpp::SystemDefaultsQoS());
-    pub_map_keyboard = create_publisher<radar_interface::msg::MapCommand>("judge/map_keyboard", rclcpp::SystemDefaultsQoS());
-    pub_uwb_data = create_publisher<radar_interface::msg::UwbData>("judge/uwb_data", rclcpp::SystemDefaultsQoS());
+    //pub_map_keyboard = create_publisher<radar_interface::msg::MapCommand>("judge/map_keyboard", rclcpp::SystemDefaultsQoS());
+    //pub_uwb_data = create_publisher<radar_interface::msg::UwbData>("judge/uwb_data", rclcpp::SystemDefaultsQoS());
 
     sub_radar_cmd = create_subscription<std_msgs::msg::UInt8>("judge/radar_cmd", rclcpp::SystemDefaultsQoS(), std::bind(&JudgeBridgeNode::send_radar_cmd, this, std::placeholders::_1));
     sub_match_result = create_subscription<radar_interface::msg::MatchResult>("/matcher/match_result", rclcpp::SystemDefaultsQoS(), std::bind(&JudgeBridgeNode::send_sentry_data, this, std::placeholders::_1));
     sub_map_robot_data = create_subscription<radar_interface::msg::MatchResult>("/matcher/match_result", rclcpp::SystemDefaultsQoS(), std::bind(&JudgeBridgeNode::send_map_robot_data, this, std::placeholders::_1));
+    
+    // 新增订阅/resolve_result话题，并分别触发三个回调函数
+    sub_resolve_result = create_subscription<vision_interface::msg::RadarWarn>(
+        "/hero_state", rclcpp::SystemDefaultsQoS(), 
+        [this](const vision_interface::msg::RadarWarn::SharedPtr msg) {
+            // 一个消息触发三个回调函数
+            send_standard1_data(*msg);
+            send_standard2_data(*msg);
+            send_standard3_data(*msg);
+        });
+    
     sub_custom_info = create_subscription<std_msgs::msg::String>("judge/custom_info", rclcpp::SystemDefaultsQoS(),
         [this](const std_msgs::msg::String& msg) {
             RCLCPP_INFO(get_logger(), "Custom Info: %s", msg.data.c_str());

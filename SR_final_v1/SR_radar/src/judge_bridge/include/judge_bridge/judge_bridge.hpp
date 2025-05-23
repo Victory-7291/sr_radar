@@ -26,6 +26,7 @@
 #include <radar_interface/msg/game_robot_hp.hpp>
 #include <radar_interface/msg/uwb_data.hpp>
 #include <radar_interface/team_color.hpp>
+#include <vision_interface/msg/radar_warn.hpp>
 
 
 using namespace JudgeBridge;
@@ -48,6 +49,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::UInt8>::SharedPtr sub_radar_cmd;
     rclcpp::Subscription<radar_interface::msg::MatchResult>::SharedPtr sub_match_result;
     rclcpp::Subscription<radar_interface::msg::MatchResult>::SharedPtr sub_map_robot_data;
+    rclcpp::Subscription<vision_interface::msg::RadarWarn>::SharedPtr sub_resolve_result;
     std::atomic<team_color::ENUM> color { team_color::UNKNOWN };
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_custom_info;
@@ -65,6 +67,11 @@ private:
 
     void send_sentry_data(const radar_interface::msg::MatchResult& topic_message);
     void send_radar_cmd(const std_msgs::msg::UInt8 &radar_cmd);
+    
+    // 新增的三个回调函数，用于发送状态给步兵
+    void send_standard1_data(const vision_interface::msg::RadarWarn& msg);
+    void send_standard2_data(const vision_interface::msg::RadarWarn& msg);
+    void send_standard3_data(const vision_interface::msg::RadarWarn& msg);
 
 public:
     JudgeBridgeNode();

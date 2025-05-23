@@ -90,6 +90,9 @@ enum INTERACTION_CMD {
     SENTRY_DATA = 0x0200,
     MAP_KEYBOARD = 0x0202,
     UWB_DATA = 0x0203,
+    STANDARD_1 = 0x0204,
+    STANDARD_2 = 0x0205,
+    STANDARD_3 = 0x0206,
 };
 
 struct robot_interaction_header_t {
@@ -161,6 +164,12 @@ struct game_robot_HP_t
     uint16_t blue_outpost_HP; 
     uint16_t blue_base_HP; 
 }; 
+
+// 新增：用于与标准步兵通信的数据结构
+struct robot_interaction_standard_data_t {
+    robot_interaction_header_t header;
+    uint8_t hero_state;  // 英雄状态
+};
 
 #pragma pack()
 

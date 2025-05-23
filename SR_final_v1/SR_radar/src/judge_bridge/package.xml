@@ -10,6 +10,7 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>  <!-- 添加 std_msgs 依赖 -->
   <depend>radar_interface</depend>
+  <depend>vision_interface</depend>  <!-- 添加 vision_interface 依赖 -->
   <depend>Boost</depend>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
