@@ -79,10 +79,10 @@ namespace tdt_radar
     cv::Point2f parser::get_2d(cv::Point2f &input_point, float height)
     {
         std::vector<cv::Point3f> world_points;
-        world_points.push_back(cv::Point3f(12, -6, ARMOR_HEIGHT+height));
-        world_points.push_back(cv::Point3f(16, -6, ARMOR_HEIGHT+height));
-        world_points.push_back(cv::Point3f(16, -8, ARMOR_HEIGHT+height));
-        world_points.push_back(cv::Point3f(12, -8, ARMOR_HEIGHT+height));
+        world_points.push_back(cv::Point3f(12, -6, height-ARMOR_HEIGHT));
+        world_points.push_back(cv::Point3f(16, -6, height-ARMOR_HEIGHT));
+        world_points.push_back(cv::Point3f(16, -8, height-ARMOR_HEIGHT));
+        world_points.push_back(cv::Point3f(12, -8, height-ARMOR_HEIGHT));
         std::vector<cv::Point2f> image_points;
         cv::projectPoints(world_points, world_rvec, world_tvec, camera_matrix, dist_coeffs, image_points);
         for(auto &point:image_points){

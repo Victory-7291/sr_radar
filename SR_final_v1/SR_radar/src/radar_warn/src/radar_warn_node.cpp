@@ -14,7 +14,7 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
     
     // 初始化订阅者
     detect_sub_ = this->create_subscription<vision_interface::msg::DetectResult>(
-        "/resolve_result", 10, std::bind(&RadarWarn::detect_callback, this, std::placeholders::_1));
+        "/kalman_detect", 10, std::bind(&RadarWarn::detect_callback, this, std::placeholders::_1));
     
     color_sub_ = this->create_subscription<radar_interface::team_color::msg>(
         "judge/color", 10, std::bind(&RadarWarn::color_callback, this, std::placeholders::_1));
@@ -60,6 +60,7 @@ float RadarWarn::calculate_distance(const cv::Point2f& p1, const cv::Point2f& p2
 
 void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg) {
     // 获取当前时间
+    std::cout<<"1111111111111111"<<std::endl;
     auto now = std::chrono::system_clock::now();
     double current_time = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() / 1000.0;
     
@@ -158,6 +159,8 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
             warning_level = 0; // 不预警
         }
     }
+
+    RCLCPP_INFO(this->get_logger(), "敌方英雄机器人预警等级1：%d", warning_level);
     
     // 发布预警消息
     vision_interface::msg::RadarWarn radar_warn;

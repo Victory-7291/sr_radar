@@ -29,7 +29,7 @@ def generate_launch_description():
     # 定义RadarWarn节点
     radar_warn_node = Node(
         package='radar_warn',
-        executable='radar_warn',
+        executable='radar_warn_node',
         name='radar_warn_node',
         output='screen'
     )
