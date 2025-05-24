@@ -61,12 +61,7 @@ private:
     float min_movement_threshold = 1.0f; // 最小移动阈值（米）
     
     // 预警相关
-    int warning_level = 0; // 预警等级：0-不预警，1-可能预警，2-明确预警
-    double last_warning_active_time = 0.0; // 最后一次预警激活的时间
-    double warning_hold_duration = 1.0; // 预警保持时间（秒）
-    double last_hero_detected_time = 0.0; // 最后一次检测到敌方英雄的时间
-    double time_since_last_detection =0.0;
-    double possible_warning_timeout = 5.0; // 触发可能预警所需的未检测到敌方英雄的时间（秒）
+    int warning_level = 0; // 预警等级：0-不预警，1-预警
 };
 
 }  // namespace tdt_radar

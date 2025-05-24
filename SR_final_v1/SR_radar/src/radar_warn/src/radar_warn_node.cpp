@@ -42,9 +42,6 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
         red_update[i] = 0.0;
     }
     
-    // 初始化最后检测时间
-    last_hero_detected_time = 0.0;
-    
     RCLCPP_INFO(this->get_logger(), "RadarWarn节点已启动");
 }
 
@@ -60,7 +57,6 @@ float RadarWarn::calculate_distance(const cv::Point2f& p1, const cv::Point2f& p2
 
 void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg) {
     // 获取当前时间
-    std::cout<<"1111111111111111"<<std::endl;
     auto now = std::chrono::system_clock::now();
     double current_time = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() / 1000.0;
     
@@ -75,6 +71,9 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
             red_update[i] = current_time;
         }
     }
+    
+    // 默认设置预警等级为0（不预警）
+    warning_level = 0;
     
     // 获取敌方英雄机器人的位置（编号为1，在数组中索引为0）
     cv::Point2f enemy_hero_position;
@@ -94,20 +93,12 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
         }
     }
     
-    // 计算未检测到敌方英雄的时间
-    double time_since_last_detection = current_time - last_hero_detected_time;
-    
-    // 使用条件语句设置warning_level，不需要先重置为0
-    
-    // 如果检测到敌方英雄机器人
+    // 处理敌方英雄机器人预警逻辑
     if (enemy_hero_detected) {
-        // 更新最后检测到敌方英雄的时间
-        last_hero_detected_time = current_time;
-        
-        // 添加当前位置到历史记录
+        // 检测到敌方英雄，添加位置到历史记录
         hero_history.push_back({enemy_hero_position, current_time});
         
-        // 移除过时的历史记录，但至少保留两个记录
+        // 移除超过2秒的过时历史记录，但至少保留两个记录
         while (hero_history.size() > 2 && current_time - hero_history.front().timestamp > hero_history_duration) {
             hero_history.pop_front();
         }
@@ -124,47 +115,28 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
             if (distance_moved < min_movement_threshold && 
                 current_time - oldest_record.timestamp >= hero_history_duration) {
                 
-                // 敌方英雄机器人在指定时间内移动距离小于阈值，发出明确预警（等级2）
-                warning_level = 2; // 明确预警
-                last_warning_active_time = current_time; // 更新最后一次预警激活时间
-                RCLCPP_WARN(this->get_logger(), "敌方英雄机器人预警（等级2）：移动距离 %.2f 米，小于阈值 %.2f 米", 
+                // 敌方英雄机器人在指定时间内移动距离小于阈值，发出预警
+                warning_level = 1; // 设置为预警状态
+                RCLCPP_WARN(this->get_logger(), "敌方英雄机器人预警：移动距离 %.2f 米，小于阈值 %.2f 米", 
                            distance_moved, min_movement_threshold);
             } else {
-                warning_level = 0; // 不预警
+                // 移动距离大于阈值，不预警
+                warning_level = 0;
+                RCLCPP_INFO(this->get_logger(), "敌方英雄机器人正常移动：移动距离 %.2f 米，大于阈值 %.2f 米",
+                           distance_moved, min_movement_threshold);
             }
-        } else {
-            warning_level = 0; // 不预警
         }
     } else {
-        // 未检测到敌方英雄机器人
-        // 如果之前是明确预警状态，且在保持时间内，则继续保持预警状态
-        if (current_time - last_warning_active_time <= warning_hold_duration) {
-            warning_level = 2; // 继续保持明确预警
-            RCLCPP_INFO(this->get_logger(), "未检测到敌方英雄，但预警状态保持中%.1f", 
-                       warning_hold_duration - (current_time - last_warning_active_time));
-        } else if(!hero_history.empty() && time_since_last_detection >= possible_warning_timeout){
-            // 检查是否应该发出可能预警（等级1）
-            // 条件：未检测到敌方英雄达到5秒 且 最后记录的位置y坐标小于22
-            // 获取最新的历史记录
-            const auto& latest_record = hero_history.back();
-            // 如果y坐标小于22，则发出可能预警
-            if (latest_record.position.y < 22) {
-                warning_level = 1; // 可能预警
-                RCLCPP_INFO(this->get_logger(), "敌方英雄机器人可能预警（等级1）：未检测到敌方英雄%.1f秒，最后位置y=%.2f < 22", 
-                           time_since_last_detection, latest_record.position.y);
-            } else {
-                warning_level = 0; // 不预警
-            }
-        } else {
-            warning_level = 0; // 不预警
-        }
+        // 未检测到敌方英雄机器人，不预警
+        warning_level = 0;
+        RCLCPP_INFO(this->get_logger(), "未检测到敌方英雄机器人");
     }
-
-    RCLCPP_INFO(this->get_logger(), "敌方英雄机器人预警等级1：%d", warning_level);
+    
+    RCLCPP_INFO(this->get_logger(), "敌方英雄机器人预警等级：%d", warning_level);
     
     // 发布预警消息
     vision_interface::msg::RadarWarn radar_warn;
-    radar_warn.hero_state = warning_level; // 使用预警等级
+    radar_warn.hero_state = warning_level;
     warn_pub_->publish(radar_warn);
     
     // 发布Radar2Sentry消息

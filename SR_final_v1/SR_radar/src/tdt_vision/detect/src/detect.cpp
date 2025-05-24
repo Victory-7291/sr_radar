@@ -115,144 +115,164 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   auto img = cv_bridge::toCvShare(msg, "bgr8")->image;
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
+  // 创建一个空的检测结果消息，所有坐标默认为0
+  vision_interface::msg::DetectResult detect_result;
+  detect_result.header.stamp = msg->header.stamp;
+
+  // 标记是否需要处理检测到的车辆和装甲板
+  bool should_process = true;
+
   yolo::Image image(img.data, img.cols, img.rows);
 
   auto result = yolo->forward(image);
   if(result.size()==0){
     RCLCPP_INFO(this->get_logger(), "No Car!");
-    return;
+    // 发布空的检测结果（所有坐标默认为0）
+    pub->publish(detect_result);
+    should_process = false;  // 不需要处理后续步骤
   }else if(result.size()>MAX_CARS){
     RCLCPP_INFO(this->get_logger(), "Too Many Car!");
-    return;
+    // 发布空的检测结果（所有坐标默认为0）
+    pub->publish(detect_result);
+    should_process = false;  // 不需要处理后续步骤
   }
 
   std::vector<yolo::Image> images;
   std::vector<cv::Mat> car_imgs;
   std::vector<Car> cars;
-  for(auto &box:result){
-    if (box.class_label==0 || box.class_label==1)
-    {
-      Car car;
-      car.car=box;
-      cars.push_back(car);
-    }
-  }
-  
-  for(auto &car : cars){
-    auto temp_rect = cv::Rect(
-      car.car.left,
-      car.car.top,
-      car.car.right-car.car.left,
-      car.car.bottom-car.car.top);
-    cv::Rect temp_car_rect = getSafeRect(img,temp_rect);
-    auto car_img = img(temp_car_rect);
-    car_imgs.push_back(car_img.clone());
-    car.car_rect = temp_car_rect;
-  }
 
-  for(auto &car_img:car_imgs){
-    auto image_yolo = yolo::Image(car_img.data, car_img.cols, car_img.rows);
-    images.push_back(image_yolo);
-  }
-
-  auto armor_boxes = armor_yolo->forwards(images);
-  bool has_armor=false;
-  for(int i=0;i<armor_boxes.size();i++){
-    if(armor_boxes[i].size()==0){
-      continue;
-    }else{
-      cars[i].armors=armor_boxes[i];
-      has_armor=true;}
-  }
-  if(!has_armor){
-    RCLCPP_INFO(this->get_logger(), "No Armor!");
-    return;
-  }
-
-  for(auto &car:cars){
-    if(car.armors.size()==0){continue;}
-    for(auto &armor:car.armors){
-      if(debug){
-        //cv::putText(img,std::to_string(armor.class_label),cv::Point(armor.left+car.car.left,armor.top+car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,255,0),2);
-        cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
+  if(should_process) {
+    for(auto &box:result){
+      if (box.class_label==0 || box.class_label==1)
+      {
+        Car car;
+        car.car=box;
+        cars.push_back(car);
       }
     }
-  }
-  
-  vision_interface::msg::DetectResult detect_result;
-  for(auto &car:cars){
-    if(car.armors.size()==0){continue;}
     
-    cv::Rect max_rect;
-    float max_confidence=0;
-    int best_armor_class_label = -1;
+    for(auto &car : cars){
+      auto temp_rect = cv::Rect(
+        car.car.left,
+        car.car.top,
+        car.car.right-car.car.left,
+        car.car.bottom-car.car.top);
+      cv::Rect temp_car_rect = getSafeRect(img,temp_rect);
+      auto car_img = img(temp_car_rect);
+      car_imgs.push_back(car_img.clone());
+      car.car_rect = temp_car_rect;
+    }
 
-    for(auto &armor:car.armors){
-      if(armor.confidence > max_confidence){
-        max_rect=cv::Rect(
-          armor.left+car.car.left,
-          armor.top+car.car.top,
-          armor.right-armor.left,
-          armor.bottom-armor.top);
-        max_confidence=armor.confidence;
-        best_armor_class_label = armor.class_label;
+    for(auto &car_img:car_imgs){
+      auto image_yolo = yolo::Image(car_img.data, car_img.cols, car_img.rows);
+      images.push_back(image_yolo);
+    }
+
+    auto armor_boxes = armor_yolo->forwards(images);
+    bool has_armor=false;
+    for(int i=0;i<armor_boxes.size();i++){
+      if(armor_boxes[i].size()==0){
+        continue;
+      }else{
+        cars[i].armors=armor_boxes[i];
+        has_armor=true;}
+    }
+    if(!has_armor){
+      RCLCPP_INFO(this->get_logger(), "No Armor!");
+      // 发布空的检测结果（所有坐标默认为0）
+      pub->publish(detect_result);
+      should_process = false;  // 不需要处理后续步骤
+    }
+  }
+
+  if(should_process) {
+    for(auto &car:cars){
+      if(car.armors.size()==0){continue;}
+      for(auto &armor:car.armors){
+        if(debug){
+          //cv::putText(img,std::to_string(armor.class_label),cv::Point(armor.left+car.car.left,armor.top+car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,255,0),2);
+          cv::rectangle(img,car.car_rect,cv::Scalar(255,255,255),2);
+        }
       }
     }
+    
+    for(auto &car:cars){
+      if(car.armors.size()==0){continue;}
+      
+      cv::Rect max_rect;
+      float max_confidence=0;
+      int best_armor_class_label = -1;
 
-    if(best_armor_class_label == -1){
-        if(debug)
-          cv::putText(img,"No Valid Armor",cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,0),3);
-        continue;
-    }
+      for(auto &armor:car.armors){
+        if(armor.confidence > max_confidence){
+          max_rect=cv::Rect(
+            armor.left+car.car.left,
+            armor.top+car.car.top,
+            armor.right-armor.left,
+            armor.bottom-armor.top);
+          max_confidence=armor.confidence;
+          best_armor_class_label = armor.class_label;
+        }
+      }
 
-    if (best_armor_class_label >= 0 && best_armor_class_label <= 5) {
-        car.color = 0;
-        car.number = best_armor_class_label + 1;
-    } else if (best_armor_class_label >= 6 && best_armor_class_label <= 11) {
-        car.color = 2;
-        car.number = best_armor_class_label - 5;
-    } else {
-        if(debug) cv::putText(img,"Unknown Class",cv::Point(car.car.left,car.car.bottom-20),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,0,0),2);
-        continue;
+      if(best_armor_class_label == -1){
+          if(debug)
+            cv::putText(img,"No Valid Armor",cv::Point(car.car.left,car.car.bottom-10),cv::FONT_HERSHEY_SIMPLEX,2,cv::Scalar(255,255,0),3);
+          continue;
+      }
+
+      if (best_armor_class_label >= 0 && best_armor_class_label <= 5) {
+          car.color = 0;
+          car.number = best_armor_class_label + 1;
+      } else if (best_armor_class_label >= 6 && best_armor_class_label <= 11) {
+          car.color = 2;
+          car.number = best_armor_class_label - 5;
+      } else {
+          if(debug) cv::putText(img,"Unknown Class",cv::Point(car.car.left,car.car.bottom-20),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,0,0),2);
+          continue;
+      }
+      
+      auto safe_rect = getSafeRect(img,max_rect);
+      //cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
+
+      car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
+      
+      if(car.color==0){
+          detect_result.blue_x[car.number-1]=car.center.x;
+          detect_result.blue_y[car.number-1]=car.center.y;
+          if(car.center.x*car.center.y==0&&car.number!=0){
+            RCLCPP_ERROR(this->get_logger(), "Error: blue car center is 0 for number %d", car.number);
+          }
+          if(debug){
+          cv::rectangle(img,car.car_rect,cv::Scalar(255,0,0),2);
+          cv::putText(img,std::to_string(car.number),cv::Point(safe_rect.x, safe_rect.y -10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,0,0),2);
+          cv::putText(img,"C:"+std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
+          }
+      }
+      if(car.color==2){
+          detect_result.red_x[car.number-1]=car.center.x;
+          detect_result.red_y[car.number-1]=car.center.y;
+          if(car.center.x*car.center.y==0&&car.number!=0){
+            RCLCPP_ERROR(this->get_logger(), "Error: red car center is 0 for number %d", car.number);
+          }
+          if(debug){
+          cv::rectangle(img,car.car_rect,cv::Scalar(0,0,255),2);
+          cv::putText(img,std::to_string(car.number),cv::Point(safe_rect.x, safe_rect.y - 10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,0,255),2);
+          cv::putText(img,"C:"+std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
+          }
+      }
     }
     
-    auto safe_rect = getSafeRect(img,max_rect);
-    //cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
-
-    car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
-    
-    if(car.color==0){
-        detect_result.blue_x[car.number-1]=car.center.x;
-        detect_result.blue_y[car.number-1]=car.center.y;
-        if(car.center.x*car.center.y==0&&car.number!=0){
-          RCLCPP_ERROR(this->get_logger(), "Error: blue car center is 0 for number %d", car.number);
-        }
-        if(debug){
-        cv::rectangle(img,car.car_rect,cv::Scalar(255,0,0),2);
-        cv::putText(img,std::to_string(car.number),cv::Point(safe_rect.x, safe_rect.y -10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,0,0),2);
-        cv::putText(img,"C:"+std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
-        }
-    }
-    if(car.color==2){
-        detect_result.red_x[car.number-1]=car.center.x;
-        detect_result.red_y[car.number-1]=car.center.y;
-        if(car.center.x*car.center.y==0&&car.number!=0){
-          RCLCPP_ERROR(this->get_logger(), "Error: red car center is 0 for number %d", car.number);
-        }
-        if(debug){
-        cv::rectangle(img,car.car_rect,cv::Scalar(0,0,255),2);
-        cv::putText(img,std::to_string(car.number),cv::Point(safe_rect.x, safe_rect.y - 10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,0,255),2);
-        cv::putText(img,"C:"+std::to_string(car.car.confidence),cv::Point(car.car.left,car.car.top),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),2);
-        }
-    }
+    pub->publish(detect_result);
   }
-  detect_result.header.stamp=msg->header.stamp;
-  pub->publish(detect_result);
+
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
   std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(end - begin);
   std::cout<<"Detect Time: "<<time_used.count()*1000<<"ms"<<std::endl;
+  
+  // 确保在所有情况下都显示图像
   cv::Mat final_img;
-  cv::resize(img,final_img,cv::Size(1536, 1125));
+  cv::resize(img, final_img, cv::Size(1536, 1125));
   cv::imshow("detect", final_img);
   auto key = cv::waitKey(1);
   if(key=='r'){
