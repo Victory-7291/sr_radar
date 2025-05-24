@@ -99,7 +99,7 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
         hero_history.push_back({enemy_hero_position, current_time});
         
         // 移除超过2秒的过时历史记录，但至少保留两个记录
-        while (hero_history.size() > 2 && current_time - hero_history.front().timestamp > hero_history_duration) {
+        while (hero_history.size() > 2 && current_time - hero_history.front().timestamp > hero_history_duration+0.5) {
             hero_history.pop_front();
         }
         

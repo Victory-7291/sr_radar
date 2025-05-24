@@ -195,33 +195,49 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
         }
     }
     
-    // 处理英雄机器人(索引为0)的坐标持久化
-    // 处理红方英雄
-    if(detect_msg.red_x[0] != 0.0f && detect_msg.red_y[0] != 0.0f) {
-        // 如果有红方英雄坐标，更新最后位置
-        red_hero_last_position.x = detect_msg.red_x[0];
-        red_hero_last_position.y = detect_msg.red_y[0];
-        red_hero_last_position.valid = true;
-        RCLCPP_INFO(this->get_logger(), "更新红方英雄最后位置: x=%.2f, y=%.2f", red_hero_last_position.x, red_hero_last_position.y);
-    } else if(red_hero_last_position.valid) {
-        // 如果没有红方英雄坐标但有之前记录的位置，使用最后位置
-        detect_msg.red_x[0] = red_hero_last_position.x;
-        detect_msg.red_y[0] = red_hero_last_position.y;
-        RCLCPP_INFO(this->get_logger(), "使用红方英雄最后位置: x=%.2f, y=%.2f", red_hero_last_position.x, red_hero_last_position.y);
-    }
+    // 处理所有机器人(索引0-5)的坐标持久化
+    for(int i = 0; i < 6; i++) {
+        // 处理红方机器人
+        if(detect_msg.red_x[i] != 0.0f && detect_msg.red_y[i] != 0.0f) {
+            // 如果有红方机器人坐标，更新最后位置
+            red_robots_last_position[i].x = detect_msg.red_x[i];
+            red_robots_last_position[i].y = detect_msg.red_y[i];
+            red_robots_last_position[i].valid = true;
+            RCLCPP_INFO(this->get_logger(), "更新红方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+                       i, red_robots_last_position[i].x, red_robots_last_position[i].y);
+        } else if(red_robots_last_position[i].valid) {
+            // 如果最后位置在特定区域内（x<=4.3且y<=3.7），不使用最后位置
+            if(red_robots_last_position[i].x <= 4.3f && red_robots_last_position[i].y <= 3.7f) {
+                RCLCPP_INFO(this->get_logger(), "红方机器人[%d]位于特定区域内，不使用最后位置", i);
+            } else {
+                // 如果不在特定区域内，使用最后位置
+                detect_msg.red_x[i] = red_robots_last_position[i].x;
+                detect_msg.red_y[i] = red_robots_last_position[i].y;
+                RCLCPP_INFO(this->get_logger(), "使用红方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+                           i, red_robots_last_position[i].x, red_robots_last_position[i].y);
+            }
+        }
     
-    // 处理蓝方英雄
-    if(detect_msg.blue_x[0] != 0.0f && detect_msg.blue_y[0] != 0.0f) {
-        // 如果有蓝方英雄坐标，更新最后位置
-        blue_hero_last_position.x = detect_msg.blue_x[0];
-        blue_hero_last_position.y = detect_msg.blue_y[0];
-        blue_hero_last_position.valid = true;
-        RCLCPP_INFO(this->get_logger(), "更新蓝方英雄最后位置: x=%.2f, y=%.2f", blue_hero_last_position.x, blue_hero_last_position.y);
-    } else if(blue_hero_last_position.valid) {
-        // 如果没有蓝方英雄坐标但有之前记录的位置，使用最后位置
-        detect_msg.blue_x[0] = blue_hero_last_position.x;
-        detect_msg.blue_y[0] = blue_hero_last_position.y;
-        RCLCPP_INFO(this->get_logger(), "使用蓝方英雄最后位置: x=%.2f, y=%.2f", blue_hero_last_position.x, blue_hero_last_position.y);
+        // 处理蓝方机器人
+        if(detect_msg.blue_x[i] != 0.0f && detect_msg.blue_y[i] != 0.0f) {
+            // 如果有蓝方机器人坐标，更新最后位置
+            blue_robots_last_position[i].x = detect_msg.blue_x[i];
+            blue_robots_last_position[i].y = detect_msg.blue_y[i];
+            blue_robots_last_position[i].valid = true;
+            RCLCPP_INFO(this->get_logger(), "更新蓝方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+                       i, blue_robots_last_position[i].x, blue_robots_last_position[i].y);
+        } else if(blue_robots_last_position[i].valid) {
+            // 如果最后位置在特定区域内（x>=10.7且y>=24.3），不使用最后位置
+            if(blue_robots_last_position[i].x >= 10.7f && blue_robots_last_position[i].y >= 24.3f) {
+                RCLCPP_INFO(this->get_logger(), "蓝方机器人[%d]位于特定区域内，不使用最后位置", i);
+            } else {
+                // 如果不在特定区域内，使用最后位置
+                detect_msg.blue_x[i] = blue_robots_last_position[i].x;
+                detect_msg.blue_y[i] = blue_robots_last_position[i].y;
+                RCLCPP_INFO(this->get_logger(), "使用蓝方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+                           i, blue_robots_last_position[i].x, blue_robots_last_position[i].y);
+            }
+        }
     }
     
     radar_detect_pub_->publish(detect_msg);
