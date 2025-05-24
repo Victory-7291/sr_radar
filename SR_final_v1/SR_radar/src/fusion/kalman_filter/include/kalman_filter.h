@@ -43,14 +43,13 @@ class KalmanFilter :public rclcpp::Node
     vision_interface::msg::MatchInfo match_info;
     radar_interface::team_color::ENUM self_color;
     
-    // 存储机器人的最后位置
-    struct RobotPosition {
+    // 存储红方和蓝方英雄机器人的最后位置
+    struct HeroPosition {
         float x = 0.0f;
         float y = 0.0f;
         bool valid = false;
     };
-    // 索引0-5分别对应不同兵种
-    RobotPosition red_robots_last_position[6];
-    RobotPosition blue_robots_last_position[6];
+    HeroPosition red_hero_last_position;
+    HeroPosition blue_hero_last_position;
 };
 }//namespace tdt_radar
