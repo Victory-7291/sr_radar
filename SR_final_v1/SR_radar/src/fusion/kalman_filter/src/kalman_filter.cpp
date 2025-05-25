@@ -196,18 +196,18 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
             red_robots_last_position[i].x = detect_msg.red_x[i];
             red_robots_last_position[i].y = detect_msg.red_y[i];
             red_robots_last_position[i].valid = true;
-            RCLCPP_INFO(this->get_logger(), "更新红方机器人[%d]最后位置: x=%.2f, y=%.2f", 
-                       i, red_robots_last_position[i].x, red_robots_last_position[i].y);
+            //RCLCPP_INFO(this->get_logger(), "更新红方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+            //           i, red_robots_last_position[i].x, red_robots_last_position[i].y);
         } else if(red_robots_last_position[i].valid) {
             // 如果最后位置在特定区域内（x<=4.3且y<=3.7），不使用最后位置
             if(red_robots_last_position[i].x <= 4.3f && red_robots_last_position[i].y <= 3.7f) {
-                RCLCPP_INFO(this->get_logger(), "红方机器人[%d]位于特定区域内，不使用最后位置", i);
+                //RCLCPP_INFO(this->get_logger(), "红方机器人[%d]位于特定区域内，不使用最后位置", i);
             } else {
                 // 如果不在特定区域内，使用最后位置
                 detect_msg.red_x[i] = red_robots_last_position[i].x;
                 detect_msg.red_y[i] = red_robots_last_position[i].y;
-                RCLCPP_INFO(this->get_logger(), "使用红方机器人[%d]最后位置: x=%.2f, y=%.2f", 
-                           i, red_robots_last_position[i].x, red_robots_last_position[i].y);
+                //RCLCPP_INFO(this->get_logger(), "使用红方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+                //           i, red_robots_last_position[i].x, red_robots_last_position[i].y);
             }
         }
     
@@ -217,18 +217,18 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
             blue_robots_last_position[i].x = detect_msg.blue_x[i];
             blue_robots_last_position[i].y = detect_msg.blue_y[i];
             blue_robots_last_position[i].valid = true;
-            RCLCPP_INFO(this->get_logger(), "更新蓝方机器人[%d]最后位置: x=%.2f, y=%.2f", 
-                       i, blue_robots_last_position[i].x, blue_robots_last_position[i].y);
+            //RCLCPP_INFO(this->get_logger(), "更新蓝方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+            //           i, blue_robots_last_position[i].x, blue_robots_last_position[i].y);
         } else if(blue_robots_last_position[i].valid) {
             // 如果最后位置在特定区域内（x>=10.7且y>=24.3），不使用最后位置
             if(blue_robots_last_position[i].x >= 10.7f && blue_robots_last_position[i].y >= 24.3f) {
-                RCLCPP_INFO(this->get_logger(), "蓝方机器人[%d]位于特定区域内，不使用最后位置", i);
+                //RCLCPP_INFO(this->get_logger(), "蓝方机器人[%d]位于特定区域内，不使用最后位置", i);
             } else {
                 // 如果不在特定区域内，使用最后位置
                 detect_msg.blue_x[i] = blue_robots_last_position[i].x;
                 detect_msg.blue_y[i] = blue_robots_last_position[i].y;
-                RCLCPP_INFO(this->get_logger(), "使用蓝方机器人[%d]最后位置: x=%.2f, y=%.2f", 
-                           i, blue_robots_last_position[i].x, blue_robots_last_position[i].y);
+                //RCLCPP_INFO(this->get_logger(), "使用蓝方机器人[%d]最后位置: x=%.2f, y=%.2f", 
+                //           i, blue_robots_last_position[i].x, blue_robots_last_position[i].y);
             }
         }
     }
