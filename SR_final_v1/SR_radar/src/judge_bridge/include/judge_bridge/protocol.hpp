@@ -117,12 +117,7 @@ struct robot_interaction_map_data_t {
 
 struct robot_interaction_sentry_data_t {
     robot_interaction_header_t header;
-    uint8_t arr_len;
-    struct robot_pos {
-        uint8_t robot_id;           
-        float pos_x;                // (m)
-        float pos_y;                // (m)
-    } custom_data[12];
+    uint8_t engine_state;  // 添加工程机器人状态字段
 };
 
 struct robot_interaction_uwb_t {
@@ -169,12 +164,6 @@ struct game_robot_HP_t
 struct robot_interaction_standard_data_t {
     robot_interaction_header_t header;
     uint8_t hero_state;  // 英雄状态
-};
-
-// 新增：用于与哨兵通信的数据结构
-struct robot_interaction_sentry_data_t {
-    robot_interaction_header_t header;
-    uint8_t engine_state;  // 工程机器人状态
 };
 
 #pragma pack()
