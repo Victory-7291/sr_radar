@@ -1,45 +1,70 @@
-wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ ros2 launch tdt_vision calib_rosbag.launch.py 
-[INFO] [launch]: All log files can be found below /home/wan/.ros/log/2025-05-22-15-33-35-845727-wan-Predator-PHN16-71-6192
-[INFO] [launch]: Default logging verbosity is set to INFO
-[INFO] [component_container-1]: process started with pid [6204]
-[component_container-1] [INFO] [1747899216.182137995] [camera_detector_container]: Load Library: /home/wan/SR_final_v1/SR_radar/install/tdt_vision/lib/libradar_calibrate.so
-[component_container-1] [INFO] [1747899216.466800634] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Calibrate>
-[component_container-1] [INFO] [1747899216.466863874] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Calibrate>
-[component_container-1] Calibrate start
-[component_container-1] [-8.084797652722209;
-[component_container-1]  3.308550047631711;
-[component_container-1]  9.914300447855721]
-[component_container-1] [1.472702981759967;
-[component_container-1]  -1.576365321399126;
-[component_container-1]  1.119260627612431]
-[component_container-1] Resolve camera[3574.789997539575, 0, 2035.516221639947;
-[component_container-1]  0, 3570.152216895105, 1512.394106392463;
-[component_container-1]  0, 0, 1]
-[component_container-1] Resolve dist[]
-[component_container-1] [INFO] [1747899216.517882938] [radar_calib_node]: 
-[component_container-1]       ┏━┓       ┏━┓
-[component_container-1]     ┏━┛ ┻━━━━━━━┛ ┻━┓
-[component_container-1]     ┃               ┃
-[component_container-1]     ┃       ━       ┃
-[component_container-1]     ┃  ┳━┛     ┗━┳  ┃
-[component_container-1]     ┃               ┃
-[component_container-1]     ┃      ━┻━      ┃
-[component_container-1]     ┃               ┃
-[component_container-1]     ┗━━━┓       ┏━━━┛
-[component_container-1]         ┃       ┃
-[component_container-1]         ┃       ┃
-[component_container-1]         ┃       ┃
-[component_container-1]         ┃       ┃
-[component_container-1]         ┃       ┗━━━━━━━┓
-[component_container-1]         ┃               ┣━━┓
-[component_container-1]         ┃              ┏┛
-[component_container-1]         ┗━┓┓┏━━━━━━━┳┓┏┛
-[component_container-1]           ┃┫┫       ┃┫┫
-[component_container-1]           ┗┻┛       ┗┻┛
-[component_container-1] Calibrate end
-[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/radar_calib_node' in container '/camera_detector_container'
-[component_container-1] [ERROR] [1747899216.527752624] [camera_detector_container]: Could not find requested resource in ament index
-[ERROR] [launch_ros.actions.load_composable_nodes]: Failed to load node 'video_player_node' of type 'video_player::VideoPlayerNode' in container '/camera_detector_container': Could not find requested resource in ament index
-
+wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ colcon build
+Starting >>> radar_interface
+Starting >>> vision_interface
+Starting >>> hik_camera
+Starting >>> libocsort
+Starting >>> video_player
+Finished <<< libocsort [0.08s]
+Finished <<< video_player [0.10s]                                        
+Finished <<< hik_camera [0.11s]
+Finished <<< vision_interface [0.26s]                                     
+Starting >>> rosbag_player
+Finished <<< radar_interface [0.28s]
+Starting >>> tdt_vision
+Starting >>> debug_map
+Starting >>> dv_trigger
+Starting >>> judge_bridge
+Starting >>> kalman_filter
+Starting >>> radar_decision
+Finished <<< radar_decision [0.06s]                                
+Finished <<< debug_map [0.08s]
+Finished <<< rosbag_player [0.10s]
+Finished <<< dv_trigger [5.09s]                                     
+--- stderr: judge_bridge                                            
+In file included from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/serial.hpp:3,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/serial.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/protocol.hpp:175:8: error: redefinition of ‘struct robot_interaction_sentry_data_t’
+  175 | struct robot_interaction_sentry_data_t {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/protocol.hpp:118:8: note: previous definition of ‘struct robot_interaction_sentry_data_t’
+  118 | struct robot_interaction_sentry_data_t {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/judge_bridge.hpp:15,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/protocol.hpp:175:8: error: redefinition of ‘struct robot_interaction_sentry_data_t’
+  175 | struct robot_interaction_sentry_data_t {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/protocol.hpp:118:8: note: previous definition of ‘struct robot_interaction_sentry_data_t’
+  118 | struct robot_interaction_sentry_data_t {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/judge_bridge.hpp:15,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/main.cpp:3:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/protocol.hpp:175:8: error: redefinition of ‘struct robot_interaction_sentry_data_t’
+  175 | struct robot_interaction_sentry_data_t {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/protocol.hpp:118:8: note: previous definition of ‘struct robot_interaction_sentry_data_t’
+  118 | struct robot_interaction_sentry_data_t {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp: In member function ‘void JudgeBridgeNode::send_sentry_data(const RadarWarn&)’:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:206:22: error: ‘struct robot_interaction_sentry_data_t’ has no member named ‘engine_state’
+  206 |     interaction_data.engine_state = topic_message.engine_state;
+      |                      ^~~~~~~~~~~~
+gmake[2]: *** [CMakeFiles/judge_bridge.dir/build.make:90: CMakeFiles/judge_bridge.dir/src/main.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+gmake[2]: *** [CMakeFiles/judge_bridge.dir/build.make:104: CMakeFiles/judge_bridge.dir/src/serial.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/judge_bridge.dir/build.make:76: CMakeFiles/judge_bridge.dir/src/judge_bridge.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/judge_bridge.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2
+---
+Failed   <<< judge_bridge [5.75s, exited with code 2]
+Aborted  <<< kalman_filter [9.07s]                
+Aborted  <<< tdt_vision [33.8s]                                    
+                                   
+Summary: 9 packages finished [34.3s]
+  1 package failed: judge_bridge
+  2 packages aborted: kalman_filter tdt_vision
+  2 packages had stderr output: judge_bridge tdt_vision
+  1 package not processed
+wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ 
 
 

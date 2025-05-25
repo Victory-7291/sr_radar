@@ -100,6 +100,14 @@ namespace tdt_radar
         cv::perspectiveTransform(srcPointMat, srcPointMat, Perspective_matrix);
         return srcPointMat.at<cv::Point2f>(0, 0);
     }
+    bool parser::isPointInCenterHighland(const cv::Point2f &point) {
+        if (points_map.find("Center_Highland") == points_map.end()) {
+            return false;
+        }
+        
+        cv::Point intPoint(static_cast<int>(point.x), static_cast<int>(point.y));
+        return cv::pointPolygonTest(points_map["Center_Highland"]->Points_2D, intPoint, false) > 0;
+    }
     std::vector<cv::Point3f> Parser_Points::ReadPoints(const std::string &points_name){
     cv::FileStorage fs("./config/RM2025_Points.yaml", cv::FileStorage::READ); // 打开YAML文件
 

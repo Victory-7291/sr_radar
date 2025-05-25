@@ -21,17 +21,20 @@ private:
     // 回调函数
     void detect_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg);
     void color_callback(const radar_interface::team_color::msg::SharedPtr msg);
+    void engine_state_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg);
     
     // 计算两点之间的距离
     float calculate_distance(const cv::Point2f& p1, const cv::Point2f& p2);
     
     // 订阅者
     rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr detect_sub_;
+    rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr engine_detect_sub_;
     rclcpp::Subscription<radar_interface::team_color::msg>::SharedPtr color_sub_;
     
     // 发布者
     rclcpp::Publisher<vision_interface::msg::RadarWarn>::SharedPtr warn_pub_;
     rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar2sentry_pub_;
+    rclcpp::Publisher<vision_interface::msg::RadarWarn>::SharedPtr engine_warn_pub_;
     
     // 工具类
     std::unique_ptr<parser> parser_;

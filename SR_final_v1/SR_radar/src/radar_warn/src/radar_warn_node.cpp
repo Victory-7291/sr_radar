@@ -54,8 +54,8 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
 
 void RadarWarn::color_callback(const radar_interface::team_color::msg::SharedPtr msg) {
     self_color = msg->data ? radar_interface::team_color::C_RED : radar_interface::team_color::C_BLUE;
-    RCLCPP_INFO(this->get_logger(), "团队颜色已接收: %s", 
-                self_color == radar_interface::team_color::C_RED ? "红色" : "蓝色");
+    //RCLCPP_INFO(this->get_logger(), "团队颜色已接收: %s", 
+    //            self_color == radar_interface::team_color::C_RED ? "红色" : "蓝色");
 }
 
 float RadarWarn::calculate_distance(const cv::Point2f& p1, const cv::Point2f& p2) {

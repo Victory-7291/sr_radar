@@ -93,10 +93,10 @@ public:
           cv::Mat img(out_frame.stFrameInfo.nHeight, out_frame.stFrameInfo.nWidth, CV_8UC3, image_msg_.data.data());
           cv::cvtColor(img, img, cv::COLOR_RGB2BGR);  // 转换为 BGR8
           
-          cv::Mat final_img;
-  	      cv::resize(img,final_img,cv::Size(960, 640));
-  	      cv::imshow("hik_node", final_img);
-  	      cv::waitKey(1);
+          //cv::Mat final_img;
+  	      //cv::resize(img,final_img,cv::Size(3096, 2048));
+  	      //cv::imshow("hik_node", final_img);
+  	      //cv::waitKey(1);
 
           // 更新图像消息
           image_msg_.height = out_frame.stFrameInfo.nHeight;

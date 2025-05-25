@@ -50,6 +50,7 @@ private:
     rclcpp::Subscription<radar_interface::msg::MatchResult>::SharedPtr sub_match_result;
     rclcpp::Subscription<radar_interface::msg::MatchResult>::SharedPtr sub_map_robot_data;
     rclcpp::Subscription<vision_interface::msg::RadarWarn>::SharedPtr sub_resolve_result;
+    rclcpp::Subscription<vision_interface::msg::RadarWarn>::SharedPtr sub_engine_state;
     std::atomic<team_color::ENUM> color { team_color::UNKNOWN };
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_custom_info;
@@ -65,7 +66,7 @@ private:
     void game_robot_hp_callback(const game_robot_HP_t& hp);
     void interaction_data_callback(const std::vector<uint8_t>& data);
 
-    void send_sentry_data(const radar_interface::msg::MatchResult& topic_message);
+    void send_sentry_data(const vision_interface::msg::RadarWarn& topic_message);
     void send_radar_cmd(const std_msgs::msg::UInt8 &radar_cmd);
     
     // 新增的三个回调函数，用于发送状态给步兵

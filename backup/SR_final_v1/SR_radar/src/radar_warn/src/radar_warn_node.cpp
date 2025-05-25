@@ -16,6 +16,10 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
     detect_sub_ = this->create_subscription<vision_interface::msg::DetectResult>(
         "/kalman_detect", 10, std::bind(&RadarWarn::detect_callback, this, std::placeholders::_1));
     
+    // 新增：专门用于工程机器人状态监测的订阅者
+    engine_detect_sub_ = this->create_subscription<vision_interface::msg::DetectResult>(
+        "/detect_result", rclcpp::SensorDataQoS(), std::bind(&RadarWarn::engine_state_callback, this, std::placeholders::_1));
+    
     color_sub_ = this->create_subscription<radar_interface::team_color::msg>(
         "judge/color", 10, std::bind(&RadarWarn::color_callback, this, std::placeholders::_1));
     
@@ -25,6 +29,9 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
     
     radar2sentry_pub_ = this->create_publisher<vision_interface::msg::Radar2Sentry>(
         "/Radar2Sentry", rclcpp::SensorDataQoS());
+    
+    engine_warn_pub_ = this->create_publisher<vision_interface::msg::RadarWarn>(
+        "/engine_state", 10);
     
     // 初始化parser
     parser_ = std::make_unique<parser>();
@@ -53,6 +60,50 @@ void RadarWarn::color_callback(const radar_interface::team_color::msg::SharedPtr
 
 float RadarWarn::calculate_distance(const cv::Point2f& p1, const cv::Point2f& p2) {
     return std::sqrt(std::pow(p1.x - p2.x, 2) + std::pow(p1.y - p2.y, 2));
+}
+
+void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg) {
+    // 工程机器人检测逻辑（工程机器人编号为2，在数组中索引为1）
+    int engine_warning_level = 0;
+    cv::Point2f engine_position;
+    bool engine_detected = false;
+
+
+    
+    // 只更新工程机器人的位置（索引为1）
+    if (self_color == radar_interface::team_color::C_BLUE) {
+        // 获取敌方（红色）工程机器人位置
+        if (msg->red_x[1] && msg->red_y[1]) {
+            // 只更新红方工程机器人位置
+            engine_position = cv::Point2f(msg->red_x[1], msg->red_y[1]);
+            engine_detected = true;
+        }
+    } else if (self_color == radar_interface::team_color::C_RED) {
+        // 获取敌方（蓝色）工程机器人位置
+        if (msg->blue_x[1] && msg->blue_y[1]) {
+            // 只更新蓝方工程机器人位置
+            engine_position = cv::Point2f(msg->blue_x[1], msg->blue_y[1]);
+            engine_detected = true;
+        }
+    }
+    
+    if (engine_detected) {
+        // 使用isPointInCenterHighland判断工程机器人是否在中心高地
+        if (parser_->isPointInCenterHighland(engine_position)) {
+            engine_warning_level = 1;
+            RCLCPP_WARN(this->get_logger(), "敌方工程机器人位于中心高地，发出预警");
+        } else {
+            engine_warning_level = 0;
+            RCLCPP_INFO(this->get_logger(), "敌方工程机器人不在中心高地");
+        }
+    } else {
+        RCLCPP_INFO(this->get_logger(), "未检测到敌方工程机器人");
+    }
+    
+    // 发布工程机器人预警消息
+    vision_interface::msg::RadarWarn engine_warn;
+    engine_warn.engine_state = engine_warning_level;
+    engine_warn_pub_->publish(engine_warn);
 }
 
 void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::DetectResult> msg) {

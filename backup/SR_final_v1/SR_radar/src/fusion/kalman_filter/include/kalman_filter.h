@@ -13,7 +13,6 @@
 #include <vision_interface/msg/detect_result.hpp>
 #include <vision_interface/msg/radar2_sentry.hpp>
 #include <vision_interface/msg/radar_warn.hpp>
-#include <vision_interface/msg/match_info.hpp>
 #include <radar_interface/team_color.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -28,7 +27,6 @@ class KalmanFilter :public rclcpp::Node
     //rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_;
     rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr sub_detect_;
     //rclcpp::Subscription<vision_interface::msg::RadarWarn>::SharedPtr sub_lidar_;
-    rclcpp::Subscription<vision_interface::msg::MatchInfo>::SharedPtr sub_match_;
     rclcpp::Subscription<radar_interface::team_color::msg>::SharedPtr sub_color_;
     //rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar_pub_;
     rclcpp::Publisher<vision_interface::msg::DetectResult>::SharedPtr radar_detect_pub_;
@@ -36,11 +34,9 @@ class KalmanFilter :public rclcpp::Node
     //void callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg);
     void detect_callback(const vision_interface::msg::DetectResult::SharedPtr msg);
     //void lidar_callback(const vision_interface::msg::RadarWarn::SharedPtr msg);
-    void match_callback(const vision_interface::msg::MatchInfo::SharedPtr msg);
     void color_callback(const radar_interface::team_color::msg::SharedPtr msg);
     std::vector<Kalman_filter_plus> KFs;
     //vision_interface::msg::RadarWarn lidar_detect;
-    vision_interface::msg::MatchInfo match_info;
     radar_interface::team_color::ENUM self_color;
     
     // 存储机器人的最后位置

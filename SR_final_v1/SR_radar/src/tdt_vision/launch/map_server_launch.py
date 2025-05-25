@@ -1,7 +1,7 @@
 import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.substitutions import FindPackageShare
@@ -14,12 +14,20 @@ from launch.conditions import IfCondition
 
 def generate_launch_description():
     ld = LaunchDescription()
+    
+    # 设置ROS2日志级别
+    stdout_linebuf_envvar = SetEnvironmentVariable(
+        'RCUTILS_LOGGING_BUFFERED_STREAM', '1')
+    ld.add_action(stdout_linebuf_envvar)
+    
     map_path = 'src/tdt_vision/maps/map.yaml'
 
     map_server_node = Node(
         package="nav2_map_server",
         executable='map_server',
-        output='screen', emulate_tty=True,
+        output='screen', 
+        emulate_tty=True,
+        arguments=['--ros-args', '--log-level', 'info'],
         parameters=[{'yaml_filename': map_path,'frame_id':'rm_frame'}]
     )
     # 激活map_server
