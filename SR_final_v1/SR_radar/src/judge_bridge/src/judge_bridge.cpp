@@ -62,27 +62,27 @@ void JudgeBridgeNode::send_radar_cmd(const std_msgs::msg::UInt8 &radar_cmd)
     RCLCPP_INFO(get_logger(), "DV: %d", radar_cmd.data);
 }
 
-void JudgeBridgeNode::send_custom_info(const std::string& str)
-{
-    if (color == team_color::UNKNOWN) {
-        RCLCPP_WARN(get_logger(), "Unkown Color!");
-        return;
-    }
-    custom_info_t custom_info {};
-    custom_info.sender_id = RADAR_ID[color];
-    custom_info.receiver_id = AERIAL_CLIENT[color];
-    std::u16string u16_info = boost::locale::conv::utf_to_utf<char16_t>(str);
-    if (u16_info.size() > 15)
-        RCLCPP_WARN(get_logger(), "Custom info too long!");
-    u16_info.resize(15);
-    
-    for (unsigned i = 0; i < 15; ++i) {
-        char16_t ch = u16_info[i];
-        custom_info.user_data[2 * i] = static_cast<uint8_t>(ch & 0xFF);
-        custom_info.user_data[2 * i + 1] = static_cast<uint8_t>((ch >> 8) & 0xFF);
-    }
-    judge_serial->write(CMD_ID::SEND_CUSTOM_INFO, reinterpret_cast<uint8_t*>(&custom_info), sizeof(custom_info));
-}
+//void JudgeBridgeNode::send_custom_info(const std::string& str)
+//{
+//    if (color == team_color::UNKNOWN) {
+//        RCLCPP_WARN(get_logger(), "Unkown Color!");
+//        return;
+//    }
+//    custom_info_t custom_info {};
+//    custom_info.sender_id = RADAR_ID[color];
+//    custom_info.receiver_id = AERIAL_CLIENT[color];
+//    std::u16string u16_info = boost::locale::conv::utf_to_utf<char16_t>(str);
+//    if (u16_info.size() > 15)
+//        RCLCPP_WARN(get_logger(), "Custom info too long!");
+//    u16_info.resize(15);
+//    
+//    for (unsigned i = 0; i < 15; ++i) {
+//        char16_t ch = u16_info[i];
+//        custom_info.user_data[2 * i] = static_cast<uint8_t>(ch & 0xFF);
+//        custom_info.user_data[2 * i + 1] = static_cast<uint8_t>((ch >> 8) & 0xFF);
+//    }
+//    judge_serial->write(CMD_ID::SEND_CUSTOM_INFO, reinterpret_cast<uint8_t*>(&custom_info), sizeof(custom_info));
+//}
 
 //void JudgeBridgeNode::map_command_callback(const map_command_t& cmd)
 //{
@@ -182,54 +182,32 @@ void JudgeBridgeNode::game_robot_hp_callback(const game_robot_HP_t& hp)
 //    }
 //}
 
-void JudgeBridgeNode::send_sentry_data(const radar_interface::msg::MatchResult& topic_message)
+void JudgeBridgeNode::send_sentry_data(const vision_interface::msg::RadarWarn& topic_message)
 {
     if (color == team_color::UNKNOWN) {
-        RCLCPP_WARN(get_logger(), "Unkown Color!");
+        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送哨兵数据");
         return;
     }
+    
+    // 创建交互数据结构体
     robot_interaction_sentry_data_t interaction_data;
     interaction_data.header.data_cmd_id = INTERACTION_CMD::SENTRY_DATA;
-
-    switch (color) {
-    case team_color::C_RED:
+    
+    // 根据团队颜色设置发送者和接收者ID
+    if (color == team_color::C_RED) {
         interaction_data.header.sender_id = RADAR_ID::R_RED;
         interaction_data.header.receiver_id = SENTRY_ID[team_color::C_RED];
-        break;
-    case team_color::C_BLUE:
+    } else {
         interaction_data.header.sender_id = RADAR_ID::R_BLUE;
         interaction_data.header.receiver_id = SENTRY_ID[team_color::C_BLUE];
-        break;
-    default:
-        RCLCPP_WARN_ONCE(get_logger(), "Unknow the radar color");
-        return;
     }
-    uint8_t len = 0;
-
-    for (uint8_t index = 0; index < topic_message.red.size(); index++) {
-        const auto& red = topic_message.red[index];
-        if (red.id == -1)
-            continue;
-        interaction_data.custom_data[len].robot_id = RED_ROBOT[index];
-        interaction_data.custom_data[len].pos_x = red.position[0];
-        interaction_data.custom_data[len].pos_y = red.position[1];
-        ++len;
-    }
-
-    for (uint8_t index = 0; index < topic_message.blue.size(); index++) {
-        const auto& blue = topic_message.red[index];
-        if (blue.id == -1)
-            continue;
-        interaction_data.custom_data[len].robot_id = BLUE_ROBOT[index];
-        interaction_data.custom_data[len].pos_x = blue.position[0];
-        interaction_data.custom_data[len].pos_y = blue.position[1];
-        ++len;
-    }
-
-    interaction_data.arr_len = len;
-    judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data),
-        sizeof(robot_interaction_sentry_data_t) - (12 - len) * sizeof(robot_interaction_sentry_data_t::robot_pos));
-    RCLCPP_INFO(this->get_logger(), "send_sentry_data");
+    
+    // 设置工程机器人状态
+    interaction_data.engine_state = topic_message.engine_state;
+    
+    // 发送数据
+    judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(interaction_data));
+    RCLCPP_INFO(this->get_logger(), "发送工程机器人状态给哨兵: %d", topic_message.engine_state);
 }
 
 void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResult& msg)
@@ -390,8 +368,12 @@ JudgeBridgeNode::JudgeBridgeNode()
     //pub_uwb_data = create_publisher<radar_interface::msg::UwbData>("judge/uwb_data", rclcpp::SystemDefaultsQoS());
 
     sub_radar_cmd = create_subscription<std_msgs::msg::UInt8>("judge/radar_cmd", rclcpp::SystemDefaultsQoS(), std::bind(&JudgeBridgeNode::send_radar_cmd, this, std::placeholders::_1));
-    sub_match_result = create_subscription<radar_interface::msg::MatchResult>("/matcher/match_result", rclcpp::SystemDefaultsQoS(), std::bind(&JudgeBridgeNode::send_sentry_data, this, std::placeholders::_1));
     sub_map_robot_data = create_subscription<radar_interface::msg::MatchResult>("/matcher/match_result", rclcpp::SystemDefaultsQoS(), std::bind(&JudgeBridgeNode::send_map_robot_data, this, std::placeholders::_1));
+    
+    // 新增订阅/engine_state话题，用于接收工程机器人状态
+    sub_engine_state = create_subscription<vision_interface::msg::RadarWarn>(
+        "/engine_state", rclcpp::SystemDefaultsQoS(), 
+        std::bind(&JudgeBridgeNode::send_sentry_data, this, std::placeholders::_1));
     
     // 新增订阅/resolve_result话题，并分别触发三个回调函数
     sub_resolve_result = create_subscription<vision_interface::msg::RadarWarn>(
@@ -403,11 +385,11 @@ JudgeBridgeNode::JudgeBridgeNode()
             send_standard3_data(*msg);
         });
     
-    sub_custom_info = create_subscription<std_msgs::msg::String>("judge/custom_info", rclcpp::SystemDefaultsQoS(),
-        [this](const std_msgs::msg::String& msg) {
-            RCLCPP_INFO(get_logger(), "Custom Info: %s", msg.data.c_str());
-            send_custom_info(msg.data);
-        });
+    //sub_custom_info = create_subscription<std_msgs::msg::String>("judge/custom_info", rclcpp::SystemDefaultsQoS(),
+    //    [this](const std_msgs::msg::String& msg) {
+    //        RCLCPP_INFO(get_logger(), "Custom Info: %s", msg.data.c_str());
+    //        send_custom_info(msg.data);
+    //    });
 
     read_thread = std::thread([&]() {
         while (rclcpp::ok()) {

@@ -26,6 +26,9 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
     radar2sentry_pub_ = this->create_publisher<vision_interface::msg::Radar2Sentry>(
         "/Radar2Sentry", rclcpp::SensorDataQoS());
     
+    engine_warn_pub_ = this->create_publisher<vision_interface::msg::RadarWarn>(
+        "/engine_state", 10);
+    
     // 初始化parser
     parser_ = std::make_unique<parser>();
     
@@ -138,6 +141,46 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     vision_interface::msg::RadarWarn radar_warn;
     radar_warn.hero_state = warning_level;
     warn_pub_->publish(radar_warn);
+    
+    // 工程机器人检测逻辑（工程机器人编号为2，在数组中索引为1）
+    int engine_warning_level = 0;
+    cv::Point2f engine_position;
+    bool engine_detected = false;
+    
+    if (self_color == radar_interface::team_color::C_BLUE) {
+        // 获取敌方（红色）工程机器人位置
+        if (red_point[1].x != 0 && red_point[1].y != 0 && current_time - red_update[1] < 2.0) {
+            engine_position = red_point[1];
+            engine_detected = true;
+        }
+    } else if (self_color == radar_interface::team_color::C_RED) {
+        // 获取敌方（蓝色）工程机器人位置
+        if (blue_point[1].x != 0 && blue_point[1].y != 0 && current_time - blue_update[1] < 2.0) {
+            engine_position = blue_point[1];
+            engine_detected = true;
+        }
+    }
+    
+    if (engine_detected) {
+        // 将工程机器人在相机上的坐标转换为图像坐标
+        cv::Point2f image_point = engine_position;
+        
+        // 使用isPointInCenterHighland判断工程机器人是否在中心高地
+        if (parser_->isPointInCenterHighland(image_point)) {
+            engine_warning_level = 1;
+            RCLCPP_WARN(this->get_logger(), "敌方工程机器人位于中心高地，发出预警");
+        } else {
+            engine_warning_level = 0;
+            RCLCPP_INFO(this->get_logger(), "敌方工程机器人不在中心高地");
+        }
+    } else {
+        RCLCPP_INFO(this->get_logger(), "未检测到敌方工程机器人");
+    }
+    
+    // 发布工程机器人预警消息
+    vision_interface::msg::RadarWarn engine_warn;
+    engine_warn.engine_state = engine_warning_level;
+    engine_warn_pub_->publish(engine_warn);
     
     // 发布Radar2Sentry消息
     vision_interface::msg::Radar2Sentry radar2sentry;

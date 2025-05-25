@@ -171,6 +171,12 @@ struct robot_interaction_standard_data_t {
     uint8_t hero_state;  // 英雄状态
 };
 
+// 新增：用于与哨兵通信的数据结构
+struct robot_interaction_sentry_data_t {
+    robot_interaction_header_t header;
+    uint8_t engine_state;  // 工程机器人状态
+};
+
 #pragma pack()
 
 // 具体十六进制码参见裁判系统手册

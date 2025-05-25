@@ -9,7 +9,6 @@ KalmanFilter::KalmanFilter(const rclcpp::NodeOptions& node_options):rclcpp::Node
     //radar_pub_ = this->create_publisher<vision_interface::msg::Radar2Sentry>("/radar2sentry", 10);
     radar_detect_pub_ = this->create_publisher<vision_interface::msg::DetectResult>("/kalman_detect", 10);
     sub_detect_= this->create_subscription<vision_interface::msg::DetectResult>("/resolve_result", rclcpp::SensorDataQoS(), std::bind(&KalmanFilter::detect_callback, this, std::placeholders::_1));
-    sub_match_ = this->create_subscription<vision_interface::msg::MatchInfo>("/match_info", 10, std::bind(&KalmanFilter::match_callback, this, std::placeholders::_1));
     sub_color_ = this->create_subscription<radar_interface::team_color::msg>("judge/color", 10, std::bind(&KalmanFilter::color_callback, this, std::placeholders::_1));
     
     self_color = radar_interface::team_color::UNKNOWN;
@@ -20,12 +19,6 @@ void KalmanFilter::color_callback(const radar_interface::team_color::msg::Shared
 {
     self_color = msg->data ? radar_interface::team_color::C_RED : radar_interface::team_color::C_BLUE;
     RCLCPP_INFO(this->get_logger(), "Team color received: %s", self_color == radar_interface::team_color::C_RED ? "RED" : "BLUE");
-}
-
-void KalmanFilter::match_callback(const vision_interface::msg::MatchInfo::SharedPtr msg)
-{
-    this->match_info = *msg;
-    RCLCPP_INFO(this->get_logger(), "Match_info_callback");
 }
 
 void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::SharedPtr msg)

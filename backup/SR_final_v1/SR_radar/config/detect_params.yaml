@@ -1,0 +1,5 @@
+%YAML:1.0
+---
+yolo_path: "/home/wan/SR_final_v1/SR_radar/model/TensorRT/yolo.engine"
+armor_path: "/home/wan/SR_final_v1/SR_radar/model/TensorRT/armor.engine"
+classify_path: "/home/wan/SR_final_v1/SR_radar/model/TensorRT/classify.engine"

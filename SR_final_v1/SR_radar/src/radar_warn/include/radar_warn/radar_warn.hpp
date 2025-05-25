@@ -32,6 +32,7 @@ private:
     // 发布者
     rclcpp::Publisher<vision_interface::msg::RadarWarn>::SharedPtr warn_pub_;
     rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar2sentry_pub_;
+    rclcpp::Publisher<vision_interface::msg::RadarWarn>::SharedPtr engine_warn_pub_;
     
     // 工具类
     std::unique_ptr<parser> parser_;

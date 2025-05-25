@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>radar_warn</name>
+  <version>0.0.1</version>
+  <description>雷达预警节点，用于检测特定情况并发出警告</description>
+  <maintainer email="your_email@example.com">Your Name</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>vision_interface</depend>
+  <depend>radar_interface</depend>
+  <depend>cv_bridge</depend>
+  <depend>OpenCV</depend>
+  <depend>tdt_vision</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package> 

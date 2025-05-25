@@ -35,6 +35,7 @@ namespace tdt_radar
         void draw_ui(cv::Mat &img);
         float get_height(cv::Point2f &input_point);
         cv::Point2f get_2d(cv::Point2f &input_point,float height);
+        bool isPointInCenterHighland(const cv::Point2f &point);
         cv::Mat world_rvec;
         cv::Mat world_tvec;
         cv::Mat camera_matrix;
