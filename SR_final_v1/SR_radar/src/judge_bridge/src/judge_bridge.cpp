@@ -206,7 +206,7 @@ void JudgeBridgeNode::send_sentry_data(const vision_interface::msg::RadarWarn& t
     interaction_data.engine_state = topic_message.engine_state;
     
     // 发送数据
-    judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(interaction_data));
+    judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(robot_interaction_sentry_data_t));
     RCLCPP_INFO(this->get_logger(), "发送工程机器人状态给哨兵: %d", topic_message.engine_state);
 }
 

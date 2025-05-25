@@ -18,7 +18,7 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
     
     // 新增：专门用于工程机器人状态监测的订阅者
     engine_detect_sub_ = this->create_subscription<vision_interface::msg::DetectResult>(
-        "/detect_result", 10, std::bind(&RadarWarn::engine_state_callback, this, std::placeholders::_1));
+        "/detect_result", rclcpp::SensorDataQoS(), std::bind(&RadarWarn::engine_state_callback, this, std::placeholders::_1));
     
     color_sub_ = this->create_subscription<radar_interface::team_color::msg>(
         "judge/color", 10, std::bind(&RadarWarn::color_callback, this, std::placeholders::_1));
