@@ -12,18 +12,18 @@ KalmanFilter::KalmanFilter(const rclcpp::NodeOptions& node_options):rclcpp::Node
     sub_color_ = this->create_subscription<radar_interface::team_color::msg>("judge/color", 10, std::bind(&KalmanFilter::color_callback, this, std::placeholders::_1));
     
     self_color = radar_interface::team_color::UNKNOWN;
-    RCLCPP_INFO(this->get_logger(), "Kalman_filter_Node has been started.");
+    //RCLCPP_INFO(this->get_logger(), "Kalman_filter_Node has been started.");
 }
 
 void KalmanFilter::color_callback(const radar_interface::team_color::msg::SharedPtr msg)
 {
     self_color = msg->data ? radar_interface::team_color::C_RED : radar_interface::team_color::C_BLUE;
-    RCLCPP_INFO(this->get_logger(), "Team color received: %s", self_color == radar_interface::team_color::C_RED ? "RED" : "BLUE");
+    //RCLCPP_INFO(this->get_logger(), "Team color received: %s", self_color == radar_interface::team_color::C_RED ? "RED" : "BLUE");
 }
 
 void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::SharedPtr msg)
 {
-    RCLCPP_INFO(this->get_logger(), "Detect_callback");
+    //RCLCPP_INFO(this->get_logger(), "Detect_callback");
     rclcpp::Time time = msg->header.stamp;
     
     // 首先更新所有滤波器的预测点

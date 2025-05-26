@@ -72,8 +72,6 @@ private:
     // 新增的三个回调函数，用于发送状态给步兵
     void send_standard1_data(const vision_interface::msg::RadarWarn& msg);
     void send_standard2_data(const vision_interface::msg::RadarWarn& msg);
-    void send_standard3_data(const vision_interface::msg::RadarWarn& msg);
-
 public:
     JudgeBridgeNode();
 };

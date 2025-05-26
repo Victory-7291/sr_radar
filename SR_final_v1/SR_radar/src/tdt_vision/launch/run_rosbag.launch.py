@@ -7,7 +7,7 @@ sys.path.append(os.path.join(get_package_share_directory('tdt_vision'), 'launch'
 
 from launch_ros.descriptions import ComposableNode
 from launch_ros.actions import ComposableNodeContainer, Node
-from launch.actions import TimerAction, Shutdown, SetEnvironmentVariable
+from launch.actions import TimerAction, Shutdown
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -16,18 +16,24 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
-    # 设置ROS2日志级别
-    stdout_linebuf_envvar = SetEnvironmentVariable(
-        'RCUTILS_LOGGING_BUFFERED_STREAM', '1')
-        
+
+    # 定义JudgeBridgeNode节点
+    judge_bridge_node = Node(
+        package='judge_bridge',
+        executable='judge_bridge',
+        name='judge_bridge_node',
+        output='screen',
+        parameters=[{
+            'serial_port': '/dev/ttyUSB0',
+            'enable_recorder': False
+        }]
+    )
     # 定义RadarWarn节点
     radar_warn_node = Node(
         package='radar_warn',
         executable='radar_warn_node',
         name='radar_warn_node',
-        output='screen',
-        arguments=['--ros-args', '--log-level', 'info'],
-        emulate_tty=True
+        output='screen'
     )
 
     # 定义节点
@@ -39,10 +45,7 @@ def generate_launch_description():
             parameters=[{
                 'rosbag_file': '/home/wan/rosbag_test/merged_bag_0.db3'
             }],
-            extra_arguments=[
-                {'use_intra_process_comms': True},
-                {'log_level': 'info'}
-            ]
+            extra_arguments=[{'use_intra_process_comms': True}]
         )
 
     def get_foxglove_node(package, plugin):
@@ -51,11 +54,8 @@ def generate_launch_description():
             plugin=plugin,
             name='foxglove_bridge_node',
             parameters=[{'send_buffer_limit': 1000000000}],
-            extra_arguments=[
-                {'use_intra_process_comms': True},
-                {'use_multi_threaded_executor': True},
-                {'log_level': 'info'}
-            ]
+            extra_arguments=[{'use_intra_process_comms': True},
+                             {'use_multi_threaded_executor': True}]
         )
 
     def get_radar_detect_node(package, plugin):
@@ -63,10 +63,7 @@ def generate_launch_description():
             package=package,
             plugin=plugin,
             name='radar_detect_node',
-            extra_arguments=[
-                {'use_intra_process_comms': True},
-                {'log_level': 'info'}
-            ]
+            extra_arguments=[{'use_intra_process_comms': True}]
         )
 
     def get_radar_resolve_node(package, plugin):
@@ -74,10 +71,7 @@ def generate_launch_description():
             package=package,
             plugin=plugin,
             name='radar_resolve_node',
-            extra_arguments=[
-                {'use_intra_process_comms': True},
-                {'log_level': 'info'}
-            ]
+            extra_arguments=[{'use_intra_process_comms': True}]
         )
 
     def get_kalman_filter_node(package, plugin):
@@ -85,10 +79,7 @@ def generate_launch_description():
             package=package,
             plugin=plugin,
             name='kalman_filter_node',
-            extra_arguments=[
-                {'use_intra_process_comms': True},
-                {'log_level': 'info'}
-            ]
+            extra_arguments=[{'use_intra_process_comms': True}]
         )
 
     #def get_hik_camera_node(package, plugin):
@@ -104,12 +95,12 @@ def generate_launch_description():
     #    )
 
     # 定义 dv_trigger 节点
-    #dv_trigger_node = Node(
-    #    package='dv_trigger',
-    #    executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
-    #    name='dv_trigger_node',
-    #    output='screen'
-    #)
+    dv_trigger_node = Node(
+        package='dv_trigger',
+        executable='dv_trigger', # 假设可执行文件名为 dv_trigger_node
+        name='dv_trigger_node',
+        output='screen'
+    )
 
     def get_camera_detector_container(nodes):
         return ComposableNodeContainer(
@@ -119,7 +110,6 @@ def generate_launch_description():
             executable='component_container',
             composable_node_descriptions=nodes,
             output='both',
-            arguments=['--ros-args', '--log-level', 'info'],
             emulate_tty=True,
             on_exit=Shutdown(),
         )
@@ -151,10 +141,9 @@ def generate_launch_description():
     #)
 
     return LaunchDescription([
-        stdout_linebuf_envvar,
         # 首先启动JudgeBridgeNode节点
-        #judge_bridge_node,
-        #dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
+        judge_bridge_node,
+        dv_trigger_node,  # 添加 dv_trigger 节点到启动列表
         radar_warn_node,  # 添加radar_warn节点
         cam_detector,
         #plugin_map_launch_cmd,

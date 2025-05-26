@@ -19,11 +19,10 @@ namespace tdt_radar {
     public:
         explicit DebugMap(const rclcpp::NodeOptions & options) : Node("debug_map", options){
             match_result_sub = this->create_subscription<vision_interface::msg::DetectResult>("/kalman_detect", 10, std::bind(&DebugMap::match_result_callback, this, std::placeholders::_1));
-            sub_color_ = this->create_subscription<radar_interface::team_color::msg>("judge/color", 10, std::bind(&DebugMap::color_callback, this, std::placeholders::_1));
-            sub_radar_mark_data_ = this->create_subscription<radar_interface::msg::RadarMarkData>("judge/radar_mark_data", 10, std::bind(&DebugMap::radar_mark_data_callback, this, std::placeholders::_1));
+            sub_color_ = this->create_subscription<radar_interface::team_color::msg>("judge/color", rclcpp::SystemDefaultsQoS(), std::bind(&DebugMap::color_callback, this, std::placeholders::_1));
+            sub_radar_mark_data_ = this->create_subscription<radar_interface::msg::RadarMarkData>("judge/radar_mark_data", rclcpp::SystemDefaultsQoS(), std::bind(&DebugMap::radar_mark_data_callback, this, std::placeholders::_1));
             
-            radar_warn_pub = this->create_publisher<vision_interface::msg::RadarWarn>("/hero_state", 10);
-            radar2sentry_pub = this->create_publisher<vision_interface::msg::Radar2Sentry>("/Radar2Sentry", rclcpp::SensorDataQoS());
+            //radar2sentry_pub = this->create_publisher<vision_interface::msg::Radar2Sentry>("/Radar2Sentry", rclcpp::SensorDataQoS());
             match_result_pub = this->create_publisher<radar_interface::msg::MatchResult>("/matcher/match_result", rclcpp::SystemDefaultsQoS());
             
             map = cv::imread("config/RM2025.png");
@@ -44,7 +43,7 @@ namespace tdt_radar {
             self_color = radar_interface::team_color::UNKNOWN;
             
             // 创建30Hz的定时器用于更新地图显示
-            double timer_period = 1.0 / 20.0; // 30Hz，约33.3ms
+            double timer_period = 1.0 / 30.0; // 30Hz，约33.3ms
             map_timer = this->create_wall_timer(
                 std::chrono::duration<double>(timer_period),
                 std::bind(&DebugMap::show_map, this));
@@ -194,8 +193,7 @@ namespace tdt_radar {
         }
 
         rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr match_result_sub;
-        rclcpp::Publisher<vision_interface::msg::RadarWarn>::SharedPtr radar_warn_pub;
-        rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar2sentry_pub;
+        //rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar2sentry_pub;
         rclcpp::Publisher<radar_interface::msg::MatchResult>::SharedPtr match_result_pub;
         rclcpp::Subscription<radar_interface::team_color::msg>::SharedPtr sub_color_;
         rclcpp::Subscription<radar_interface::msg::RadarMarkData>::SharedPtr sub_radar_mark_data_;
