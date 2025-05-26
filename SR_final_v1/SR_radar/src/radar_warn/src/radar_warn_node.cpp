@@ -54,8 +54,8 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
 
 void RadarWarn::color_callback(const radar_interface::team_color::msg::SharedPtr msg) {
     self_color = msg->data ? radar_interface::team_color::C_RED : radar_interface::team_color::C_BLUE;
-    RCLCPP_INFO(this->get_logger(), "团队颜色已接收: %s", 
-                self_color == radar_interface::team_color::C_RED ? "红色" : "蓝色");
+    //RCLCPP_INFO(this->get_logger(), "团队颜色已接收: %s", 
+    //            self_color == radar_interface::team_color::C_RED ? "红色" : "蓝色");
 }
 
 float RadarWarn::calculate_distance(const cv::Point2f& p1, const cv::Point2f& p2) {
@@ -96,9 +96,10 @@ void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::ms
             engine_warning_level = 0;
             RCLCPP_INFO(this->get_logger(), "敌方工程机器人不在中心高地");
         }
-    } else {
-        RCLCPP_INFO(this->get_logger(), "未检测到敌方工程机器人");
-    }
+    } 
+    //else {
+    //    RCLCPP_INFO(this->get_logger(), "未检测到敌方工程机器人");
+    //}
     
     // 发布工程机器人预警消息
     vision_interface::msg::RadarWarn engine_warn;
@@ -180,7 +181,7 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     } else {
         // 未检测到敌方英雄机器人，不预警
         warning_level = 0;
-        RCLCPP_INFO(this->get_logger(), "未检测到敌方英雄机器人");
+        //RCLCPP_INFO(this->get_logger(), "未检测到敌方英雄机器人");
     }
     
     RCLCPP_INFO(this->get_logger(), "敌方英雄机器人预警等级：%d", warning_level);

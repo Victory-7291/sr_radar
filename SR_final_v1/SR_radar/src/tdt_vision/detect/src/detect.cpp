@@ -235,7 +235,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
       auto safe_rect = getSafeRect(img,max_rect);
       //cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
 
-      car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
+      car.center=cv::Point2f(max_rect.x+max_rect.width/2,car.car.bottom);
       
       if(car.color==0){
           detect_result.blue_x[car.number-1]=car.center.x;
