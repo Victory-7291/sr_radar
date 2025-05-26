@@ -45,8 +45,8 @@ class KalmanFilter :public rclcpp::Node
         float y = 0.0f;
         bool valid = false;
     };
-    // 索引0-5分别对应不同兵种
-    RobotPosition red_robots_last_position[6];
-    RobotPosition blue_robots_last_position[6];
+    // 索引0-1分别对应英雄(0)和工程(1)机器人
+    RobotPosition red_robots_last_position[2];
+    RobotPosition blue_robots_last_position[2];
 };
 }//namespace tdt_radar
