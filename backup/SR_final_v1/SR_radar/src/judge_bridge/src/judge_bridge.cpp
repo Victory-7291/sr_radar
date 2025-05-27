@@ -192,7 +192,7 @@ void JudgeBridgeNode::send_sentry_data(const vision_interface::msg::RadarWarn& t
     // 创建交互数据结构体
     robot_interaction_sentry_data_t interaction_data;
     interaction_data.header.data_cmd_id = INTERACTION_CMD::SENTRY_DATA;
-    
+
     // 根据团队颜色设置发送者和接收者ID
     if (color == team_color::C_RED) {
         interaction_data.header.sender_id = RADAR_ID::R_RED;

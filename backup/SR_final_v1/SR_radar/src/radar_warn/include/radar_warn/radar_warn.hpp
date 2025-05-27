@@ -54,17 +54,26 @@ private:
     int hero_count1;
     int hero_count2;
     
-    // 英雄机器人历史位置
-    struct HeroPosition {
+    // 位置历史记录结构体
+    struct RobotPositionRecord {
         cv::Point2f position;
         double timestamp;
+        bool in_area; // 对于工程机器人，表示是否在中心高地
     };
-    std::deque<HeroPosition> hero_history; // 存储英雄机器人的历史位置
+    
+    // 英雄机器人历史位置
+    std::deque<RobotPositionRecord> hero_history; // 存储英雄机器人的历史位置
     double hero_history_duration = 2.5; // 历史记录保留时间（秒）
     float min_movement_threshold = 0.2f; // 最小移动阈值（米）
     
+    // 工程机器人历史位置和状态
+    std::deque<RobotPositionRecord> engine_history; // 存储工程机器人的历史位置和状态
+    double engine_in_area_duration = 1.0; // 在中心高地持续时间触发预警（秒）
+    double engine_out_area_duration = 0.5; // 离开中心高地持续时间解除预警（秒）
+    int engine_warning_level = 0; // 工程机器人预警等级：0-不预警，1-预警
+    
     // 预警相关
-    int warning_level = 0; // 预警等级：0-不预警，1-预警
+    int warning_level = 0; // 英雄预警等级：0-不预警，1-预警
 };
 
 }  // namespace tdt_radar
