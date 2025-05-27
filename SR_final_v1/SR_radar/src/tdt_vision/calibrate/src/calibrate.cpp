@@ -30,26 +30,7 @@ namespace tdt_radar {
         real_points.push_back(enemy_Tower);
         parser_ = new parser();
         
-        RCLCPP_INFO(this->get_logger(),"\n" 
-                                  "      ┏━┓       ┏━┓\n"
-                                  "    ┏━┛ ┻━━━━━━━┛ ┻━┓\n"
-                                  "    ┃               ┃\n"
-                                  "    ┃       ━       ┃\n"
-                                  "    ┃  ┳━┛     ┗━┳  ┃\n"
-                                  "    ┃               ┃\n"
-                                  "    ┃      ━┻━      ┃\n"
-                                  "    ┃               ┃\n"
-                                  "    ┗━━━┓       ┏━━━┛\n"
-                                  "        ┃       ┃\n"
-                                  "        ┃       ┃\n"
-                                  "        ┃       ┃\n"
-                                  "        ┃       ┃\n"
-                                  "        ┃       ┗━━━━━━━┓\n"
-                                  "        ┃               ┣━━┓\n"
-                                  "        ┃              ┏┛\n"
-                                  "        ┗━┓┓┏━━━━━━━┳┓┏┛\n"
-                                  "          ┃┫┫       ┃┫┫\n"
-                                  "          ┗┻┛       ┗┻┛");
+        RCLCPP_INFO(this->get_logger(),"1111111111111\n");
 
         if(usechessborad){
         image_sub = this->create_subscription<sensor_msgs::msg::Image>(
