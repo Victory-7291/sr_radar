@@ -188,9 +188,9 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
         }
     }
     
-    // 处理所有机器人(索引0-5)的坐标持久化
-    for(int i = 0; i < 6; i++) {
-        // 处理红方机器人
+    // 只持久化工程机器人(索引1)和英雄机器人(索引0)的坐标
+    // 处理红方机器人
+    for(int i = 0; i < 2; i++) { // 只处理索引0(英雄)和索引1(工程)
         if(detect_msg.red_x[i] != 0.0f && detect_msg.red_y[i] != 0.0f) {
             // 如果有红方机器人坐标，更新最后位置
             red_robots_last_position[i].x = detect_msg.red_x[i];
@@ -199,8 +199,9 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
             //RCLCPP_INFO(this->get_logger(), "更新红方机器人[%d]最后位置: x=%.2f, y=%.2f", 
             //           i, red_robots_last_position[i].x, red_robots_last_position[i].y);
         } else if(red_robots_last_position[i].valid) {
-            // 如果最后位置在特定区域内（x<=4.3且y<=3.7），不使用最后位置
-            if(red_robots_last_position[i].x <= 4.3f && red_robots_last_position[i].y <= 3.7f) {
+            if((i == 0 && red_robots_last_position[i].x <= 4.3f && red_robots_last_position[i].y <= 3.7f) || 
+               (i == 1 && red_robots_last_position[i].x <= 4.3f && red_robots_last_position[i].y <= 3.7f)) {
+                // 如果英雄或工程机器人最后位置在特定区域内，不使用最后位置
                 //RCLCPP_INFO(this->get_logger(), "红方机器人[%d]位于特定区域内，不使用最后位置", i);
             } else {
                 // 如果不在特定区域内，使用最后位置
@@ -220,8 +221,9 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
             //RCLCPP_INFO(this->get_logger(), "更新蓝方机器人[%d]最后位置: x=%.2f, y=%.2f", 
             //           i, blue_robots_last_position[i].x, blue_robots_last_position[i].y);
         } else if(blue_robots_last_position[i].valid) {
-            // 如果最后位置在特定区域内（x>=10.7且y>=24.3），不使用最后位置
-            if(blue_robots_last_position[i].x >= 10.7f && blue_robots_last_position[i].y >= 24.3f) {
+            if((i == 0 && blue_robots_last_position[i].x >= 10.7f && blue_robots_last_position[i].y >= 24.3f) ||
+               (i == 1 && blue_robots_last_position[i].x >= 10.7f && blue_robots_last_position[i].y >= 24.3f)) {
+                // 如果英雄或工程机器人最后位置在特定区域内，不使用最后位置
                 //RCLCPP_INFO(this->get_logger(), "蓝方机器人[%d]位于特定区域内，不使用最后位置", i);
             } else {
                 // 如果不在特定区域内，使用最后位置

@@ -273,8 +273,8 @@ void JudgeBridgeNode::send_standard1_data(const vision_interface::msg::RadarWarn
     }
     
     // 设置英雄状态
-    //interaction_data.hero_state = msg.hero_state;
-    interaction_data.hero_state = 1;
+    interaction_data.hero_state = msg.hero_state;
+    //interaction_data.hero_state = 1;
     
     // 发送数据
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(robot_interaction_standard_data_t));
@@ -301,8 +301,8 @@ void JudgeBridgeNode::send_standard2_data(const vision_interface::msg::RadarWarn
     }
     
     // 设置英雄状态
-    //interaction_data.hero_state = msg.hero_state;
-    interaction_data.hero_state = 1;
+    interaction_data.hero_state = msg.hero_state;
+    //interaction_data.hero_state = 1;
 
     // 发送数据
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(robot_interaction_standard_data_t));
