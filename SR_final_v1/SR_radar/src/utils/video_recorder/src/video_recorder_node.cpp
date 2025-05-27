@@ -51,7 +51,7 @@ VideoRecorderNode::VideoRecorderNode(const rclcpp::NodeOptions & options)
   
   // 创建订阅器
   subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-    topic_name, 10, 
+    "camera_image", rmw_qos_profile_sensor_data, 
     std::bind(&VideoRecorderNode::image_callback, this, std::placeholders::_1));
 
   RCLCPP_INFO(this->get_logger(), "VideoRecorderNode初始化完成");
@@ -123,4 +123,4 @@ std::string VideoRecorderNode::generate_filename()
 
 }  // namespace video_recorder
 
-RCLCPP_COMPONENTS_REGISTER_NODE(video_recorder::VideoRecorderNode) 
+RCLCPP_COMPONENTS_REGISTER_NODE(video_recorder::VideoRecorderNode)
