@@ -88,7 +88,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
         "--minBatch 1 "
         "--optBatch 5 "
         "--maxBatch 12 "
-        "--Shape=192x192 "
+        "--Shape=640x640 "
         "--input_name=images"
         );
     }else{
@@ -103,7 +103,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     TDT_INFO("Load yolo engine success!");
 
   image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-      "camera_image", rclcpp::SensorDataQoS(),
+      "rosbag_image", rclcpp::SensorDataQoS(),
       std::bind(&Detect::callback, this, std::placeholders::_1));
   image_pub = this->create_publisher<sensor_msgs::msg::Image>("detect_image", rclcpp::SensorDataQoS());
   pub = this->create_publisher<vision_interface::msg::DetectResult>("detect_result", rclcpp::SensorDataQoS());
@@ -126,12 +126,12 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
 
   auto result = yolo->forward(image);
   if(result.size()==0){
-    RCLCPP_INFO(this->get_logger(), "No Car!");
+    //RCLCPP_INFO(this->get_logger(), "No Car!");
     // 发布空的检测结果（所有坐标默认为0）
     pub->publish(detect_result);
     should_process = false;  // 不需要处理后续步骤
   }else if(result.size()>MAX_CARS){
-    RCLCPP_INFO(this->get_logger(), "Too Many Car!");
+    //RCLCPP_INFO(this->get_logger(), "Too Many Car!");
     // 发布空的检测结果（所有坐标默认为0）
     pub->publish(detect_result);
     should_process = false;  // 不需要处理后续步骤
@@ -178,7 +178,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
         has_armor=true;}
     }
     if(!has_armor){
-      RCLCPP_INFO(this->get_logger(), "No Armor!");
+      //RCLCPP_INFO(this->get_logger(), "No Armor!");
       // 发布空的检测结果（所有坐标默认为0）
       pub->publish(detect_result);
       should_process = false;  // 不需要处理后续步骤
@@ -235,14 +235,14 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
       auto safe_rect = getSafeRect(img,max_rect);
       //cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
 
-      car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
+      car.center=cv::Point2f(max_rect.x+max_rect.width/2,car.car.bottom);
       
       if(car.color==0){
           detect_result.blue_x[car.number-1]=car.center.x;
           detect_result.blue_y[car.number-1]=car.center.y;
-          if(car.center.x*car.center.y==0&&car.number!=0){
-            RCLCPP_ERROR(this->get_logger(), "Error: blue car center is 0 for number %d", car.number);
-          }
+          //if(car.center.x*car.center.y==0&&car.number!=0){
+          //  RCLCPP_ERROR(this->get_logger(), "Error: blue car center is 0 for number %d", car.number);
+          //}
           if(debug){
           cv::rectangle(img,car.car_rect,cv::Scalar(255,0,0),2);
           cv::putText(img,std::to_string(car.number),cv::Point(safe_rect.x, safe_rect.y -10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,0,0),2);
@@ -252,9 +252,9 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
       if(car.color==2){
           detect_result.red_x[car.number-1]=car.center.x;
           detect_result.red_y[car.number-1]=car.center.y;
-          if(car.center.x*car.center.y==0&&car.number!=0){
-            RCLCPP_ERROR(this->get_logger(), "Error: red car center is 0 for number %d", car.number);
-          }
+          //if(car.center.x*car.center.y==0&&car.number!=0){
+          //  RCLCPP_ERROR(this->get_logger(), "Error: red car center is 0 for number %d", car.number);
+          //}
           if(debug){
           cv::rectangle(img,car.car_rect,cv::Scalar(0,0,255),2);
           cv::putText(img,std::to_string(car.number),cv::Point(safe_rect.x, safe_rect.y - 10),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,0,255),2);

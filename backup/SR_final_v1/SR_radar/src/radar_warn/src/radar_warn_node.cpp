@@ -21,17 +21,17 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
         "/detect_result", rclcpp::SensorDataQoS(), std::bind(&RadarWarn::engine_state_callback, this, std::placeholders::_1));
     
     color_sub_ = this->create_subscription<radar_interface::team_color::msg>(
-        "judge/color", 10, std::bind(&RadarWarn::color_callback, this, std::placeholders::_1));
+        "judge/color", rclcpp::SystemDefaultsQoS(), std::bind(&RadarWarn::color_callback, this, std::placeholders::_1));
     
     // 初始化发布者
     warn_pub_ = this->create_publisher<vision_interface::msg::RadarWarn>(
-        "/hero_state", 10);
+        "/hero_state", rclcpp::SystemDefaultsQoS());
     
-    radar2sentry_pub_ = this->create_publisher<vision_interface::msg::Radar2Sentry>(
-        "/Radar2Sentry", rclcpp::SensorDataQoS());
+    //radar2sentry_pub_ = this->create_publisher<vision_interface::msg::Radar2Sentry>(
+    //    "/Radar2Sentry", rclcpp::SensorDataQoS());
     
     engine_warn_pub_ = this->create_publisher<vision_interface::msg::RadarWarn>(
-        "/engine_state", 10);
+        "/engine_state", rclcpp::SystemDefaultsQoS());
     
     // 初始化parser
     parser_ = std::make_unique<parser>();
@@ -49,13 +49,13 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
         red_update[i] = 0.0;
     }
     
-    RCLCPP_INFO(this->get_logger(), "RadarWarn节点已启动");
+    //RCLCPP_INFO(this->get_logger(), "RadarWarn节点已启动");
 }
 
 void RadarWarn::color_callback(const radar_interface::team_color::msg::SharedPtr msg) {
     self_color = msg->data ? radar_interface::team_color::C_RED : radar_interface::team_color::C_BLUE;
-    RCLCPP_INFO(this->get_logger(), "团队颜色已接收: %s", 
-                self_color == radar_interface::team_color::C_RED ? "红色" : "蓝色");
+    //RCLCPP_INFO(this->get_logger(), "团队颜色已接收: %s", 
+    //            self_color == radar_interface::team_color::C_RED ? "红色" : "蓝色");
 }
 
 float RadarWarn::calculate_distance(const cv::Point2f& p1, const cv::Point2f& p2) {
@@ -96,9 +96,10 @@ void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::ms
             engine_warning_level = 0;
             RCLCPP_INFO(this->get_logger(), "敌方工程机器人不在中心高地");
         }
-    } else {
-        RCLCPP_INFO(this->get_logger(), "未检测到敌方工程机器人");
-    }
+    } 
+    //else {
+    //    RCLCPP_INFO(this->get_logger(), "未检测到敌方工程机器人");
+    //}
     
     // 发布工程机器人预警消息
     vision_interface::msg::RadarWarn engine_warn;
@@ -180,7 +181,7 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     } else {
         // 未检测到敌方英雄机器人，不预警
         warning_level = 0;
-        RCLCPP_INFO(this->get_logger(), "未检测到敌方英雄机器人");
+        //RCLCPP_INFO(this->get_logger(), "未检测到敌方英雄机器人");
     }
     
     RCLCPP_INFO(this->get_logger(), "敌方英雄机器人预警等级：%d", warning_level);
@@ -191,28 +192,28 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     warn_pub_->publish(radar_warn);
     
     // 发布Radar2Sentry消息
-    vision_interface::msg::Radar2Sentry radar2sentry;
-    
-    // 根据团队颜色发送敌方机器人信息
-    if (self_color == radar_interface::team_color::C_BLUE) {
-        // 我方是蓝色，发送红色机器人信息
-        for (int i = 0; i < 6; i++) {
-            if (red_point[i].x != 0 && red_point[i].y != 0 && current_time - red_update[i] < 2.0) {
-                radar2sentry.radar_enemy_x[i] = red_point[i].x;
-                radar2sentry.radar_enemy_y[i] = red_point[i].y;
-            }
-        }
-    } else if (self_color == radar_interface::team_color::C_RED) {
-        // 我方是红色，发送蓝色机器人信息
-        for (int i = 0; i < 6; i++) {
-            if (blue_point[i].x != 0 && blue_point[i].y != 0 && current_time - blue_update[i] < 2.0) {
-                radar2sentry.radar_enemy_x[i] = blue_point[i].x;
-                radar2sentry.radar_enemy_y[i] = blue_point[i].y;
-            }
-        }
-    }
-    
-    radar2sentry_pub_->publish(radar2sentry);
+    //vision_interface::msg::Radar2Sentry radar2sentry;
+    //
+    //// 根据团队颜色发送敌方机器人信息
+    //if (self_color == radar_interface::team_color::C_BLUE) {
+    //    // 我方是蓝色，发送红色机器人信息
+    //    for (int i = 0; i < 6; i++) {
+    //        if (red_point[i].x != 0 && red_point[i].y != 0 && current_time - red_update[i] < 2.0) {
+    //            radar2sentry.radar_enemy_x[i] = red_point[i].x;
+    //            radar2sentry.radar_enemy_y[i] = red_point[i].y;
+    //        }
+    //    }
+    //} else if (self_color == radar_interface::team_color::C_RED) {
+    //    // 我方是红色，发送蓝色机器人信息
+    //    for (int i = 0; i < 6; i++) {
+    //        if (blue_point[i].x != 0 && blue_point[i].y != 0 && current_time - blue_update[i] < 2.0) {
+    //            radar2sentry.radar_enemy_x[i] = blue_point[i].x;
+    //            radar2sentry.radar_enemy_y[i] = blue_point[i].y;
+    //        }
+    //    }
+    //}
+    //
+    //radar2sentry_pub_->publish(radar2sentry);
 }
 
 }  // namespace tdt_radar

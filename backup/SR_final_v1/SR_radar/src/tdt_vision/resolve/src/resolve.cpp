@@ -10,7 +10,7 @@ Resolve::Resolve(const rclcpp::NodeOptions& node_options) : Node("radar_resolve_
   detect_sub = this->create_subscription<vision_interface::msg::DetectResult>("detect_result", rclcpp::SensorDataQoS(),std::bind(&Resolve::DetectCallback, this, std::placeholders::_1));
   pub_radar=this->create_publisher<vision_interface::msg::DetectResult>("/resolve_result",rclcpp::SensorDataQoS());
   
-  TDT_INFO("Load radar resolve node success!");
+  //TDT_INFO("Load radar resolve node success!");
 }
 
 
