@@ -60,8 +60,8 @@ private:
         double timestamp;
     };
     std::deque<HeroPosition> hero_history; // 存储英雄机器人的历史位置
-    double hero_history_duration = 2.0; // 历史记录保留时间（秒）
-    float min_movement_threshold = 0.3f; // 最小移动阈值（米）
+    double hero_history_duration = 2.5; // 历史记录保留时间（秒）
+    float min_movement_threshold = 0.2f; // 最小移动阈值（米）
     
     // 预警相关
     int warning_level = 0; // 预警等级：0-不预警，1-预警
