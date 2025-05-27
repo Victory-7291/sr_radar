@@ -23,7 +23,10 @@ VideoRecorderNode::VideoRecorderNode(const rclcpp::NodeOptions & options)
   this->get_parameter("output_dir", output_dir_);
   this->get_parameter("filename_prefix", filename_prefix_);
   this->get_parameter("fps", fps_);
-  this->get_parameter("topic", std::string topic_name);
+  
+  // 正确获取topic参数
+  std::string topic_name;
+  this->get_parameter("topic", topic_name);
 
   // 创建输出目录（如果不存在）
   std::filesystem::path dir_path(output_dir_);
@@ -49,9 +52,9 @@ VideoRecorderNode::VideoRecorderNode(const rclcpp::NodeOptions & options)
   
   RCLCPP_INFO(this->get_logger(), "订阅话题: %s", topic_name.c_str());
   
-  // 创建订阅器
+  // 创建订阅器，使用正确的QoS设置
   subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-    "camera_image", rmw_qos_profile_sensor_data, 
+    topic_name, rclcpp::SensorDataQoS(), 
     std::bind(&VideoRecorderNode::image_callback, this, std::placeholders::_1));
 
   RCLCPP_INFO(this->get_logger(), "VideoRecorderNode初始化完成");
