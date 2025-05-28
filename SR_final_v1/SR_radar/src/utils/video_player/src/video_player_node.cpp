@@ -71,20 +71,20 @@ VideoPlayerNode::VideoPlayerNode(const rclcpp::NodeOptions & options)
   publisher_ = this->create_publisher<sensor_msgs::msg::Image>("video_image", 10);
   
   // 获取视频帧率或使用默认值
-  double fps = cap_.get(cv::CAP_PROP_FPS);
-  if (fps <= 0 || force_frame_rate_) {
+  fps_ = cap_.get(cv::CAP_PROP_FPS);
+  if (fps_ <= 0 || force_frame_rate_) {
     if (force_frame_rate_) {
       RCLCPP_INFO(this->get_logger(), "Forcing frame rate to user-specified value: %f FPS.", frame_rate_);
     } else {
       RCLCPP_WARN(this->get_logger(), "Could not get FPS from video, using default: %f FPS.", frame_rate_);
     }
-    fps = frame_rate_;
+    fps_ = frame_rate_;
   } else {
-    RCLCPP_INFO(this->get_logger(), "Video FPS: %f", fps);
+    RCLCPP_INFO(this->get_logger(), "Video FPS: %f", fps_);
   }
   
   // 使用更精确的帧率计算
-  double frame_interval = 1.0 / fps;
+  double frame_interval = 1.0 / fps_;
   RCLCPP_INFO(this->get_logger(), "Frame interval: %f seconds", frame_interval);
   
   // 创建初始定时器
@@ -93,9 +93,9 @@ VideoPlayerNode::VideoPlayerNode(const rclcpp::NodeOptions & options)
     std::bind(&VideoPlayerNode::timer_callback, this));
   
   if (use_camera_) {
-    RCLCPP_INFO(this->get_logger(), "VideoPlayerNode initialized, publishing camera frames to 'video_image' at %f FPS.", fps);
+    RCLCPP_INFO(this->get_logger(), "VideoPlayerNode initialized, publishing camera frames to 'video_image' at %f FPS.", fps_);
   } else {
-    RCLCPP_INFO(this->get_logger(), "VideoPlayerNode initialized, publishing video to 'video_image' at %f FPS.", fps);
+    RCLCPP_INFO(this->get_logger(), "VideoPlayerNode initialized, publishing video to 'video_image' at %f FPS.", fps_);
   }
 }
 
@@ -142,11 +142,8 @@ void VideoPlayerNode::timer_callback()
     auto end_time = this->now();
     auto processing_time = (end_time - start_time).seconds();
     
-    // 计算期望的帧间隔时间（秒）
-    double frame_interval = 1.0 / fps;
-    
     // 计算需要等待的剩余时间（如果有）
-    double remaining_time = frame_interval - processing_time;
+    double remaining_time = (1.0 / fps_) - processing_time;
     
     // 如果还有剩余时间，则调整下一次回调的时间
     if (remaining_time > 0) {
@@ -163,10 +160,10 @@ void VideoPlayerNode::timer_callback()
         std::bind(&VideoPlayerNode::timer_callback, this));
       
       // 如果处理时间远大于帧间隔，可能会输出警告
-      if (processing_time > frame_interval * 1.5) {
+      if (processing_time > (1.0 / fps_) * 1.5) {
         RCLCPP_WARN(this->get_logger(), 
                     "Processing time (%f s) exceeds frame interval (%f s), playback may be slower than expected.", 
-                    processing_time, frame_interval);
+                    processing_time, 1.0 / fps_);
       }
     }
   } catch (const std::exception& e) {

@@ -30,8 +30,9 @@ private:
   bool use_camera_ = false;    // 是否使用摄像头代替视频文件
   int camera_id_ = 0;          // 摄像头ID（仅当use_camera_为true时有效）
   bool loop_ = true;           // 是否循环播放视频
-  double frame_rate_ = 60.0;   // 默认帧率（如果无法从视频获取或force_frame_rate为true）
+  double frame_rate_ = 30.0;   // 默认帧率（如果无法从视频获取或force_frame_rate为true）
   bool force_frame_rate_ = false; // 是否强制使用指定的帧率，忽略视频文件中的帧率
+  double fps_ = 30.0;          // 实际使用的帧率，在构造函数中初始化
 };
 
 }  // namespace video_player
