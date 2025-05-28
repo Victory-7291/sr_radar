@@ -103,7 +103,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     TDT_INFO("Load yolo engine success!");
 
   image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-      "camera_image", rclcpp::SensorDataQoS(),
+      "video_image", rclcpp::SensorDataQoS(),
       std::bind(&Detect::callback, this, std::placeholders::_1));
   image_pub = this->create_publisher<sensor_msgs::msg::Image>("detect_image", rclcpp::SensorDataQoS());
   pub = this->create_publisher<vision_interface::msg::DetectResult>("detect_result", rclcpp::SensorDataQoS());
