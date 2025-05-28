@@ -53,12 +53,6 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
         red_update[i] = 0.0;
     }
     
-    // 初始化机器人最后位置
-    for (int i = 0; i < 2; i++) {
-        red_robots_last_position[i].valid = false;
-        blue_robots_last_position[i].valid = false;
-    }
-    
     //RCLCPP_INFO(this->get_logger(), "RadarWarn节点已启动");
 }
 
@@ -83,42 +77,16 @@ void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::ms
     
     // 根据团队颜色获取敌方工程机器人位置
     if (self_color == radar_interface::team_color::C_BLUE) {
-        // 持久化红方工程机器人位置（工程机器人索引为1）
+        // 检查是否有红方工程机器人坐标
         if (msg->red_x[1] && msg->red_y[1]) {
-            // 如果有红方工程机器人坐标，更新最后位置
-            red_robots_last_position[1].x = msg->red_x[1];
-            red_robots_last_position[1].y = msg->red_y[1];
-            red_robots_last_position[1].valid = true;
             engine_position = cv::Point2f(msg->red_x[1], msg->red_y[1]);
             engine_detected = true;
-        } else if (red_robots_last_position[1].valid) {
-            // 检查是否在特定区域内
-            if (red_robots_last_position[1].x <= 4.3f && red_robots_last_position[1].y <= 3.7f) {
-                // 如果工程机器人最后位置在特定区域内，不使用最后位置
-            } else {
-                // 使用保存的最后位置
-                engine_position = cv::Point2f(red_robots_last_position[1].x, red_robots_last_position[1].y);
-                engine_detected = true;
-            }
         }
     } else if (self_color == radar_interface::team_color::C_RED) {
-        // 持久化蓝方工程机器人位置（工程机器人索引为1）
+        // 检查是否有蓝方工程机器人坐标
         if (msg->blue_x[1] && msg->blue_y[1]) {
-            // 如果有蓝方工程机器人坐标，更新最后位置
-            blue_robots_last_position[1].x = msg->blue_x[1];
-            blue_robots_last_position[1].y = msg->blue_y[1];
-            blue_robots_last_position[1].valid = true;
             engine_position = cv::Point2f(msg->blue_x[1], msg->blue_y[1]);
             engine_detected = true;
-        } else if (blue_robots_last_position[1].valid) {
-            // 检查是否在特定区域内
-            if (blue_robots_last_position[1].x >= 10.7f && blue_robots_last_position[1].y >= 24.3f) {
-                // 如果工程机器人最后位置在特定区域内，不使用最后位置
-            } else {
-                // 使用保存的最后位置
-                engine_position = cv::Point2f(blue_robots_last_position[1].x, blue_robots_last_position[1].y);
-                engine_detected = true;
-            }
         }
     }
     
@@ -208,42 +176,16 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     bool enemy_hero_detected = false;
     
     if (self_color == radar_interface::team_color::C_BLUE) {
-        // 持久化红方英雄机器人位置（英雄机器人索引为0）
+        // 检查是否有红方英雄机器人坐标
         if (msg->red_x[0] && msg->red_y[0]) {
-            // 如果有红方英雄机器人坐标，更新最后位置
-            red_robots_last_position[0].x = msg->red_x[0];
-            red_robots_last_position[0].y = msg->red_y[0];
-            red_robots_last_position[0].valid = true;
             enemy_hero_position = cv::Point2f(msg->red_x[0], msg->red_y[0]);
             enemy_hero_detected = true;
-        } else if (red_robots_last_position[0].valid) {
-            // 检查是否在特定区域内
-            if (red_robots_last_position[0].x <= 4.3f && red_robots_last_position[0].y <= 3.7f) {
-                // 如果英雄机器人最后位置在特定区域内，不使用最后位置
-            } else {
-                // 使用保存的最后位置
-                enemy_hero_position = cv::Point2f(red_robots_last_position[0].x, red_robots_last_position[0].y);
-                enemy_hero_detected = true;
-            }
         }
     } else if (self_color == radar_interface::team_color::C_RED) {
-        // 持久化蓝方英雄机器人位置（英雄机器人索引为0）
+        // 检查是否有蓝方英雄机器人坐标
         if (msg->blue_x[0] && msg->blue_y[0]) {
-            // 如果有蓝方英雄机器人坐标，更新最后位置
-            blue_robots_last_position[0].x = msg->blue_x[0];
-            blue_robots_last_position[0].y = msg->blue_y[0];
-            blue_robots_last_position[0].valid = true;
             enemy_hero_position = cv::Point2f(msg->blue_x[0], msg->blue_y[0]);
             enemy_hero_detected = true;
-        } else if (blue_robots_last_position[0].valid) {
-            // 检查是否在特定区域内
-            if (blue_robots_last_position[0].x >= 10.7f && blue_robots_last_position[0].y >= 24.3f) {
-                // 如果英雄机器人最后位置在特定区域内，不使用最后位置
-            } else {
-                // 使用保存的最后位置
-                enemy_hero_position = cv::Point2f(blue_robots_last_position[0].x, blue_robots_last_position[0].y);
-                enemy_hero_detected = true;
-            }
         }
     }
     
@@ -310,7 +252,7 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     radar_warn.hero_state = warning_level;
     warn_pub_->publish(radar_warn);
     
-    // 发布Radar2Sentry消息
+    // 发布Radar2Sentry消息 (已注释)
     //vision_interface::msg::Radar2Sentry radar2sentry;
     //
     //// 根据团队颜色发送敌方机器人信息

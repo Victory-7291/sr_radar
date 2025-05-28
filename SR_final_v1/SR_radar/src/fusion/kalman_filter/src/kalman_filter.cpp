@@ -12,6 +12,13 @@ KalmanFilter::KalmanFilter(const rclcpp::NodeOptions& node_options):rclcpp::Node
     sub_color_ = this->create_subscription<radar_interface::team_color::msg>("judge/color", 10, std::bind(&KalmanFilter::color_callback, this, std::placeholders::_1));
     
     self_color = radar_interface::team_color::UNKNOWN;
+    
+    // 初始化机器人最后位置
+    for (int i = 0; i < 2; i++) {
+        red_robots_last_position[i].valid = false;
+        blue_robots_last_position[i].valid = false;
+    }
+    
     //RCLCPP_INFO(this->get_logger(), "Kalman_filter_Node has been started.");
 }
 
@@ -26,6 +33,9 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
     //RCLCPP_INFO(this->get_logger(), "Detect_callback");
     rclcpp::Time time = msg->header.stamp;
     
+    // 创建输出消息，初始化为输入消息的内容
+    vision_interface::msg::DetectResult detect_msg = *msg;
+    
     // 首先更新所有滤波器的预测点
     for(auto &kf : KFs)
     {
@@ -33,19 +43,18 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
         kf.has_updated = false;
     }
     
-    // 处理红色点
-    for(int i=0; i<6; i++)
-    {
-        pcl::PointXY red_point;
-        red_point.x = msg->red_x[i];
-        red_point.y = msg->red_y[i];
-        if(red_point.x == 0 || red_point.y == 0) continue;
-        
+    // 只处理红蓝双方的英雄机器人坐标（索引为0）
+    
+    // 处理红色英雄
+    pcl::PointXY red_hero_point;
+    red_hero_point.x = msg->red_x[0];
+    red_hero_point.y = msg->red_y[0];
+    if(red_hero_point.x != 0 && red_hero_point.y != 0) {
         // 匹配过程
         std::vector<int> match_kf_indexs;
         for(int j = 0; j < this->KFs.size(); j++)
         {
-            if(KFs[j].match(red_point)){
+            if(KFs[j].match(red_hero_point) && KFs[j].get_color() == 2 && KFs[j].get_number() == 0){
                 match_kf_indexs.push_back(j);
             }
         }
@@ -54,15 +63,15 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
         if(match_kf_indexs.size() == 0)
         {
             // 无匹配：创建新滤波器
-            Kalman_filter_plus kf(red_point, time);
-            kf.camera_match(time, red_point, 2, i); // 设置为红色，编号为i
+            Kalman_filter_plus kf(red_hero_point, time);
+            kf.camera_match(time, red_hero_point, 2, 0); // 设置为红色英雄
             KFs.push_back(kf);
         }
         else if(match_kf_indexs.size() == 1)
         {
             // 单一匹配：直接更新
-            KFs[match_kf_indexs[0]].update(red_point, time);
-            KFs[match_kf_indexs[0]].camera_match(time, red_point, 2, i);
+            KFs[match_kf_indexs[0]].update(red_hero_point, time);
+            KFs[match_kf_indexs[0]].camera_match(time, red_hero_point, 2, 0);
         }
         else
         {
@@ -71,31 +80,28 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
             int min_index = 0;
             for(auto index : match_kf_indexs)
             {
-                float distance = KFs[index].Distance(KFs[index].predict_point, red_point);
+                float distance = KFs[index].Distance(KFs[index].predict_point, red_hero_point);
                 if(distance < min_distance)
                 {
                     min_distance = distance;
                     min_index = index;
                 }
             }
-            KFs[min_index].update(red_point, time);
-            KFs[min_index].camera_match(time, red_point, 2, i);
+            KFs[min_index].update(red_hero_point, time);
+            KFs[min_index].camera_match(time, red_hero_point, 2, 0);
         }
     }
     
-    // 处理蓝色点
-    for(int i=0; i<6; i++)
-    {
-        pcl::PointXY blue_point;
-        blue_point.x = msg->blue_x[i];
-        blue_point.y = msg->blue_y[i];
-        if(blue_point.x == 0 || blue_point.y == 0) continue;
-        
+    // 处理蓝色英雄
+    pcl::PointXY blue_hero_point;
+    blue_hero_point.x = msg->blue_x[0];
+    blue_hero_point.y = msg->blue_y[0];
+    if(blue_hero_point.x != 0 && blue_hero_point.y != 0) {
         // 匹配过程
         std::vector<int> match_kf_indexs;
         for(int j = 0; j < this->KFs.size(); j++)
         {
-            if(KFs[j].match(blue_point)){
+            if(KFs[j].match(blue_hero_point) && KFs[j].get_color() == 0 && KFs[j].get_number() == 0){
                 match_kf_indexs.push_back(j);
             }
         }
@@ -104,15 +110,15 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
         if(match_kf_indexs.size() == 0)
         {
             // 无匹配：创建新滤波器
-            Kalman_filter_plus kf(blue_point, time);
-            kf.camera_match(time, blue_point, 0, i); // 设置为蓝色，编号为i
+            Kalman_filter_plus kf(blue_hero_point, time);
+            kf.camera_match(time, blue_hero_point, 0, 0); // 设置为蓝色英雄
             KFs.push_back(kf);
         }
         else if(match_kf_indexs.size() == 1)
         {
             // 单一匹配：直接更新
-            KFs[match_kf_indexs[0]].update(blue_point, time);
-            KFs[match_kf_indexs[0]].camera_match(time, blue_point, 0, i);
+            KFs[match_kf_indexs[0]].update(blue_hero_point, time);
+            KFs[match_kf_indexs[0]].camera_match(time, blue_hero_point, 0, 0);
         }
         else
         {
@@ -121,15 +127,15 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
             int min_index = 0;
             for(auto index : match_kf_indexs)
             {
-                float distance = KFs[index].Distance(KFs[index].predict_point, blue_point);
+                float distance = KFs[index].Distance(KFs[index].predict_point, blue_hero_point);
                 if(distance < min_distance)
                 {
                     min_distance = distance;
                     min_index = index;
                 }
             }
-            KFs[min_index].update(blue_point, time);
-            KFs[min_index].camera_match(time, blue_point, 0, i);
+            KFs[min_index].update(blue_hero_point, time);
+            KFs[min_index].camera_match(time, blue_hero_point, 0, 0);
         }
     }
     
@@ -153,24 +159,19 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
         }
     }
     
-    // 发布检测结果
-    vision_interface::msg::DetectResult detect_msg;
-    detect_msg.header = msg->header;
-    
+    // 更新英雄机器人坐标（索引为0）的滤波结果
     for(auto kf : KFs)
     {
         if(kf.detect_history.size()==0) continue;
-        if(kf.get_color() == 0) // 蓝色
+        if(kf.get_color() == 0 && kf.get_number() == 0) // 蓝色英雄
         {
-            int number = kf.get_number();
-            detect_msg.blue_x[number] = kf.predict_point.x;
-            detect_msg.blue_y[number] = kf.predict_point.y;
+            detect_msg.blue_x[0] = kf.predict_point.x;
+            detect_msg.blue_y[0] = kf.predict_point.y;
         }
-        if(kf.get_color() == 2) // 红色
+        if(kf.get_color() == 2 && kf.get_number() == 0) // 红色英雄
         {
-            int number = kf.get_number();
-            detect_msg.red_x[number] = kf.predict_point.x;
-            detect_msg.red_y[number] = kf.predict_point.y;
+            detect_msg.red_x[0] = kf.predict_point.x;
+            detect_msg.red_y[0] = kf.predict_point.y;
         }
     }
     
@@ -185,6 +186,37 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
                 detect_msg.red_x[i]=28-detect_msg.red_x[i];
                 detect_msg.red_y[i]=15-detect_msg.red_y[i];
             }
+        }
+    }
+    
+    // 添加英雄机器人位置持久化逻辑 - 从radar_warn_node移植
+    // 红方英雄(索引为0)持久化
+    if (detect_msg.red_x[0] != 0 && detect_msg.red_y[0] != 0) {
+        // 更新红方英雄最后位置
+        red_robots_last_position[0].x = detect_msg.red_x[0];
+        red_robots_last_position[0].y = detect_msg.red_y[0];
+        red_robots_last_position[0].valid = true;
+    } else if (red_robots_last_position[0].valid) {
+        // 检查红方英雄是否在特定区域内
+        if (!(red_robots_last_position[0].x <= 4.3f && red_robots_last_position[0].y <= 3.7f)) {
+            // 使用保存的最后位置
+            detect_msg.red_x[0] = red_robots_last_position[0].x;
+            detect_msg.red_y[0] = red_robots_last_position[0].y;
+        }
+    }
+    
+    // 蓝方英雄(索引为0)持久化
+    if (detect_msg.blue_x[0] != 0 && detect_msg.blue_y[0] != 0) {
+        // 更新蓝方英雄最后位置
+        blue_robots_last_position[0].x = detect_msg.blue_x[0];
+        blue_robots_last_position[0].y = detect_msg.blue_y[0];
+        blue_robots_last_position[0].valid = true;
+    } else if (blue_robots_last_position[0].valid) {
+        // 检查蓝方英雄是否在特定区域内
+        if (!(blue_robots_last_position[0].x >= 10.7f && blue_robots_last_position[0].y >= 24.3f)) {
+            // 使用保存的最后位置
+            detect_msg.blue_x[0] = blue_robots_last_position[0].x;
+            detect_msg.blue_y[0] = blue_robots_last_position[0].y;
         }
     }
     
