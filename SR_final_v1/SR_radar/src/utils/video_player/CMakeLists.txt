@@ -40,10 +40,10 @@ rclcpp_components_register_nodes(${PROJECT_NAME}
   "video_player::VideoPlayerNode"
 )
 
-add_executable(video_player_node src/video_player_node.cpp)
+add_executable(video_player_node src/main.cpp)
 ament_target_dependencies(video_player_node ${dependencies})
 
-target_link_libraries(video_player_node ${OpenCV_LIBRARIES})
+target_link_libraries(video_player_node ${PROJECT_NAME} ${OpenCV_LIBRARIES})
 
 install(TARGETS
   ${PROJECT_NAME}
