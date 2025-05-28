@@ -23,14 +23,15 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   cv::VideoCapture cap_;
   
-  // 默认视频路径（请修改为您的实际视频路径）
-  std::string video_path_ = "/Users/wan/Documents/SR_final_v1/videos/sample.mp4";
+  // 默认视频路径设置为空，需要通过参数传入
+  std::string video_path_ = "";
   
   // 其他播放相关参数
-  bool use_camera_ = false;  // 是否使用摄像头代替视频文件
-  int camera_id_ = 0;        // 摄像头ID（仅当use_camera_为true时有效）
-  bool loop_ = true;         // 是否循环播放视频
-  double frame_rate_ = 30.0; // 默认帧率（如果无法从视频获取）
+  bool use_camera_ = false;    // 是否使用摄像头代替视频文件
+  int camera_id_ = 0;          // 摄像头ID（仅当use_camera_为true时有效）
+  bool loop_ = true;           // 是否循环播放视频
+  double frame_rate_ = 60.0;   // 默认帧率（如果无法从视频获取或force_frame_rate为true）
+  bool force_frame_rate_ = false; // 是否强制使用指定的帧率，忽略视频文件中的帧率
 };
 
 }  // namespace video_player

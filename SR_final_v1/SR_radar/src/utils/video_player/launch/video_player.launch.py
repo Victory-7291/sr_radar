@@ -36,6 +36,12 @@ def generate_launch_description():
         default_value='30.0',
         description='Default frame rate to use if cannot be determined from video (optional)'
     )
+    
+    force_frame_rate_arg = DeclareLaunchArgument(
+        'force_frame_rate',
+        default_value='false',
+        description='Whether to force using the specified frame rate instead of the video file frame rate (optional)'
+    )
 
     # 创建节点
     video_player_node = Node(
@@ -48,7 +54,8 @@ def generate_launch_description():
             'use_camera': LaunchConfiguration('use_camera'),
             'camera_id': LaunchConfiguration('camera_id'),
             'loop': LaunchConfiguration('loop'),
-            'frame_rate': LaunchConfiguration('frame_rate')
+            'frame_rate': LaunchConfiguration('frame_rate'),
+            'force_frame_rate': LaunchConfiguration('force_frame_rate')
         }]
     )
 
@@ -58,5 +65,6 @@ def generate_launch_description():
         camera_id_arg,
         loop_arg,
         frame_rate_arg,
+        force_frame_rate_arg,
         video_player_node
     ]) 
