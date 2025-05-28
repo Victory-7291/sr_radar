@@ -8,7 +8,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'output_dir',
-            default_value='/tmp',
+            default_value='/home/wan/radar_video',
             description='视频文件保存目录路径'
         ),
         DeclareLaunchArgument(
@@ -18,7 +18,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'fps',
-            default_value='30.0',
+            default_value='60.0',
             description='视频帧率'
         ),
         DeclareLaunchArgument(
