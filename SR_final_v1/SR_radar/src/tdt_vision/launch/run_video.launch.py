@@ -124,6 +124,14 @@ def generate_launch_description():
             name='radar_resolve_node',
             extra_arguments=[{'use_intra_process_comms': True}]
         )
+    
+    def get_debug_map_node(package, plugin):
+        return ComposableNode(
+            package=package,
+            plugin=plugin,
+            name='debug_map_node',
+            extra_arguments=[{'use_intra_process_comms': True}]
+        )
 
     #def get_kalman_filter_node(package, plugin):
     #    return ComposableNode(
@@ -172,6 +180,7 @@ def generate_launch_description():
     radar_detect_node = get_radar_detect_node('tdt_vision', 'tdt_radar::Detect')
     radar_resolve_node = get_radar_resolve_node('tdt_vision', 'tdt_radar::Resolve')
     foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
+    debug_map_node = get_debug_map_node('debug_map', 'tdt_radar::DebugMap')
     #kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
 
     # 创建节点容器，将 video_streamer_cpp_node 添加到列表中
@@ -180,6 +189,7 @@ def generate_launch_description():
         radar_detect_node,
         radar_resolve_node,
         foxglove_node,
+        debug_map_node,
         #kalman_filter_node
     ]
     cam_detector_container = get_camera_detector_container(nodes_in_container)

@@ -2,6 +2,7 @@
 #include <rclcpp/node.hpp>
 #include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 #include <opencv4/opencv2/opencv.hpp>
 #include <vision_interface/msg/detect_result.hpp>
 #include <vision_interface/msg/radar2_sentry.hpp>
@@ -14,6 +15,7 @@
 #include <radar_interface/msg/matched_target.hpp>
 #include <radar_interface/team_color.hpp>
 #include <radar_interface/msg/radar_mark_data.hpp>
+
 namespace tdt_radar {
     class DebugMap : public rclcpp::Node {
     public:
@@ -40,6 +42,8 @@ namespace tdt_radar {
             map_timer = this->create_wall_timer(
                 std::chrono::duration<double>(timer_period),
                 std::bind(&DebugMap::show_map, this));
+                
+            RCLCPP_INFO(this->get_logger(), "Debug Map node initialized as component");
         }
         
         void color_callback(const radar_interface::team_color::msg::SharedPtr msg)
@@ -129,12 +133,12 @@ namespace tdt_radar {
             match_result_pub->publish(match_result);
         }
 
+    private:
         rclcpp::Subscription<vision_interface::msg::DetectResult>::SharedPtr match_result_sub;
         //rclcpp::Publisher<vision_interface::msg::Radar2Sentry>::SharedPtr radar2sentry_pub;
         rclcpp::Publisher<radar_interface::msg::MatchResult>::SharedPtr match_result_pub;
         rclcpp::Subscription<radar_interface::team_color::msg>::SharedPtr sub_color_;
         rclcpp::TimerBase::SharedPtr map_timer; // 用于定时更新地图的定时器
-
 
         double blue_update[6];
         double red_update[6];
@@ -146,13 +150,8 @@ namespace tdt_radar {
         radar_interface::team_color::ENUM self_color;
         cv::Mat map;
         int count = 0;//20帧保存一次
-        };
+    };
 }  // namespace tdt_radar
 
-int main(int argc, char * argv[]){
-    rclcpp::init(argc, argv);
-    auto node_options = rclcpp::NodeOptions(); // 创建NodeOptions实例
-    rclcpp::spin(std::make_shared<tdt_radar::DebugMap>(node_options)); // 传递NodeOptions实例
-    rclcpp::shutdown();
-    return 0;
-}
+// 注册组件
+RCLCPP_COMPONENTS_REGISTER_NODE(tdt_radar::DebugMap)
