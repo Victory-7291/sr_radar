@@ -76,12 +76,18 @@ void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::ms
     bool engine_detected = false;
     
     // 根据团队颜色获取敌方工程机器人位置
-    if (self_color == radar_interface::team_color::C_BLUE && msg->red_x[1] && msg->red_y[1]) {
-        engine_position = cv::Point2f(msg->red_x[1], msg->red_y[1]);
-        engine_detected = true;
-    } else if (self_color == radar_interface::team_color::C_RED && msg->blue_x[1] && msg->blue_y[1]) {
-        engine_position = cv::Point2f(msg->blue_x[1], msg->blue_y[1]);
-        engine_detected = true;
+    if (self_color == radar_interface::team_color::C_BLUE) {
+        // 检查是否有红方工程机器人坐标
+        if (msg->red_x[1] && msg->red_y[1]) {
+            engine_position = cv::Point2f(msg->red_x[1], msg->red_y[1]);
+            engine_detected = true;
+        }
+    } else if (self_color == radar_interface::team_color::C_RED) {
+        // 检查是否有蓝方工程机器人坐标
+        if (msg->blue_x[1] && msg->blue_y[1]) {
+            engine_position = cv::Point2f(msg->blue_x[1], msg->blue_y[1]);
+            engine_detected = true;
+        }
     }
     
     if (engine_detected) {
@@ -169,14 +175,18 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     cv::Point2f enemy_hero_position;
     bool enemy_hero_detected = false;
     
-    if (self_color == radar_interface::team_color::C_BLUE && red_point[0].x != 0 && red_point[0].y != 0) {
-        // 我方是蓝色，敌方英雄是红色的第一个机器人
-        enemy_hero_position = red_point[0];
-        enemy_hero_detected = true;
-    } else if (self_color == radar_interface::team_color::C_RED && blue_point[0].x != 0 && blue_point[0].y != 0) {
-        // 我方是红色，敌方英雄是蓝色的第一个机器人
-        enemy_hero_position = blue_point[0];
-        enemy_hero_detected = true;
+    if (self_color == radar_interface::team_color::C_BLUE) {
+        // 检查是否有红方英雄机器人坐标
+        if (msg->red_x[0] && msg->red_y[0]) {
+            enemy_hero_position = cv::Point2f(msg->red_x[0], msg->red_y[0]);
+            enemy_hero_detected = true;
+        }
+    } else if (self_color == radar_interface::team_color::C_RED) {
+        // 检查是否有蓝方英雄机器人坐标
+        if (msg->blue_x[0] && msg->blue_y[0]) {
+            enemy_hero_position = cv::Point2f(msg->blue_x[0], msg->blue_y[0]);
+            enemy_hero_detected = true;
+        }
     }
     
     // 处理敌方英雄机器人预警逻辑
@@ -242,7 +252,7 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     radar_warn.hero_state = warning_level;
     warn_pub_->publish(radar_warn);
     
-    // 发布Radar2Sentry消息
+    // 发布Radar2Sentry消息 (已注释)
     //vision_interface::msg::Radar2Sentry radar2sentry;
     //
     //// 根据团队颜色发送敌方机器人信息
