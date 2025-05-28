@@ -236,7 +236,8 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
       //cv::rectangle(img,safe_rect,cv::Scalar(255,255,255),2);
 
       //car.center=cv::Point2f(max_rect.x+max_rect.width/2,max_rect.y);
-      car.center=cv::Point2f(max_rect.x+max_rect.width/2,car.car.bottom);
+      //car.center=cv::Point2f(max_rect.x+max_rect.width/2,car.car.bottom);
+      car.center=cv::Point2f((car.car.left+car.car.right)/2,car.car.bottom);
       
       if(car.color==0){
           detect_result.blue_x[car.number-1]=car.center.x;
@@ -272,13 +273,13 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   std::cout<<"Detect Time: "<<time_used.count()*1000<<"ms"<<std::endl;
   
   // 确保在所有情况下都显示图像
-  //cv::Mat final_img;
-  //cv::resize(img, final_img, cv::Size(1536, 1125));
-  //cv::imshow("detect", final_img);
-  //auto key = cv::waitKey(1);
-  //if(key=='r'){
-  //    debug = !debug;
-  //}
+  cv::Mat final_img;
+  cv::resize(img, final_img, cv::Size(1536, 1125));
+  cv::imshow("detect", final_img);
+  auto key = cv::waitKey(1);
+  if(key=='r'){
+      debug = !debug;
+  }
 }
 }// namespace tdt_radar
 RCLCPP_COMPONENTS_REGISTER_NODE(tdt_radar::Detect)
