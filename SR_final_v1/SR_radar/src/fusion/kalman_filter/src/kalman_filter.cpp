@@ -138,7 +138,7 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
     // 清理过时的卡尔曼滤波器
     for(int i = KFs.size() - 1; i >= 0; i--)
     {
-        if((KFs[i].last_time) > 1.5){
+        if((KFs[i].last_time) > 0.5){
             KFs.erase(KFs.begin() + i);
         }
     }
@@ -148,7 +148,7 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
     {
         for(int i=kf.history.size() - 1; i >= 0; i--)
         {
-            if(Kalman_filter_plus::GetTimeByRosTime(time)-kf.history[i].first > 1.5)
+            if(Kalman_filter_plus::GetTimeByRosTime(time)-kf.history[i].first > 0.5)
             {
                 kf.history.erase(kf.history.begin() + i);
             }
@@ -179,12 +179,12 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
     if(self_color == radar_interface::team_color::C_BLUE){
         for(int i=0; i<6; i++){
             if(detect_msg.blue_x[i]!=0 && detect_msg.blue_y[i]!=0){
-                detect_msg.blue_x[i]=28-detect_msg.blue_x[i];
-                detect_msg.blue_y[i]=15-detect_msg.blue_y[i];
+                detect_msg.blue_x[i]=28.0-detect_msg.blue_x[i];
+                detect_msg.blue_y[i]=15.0-detect_msg.blue_y[i];
             }
             if(detect_msg.red_x[i]!=0 && detect_msg.red_y[i]!=0){
-                detect_msg.red_x[i]=28-detect_msg.red_x[i];
-                detect_msg.red_y[i]=15-detect_msg.red_y[i];
+                detect_msg.red_x[i]=28.0-detect_msg.red_x[i];
+                detect_msg.red_y[i]=15.0-detect_msg.red_y[i];
             }
         }
     }

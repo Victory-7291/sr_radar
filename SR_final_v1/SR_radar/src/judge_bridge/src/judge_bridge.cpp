@@ -46,7 +46,7 @@ void JudgeBridgeNode::filter_handler(JudgeSerial::JudgePair message){
     //    interaction_data_callback(message.second);
     //    break;
     default:
-        RCLCPP_DEBUG(rclcpp::get_logger("command"), "redundant commands");           
+        //RCLCPP_DEBUG(rclcpp::get_logger("command"), "redundant commands");           
         return;
     }
 }
@@ -59,7 +59,7 @@ void JudgeBridgeNode::send_radar_cmd(const std_msgs::msg::UInt8 &radar_cmd)
     dv_data.header.receiver_id = 0x8080;
     dv_data.radar_cmd = radar_cmd.data;
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&dv_data), sizeof(dv_data));
-    RCLCPP_INFO(get_logger(), "DV: %d", radar_cmd.data);
+    //RCLCPP_INFO(get_logger(), "DV: %d", radar_cmd.data);
 }
 
 //void JudgeBridgeNode::send_custom_info(const std::string& str)
@@ -98,16 +98,16 @@ void JudgeBridgeNode::robot_status_callback(const robot_status_t& robot_data)
     switch (radar_id) {
     case RADAR_ID::R_RED: {
         if (color != team_color::C_RED)
-            RCLCPP_INFO(get_logger(), "WE ARE <<<RED>>>");
+            //RCLCPP_INFO(get_logger(), "WE ARE <<<RED>>>");
         color = team_color::C_RED;
     } break;
     case RADAR_ID::R_BLUE: {
         if (color != team_color::C_BLUE)
-            RCLCPP_INFO(get_logger(), "WE ARE <<<BLUE>>>");
+            //RCLCPP_INFO(get_logger(), "WE ARE <<<BLUE>>>");
         color = team_color::C_BLUE;
     } break;
     default:
-        RCLCPP_WARN(get_logger(), "Unknow the radar id");
+        //RCLCPP_WARN(get_logger(), "Unknow the radar id");
         return;
     }
     color_msg.data = static_cast<bool>(color);
@@ -116,9 +116,9 @@ void JudgeBridgeNode::robot_status_callback(const robot_status_t& robot_data)
 
 void JudgeBridgeNode::game_status_callback(const game_status_t& status)
 {
-    RCLCPP_INFO(get_logger(), "game_status: game_type_and_progress: %d, remain_time: %d", status.game_type_and_progress, status.stage_remain_time);
+    //RCLCPP_INFO(get_logger(), "game_status: game_type_and_progress: %d, remain_time: %d", status.game_type_and_progress, status.stage_remain_time);
     if ((status.game_type_and_progress >> 4) == 4) {
-        RCLCPP_INFO(get_logger(), "game in battle");
+        //RCLCPP_INFO(get_logger(), "game in battle");
         auto remain_time_msg = std_msgs::msg::UInt16();
         remain_time_msg.data = status.stage_remain_time;
         pub_remain_time->publish(remain_time_msg);
@@ -185,7 +185,7 @@ void JudgeBridgeNode::game_robot_hp_callback(const game_robot_HP_t& hp)
 void JudgeBridgeNode::send_sentry_data(const vision_interface::msg::RadarWarn& topic_message)
 {
     if (color == team_color::UNKNOWN) {
-        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送哨兵数据");
+        //RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送哨兵数据");
         return;
     }
     
@@ -207,7 +207,7 @@ void JudgeBridgeNode::send_sentry_data(const vision_interface::msg::RadarWarn& t
     
     // 发送数据
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(robot_interaction_sentry_data_t));
-    RCLCPP_INFO(this->get_logger(), "发送工程机器人状态给哨兵: %d", topic_message.engine_state);
+    //RCLCPP_INFO(this->get_logger(), "发送工程机器人状态给哨兵: %d", topic_message.engine_state);
 }
 
 void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResult& msg)
@@ -215,7 +215,7 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     map_robot_data_t map_robot_data;
     constexpr uint16_t default_red_x = 0, default_red_y = 0; // Removed unused variables
     constexpr uint16_t default_blue_x = 0, default_blue_y = 0;
-    //RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
+    RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
     switch (color) {
     case team_color::C_RED:
         map_robot_data.sentry_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
@@ -255,7 +255,7 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
 
 void JudgeBridgeNode::send_standard1_data(const vision_interface::msg::RadarWarn& msg) {
     if (color == team_color::UNKNOWN) {
-        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵1数据");
+        //RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵1数据");
         return;
     }
     
@@ -283,7 +283,7 @@ void JudgeBridgeNode::send_standard1_data(const vision_interface::msg::RadarWarn
 
 void JudgeBridgeNode::send_standard2_data(const vision_interface::msg::RadarWarn& msg) {
     if (color == team_color::UNKNOWN) {
-        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵2数据");
+        //RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵2数据");
         return;
     }
     

@@ -161,18 +161,18 @@ void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::ms
         }
         
         // 只在预警状态改变时输出日志
-        if (prev_warning_level != engine_warning_level) {
-            if (engine_warning_level == 1) {
-                RCLCPP_WARN(this->get_logger(), "敌方工程机器人持续在中心高地1秒以上，发出预警");
-            } else {
-                RCLCPP_INFO(this->get_logger(), "敌方工程机器人已离开中心高地0.5秒以上，解除预警");
-            }
-        }
+        //if (prev_warning_level != engine_warning_level) {
+        //    if (engine_warning_level == 1) {
+        //        RCLCPP_WARN(this->get_logger(), "敌方工程机器人持续在中心高地1秒以上，发出预警");
+        //    } else {
+        //        RCLCPP_INFO(this->get_logger(), "敌方工程机器人已离开中心高地0.5秒以上，解除预警");
+        //    }
+        //}
         
-        RCLCPP_INFO(this->get_logger(), "工程机器人: (%.2f, %.2f), 在高地: %s, 预警: %d", 
-                   engine_position.x, engine_position.y, 
-                   in_center_highland ? "是" : "否", 
-                   engine_warning_level);
+        //RCLCPP_INFO(this->get_logger(), "工程机器人: (%.2f, %.2f), 在高地: %s, 预警: %d", 
+        //           engine_position.x, engine_position.y, 
+        //           in_center_highland ? "是" : "否", 
+        //           engine_warning_level);
     }
     
     // 发布工程机器人预警消息
@@ -289,16 +289,16 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
             if (!has_significant_movement && hero_history.size() >= 3 && 
                 current_time - hero_history.front().timestamp >= hero_history_duration) {
                 warning_level = 1;
-                if (prev_warning_level != warning_level) {
-                    RCLCPP_WARN(this->get_logger(), "敌方英雄机器人预警：在%.1f秒内最大移动距离为%.2f米，小于阈值%.2f米", 
-                               hero_history_duration, max_movement, min_movement_threshold);
-                }
+                //if (prev_warning_level != warning_level) {
+                //    RCLCPP_WARN(this->get_logger(), "敌方英雄机器人预警：在%.1f秒内最大移动距离为%.2f米，小于阈值%.2f米", 
+                //               hero_history_duration, max_movement, min_movement_threshold);
+                //}
             } else {
                 warning_level = 0;
-                if (prev_warning_level != warning_level && has_significant_movement) {
-                    RCLCPP_INFO(this->get_logger(), "敌方英雄机器人正常移动：在%.1f秒内最大移动距离为%.2f米，大于阈值%.2f米",
-                               hero_history_duration, max_movement, min_movement_threshold);
-                }
+                //if (prev_warning_level != warning_level && has_significant_movement) {
+                //    RCLCPP_INFO(this->get_logger(), "敌方英雄机器人正常移动：在%.1f秒内最大移动距离为%.2f米，大于阈值%.2f米",
+                //               hero_history_duration, max_movement, min_movement_threshold);
+                //}
             }
             
             RCLCPP_INFO(this->get_logger(), "英雄机器人: (%.2f, %.2f), 最大移动: %.2f米, 预警: %d", 
