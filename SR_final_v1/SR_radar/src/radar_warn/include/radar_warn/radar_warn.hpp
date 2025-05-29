@@ -61,6 +61,17 @@ private:
         bool in_area; // 对于工程机器人，表示是否在中心高地
     };
     
+    // 持久化机器人位置所需的结构体
+    struct RobotPosition {
+        float x = 0.0f;
+        float y = 0.0f;
+        bool valid = false;
+    };
+    
+    // 存储机器人的最后位置（索引0-1分别对应英雄(0)和工程(1)机器人）
+    RobotPosition red_robots_last_position[2];
+    RobotPosition blue_robots_last_position[2];
+    
     // 英雄机器人历史位置
     std::deque<RobotPositionRecord> hero_history; // 存储英雄机器人的历史位置
     double hero_history_duration = 2.5; // 历史记录保留时间（秒）
