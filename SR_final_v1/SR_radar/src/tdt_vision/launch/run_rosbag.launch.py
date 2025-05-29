@@ -74,13 +74,13 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
-    #def get_kalman_filter_node(package, plugin):
-    #    return ComposableNode(
-    #        package=package,
-    #        plugin=plugin,
-    #        name='kalman_filter_node',
-    #        extra_arguments=[{'use_intra_process_comms': True}]
-    #    )
+    def get_kalman_filter_node(package, plugin):
+        return ComposableNode(
+            package=package,
+            plugin=plugin,
+            name='kalman_filter_node',
+            extra_arguments=[{'use_intra_process_comms': True}]
+        )
 
     #def get_hik_camera_node(package, plugin):
     #    return ComposableNode(
@@ -120,7 +120,7 @@ def generate_launch_description():
     radar_resolve_node = get_radar_resolve_node('tdt_vision', 'tdt_radar::Resolve')
     foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
     rosbag_player_node = get_rosbag_player_node('rosbag_player', 'RosbagPlayer')
-    #kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
+    kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
 
 
     # 创建节点容器，确保 hik_camera_node 是第一个
@@ -130,7 +130,7 @@ def generate_launch_description():
         radar_resolve_node,
         foxglove_node,
         rosbag_player_node,
-        #kalman_filter_node
+        kalman_filter_node
     ]
     cam_detector = get_camera_detector_container(nodes)
 

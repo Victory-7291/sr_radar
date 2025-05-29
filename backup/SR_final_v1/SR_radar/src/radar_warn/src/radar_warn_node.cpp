@@ -14,7 +14,7 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
     
     // 初始化订阅者
     detect_sub_ = this->create_subscription<vision_interface::msg::DetectResult>(
-        "/kalman_detect", 10, std::bind(&RadarWarn::detect_callback, this, std::placeholders::_1));
+        "/resolve_result", rclcpp::SensorDataQoS(), std::bind(&RadarWarn::detect_callback, this, std::placeholders::_1));
     
     // 新增：专门用于工程机器人状态监测的订阅者
     engine_detect_sub_ = this->create_subscription<vision_interface::msg::DetectResult>(
@@ -53,6 +53,12 @@ RadarWarn::RadarWarn(const rclcpp::NodeOptions& options)
         red_update[i] = 0.0;
     }
     
+    // 初始化机器人最后位置
+    for (int i = 0; i < 2; i++) {
+        red_robots_last_position[i].valid = false;
+        blue_robots_last_position[i].valid = false;
+    }
+    
     //RCLCPP_INFO(this->get_logger(), "RadarWarn节点已启动");
 }
 
@@ -71,22 +77,44 @@ void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::ms
     auto now = std::chrono::system_clock::now();
     double current_time = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() / 1000.0;
     
-    // 尝试获取敌方工程机器人位置（索引为1）
+    // 添加工程机器人位置持久化逻辑
     cv::Point2f engine_position;
     bool engine_detected = false;
     
     // 根据团队颜色获取敌方工程机器人位置
     if (self_color == radar_interface::team_color::C_BLUE) {
-        // 检查是否有红方工程机器人坐标
+        // 红方工程机器人(索引为1)持久化
         if (msg->red_x[1] && msg->red_y[1]) {
+            // 更新红方工程机器人最后位置
+            red_robots_last_position[1].x = msg->red_x[1];
+            red_robots_last_position[1].y = msg->red_y[1];
+            red_robots_last_position[1].valid = true;
             engine_position = cv::Point2f(msg->red_x[1], msg->red_y[1]);
             engine_detected = true;
+        } else if (red_robots_last_position[1].valid) {
+            // 检查是否在特定区域内
+            if (!(red_robots_last_position[1].x <= 4.3f && red_robots_last_position[1].y <= 3.7f)) {
+                // 使用保存的最后位置
+                engine_position = cv::Point2f(red_robots_last_position[1].x, red_robots_last_position[1].y);
+                engine_detected = true;
+            }
         }
     } else if (self_color == radar_interface::team_color::C_RED) {
-        // 检查是否有蓝方工程机器人坐标
+        // 蓝方工程机器人(索引为1)持久化
         if (msg->blue_x[1] && msg->blue_y[1]) {
+            // 更新蓝方工程机器人最后位置
+            blue_robots_last_position[1].x = msg->blue_x[1];
+            blue_robots_last_position[1].y = msg->blue_y[1];
+            blue_robots_last_position[1].valid = true;
             engine_position = cv::Point2f(msg->blue_x[1], msg->blue_y[1]);
             engine_detected = true;
+        } else if (blue_robots_last_position[1].valid) {
+            // 检查是否在特定区域内
+            if (!(blue_robots_last_position[1].x >= 10.7f && blue_robots_last_position[1].y >= 24.3f)) {
+                // 使用保存的最后位置
+                engine_position = cv::Point2f(blue_robots_last_position[1].x, blue_robots_last_position[1].y);
+                engine_detected = true;
+            }
         }
     }
     
@@ -130,18 +158,18 @@ void RadarWarn::engine_state_callback(const std::shared_ptr<vision_interface::ms
         }
         
         // 只在预警状态改变时输出日志
-        if (prev_warning_level != engine_warning_level) {
-            if (engine_warning_level == 1) {
-                RCLCPP_WARN(this->get_logger(), "敌方工程机器人持续在中心高地1秒以上，发出预警");
-            } else {
-                RCLCPP_INFO(this->get_logger(), "敌方工程机器人已离开中心高地0.5秒以上，解除预警");
-            }
-        }
-        
-        RCLCPP_INFO(this->get_logger(), "工程机器人: (%.2f, %.2f), 在高地: %s, 预警: %d", 
-                   engine_position.x, engine_position.y, 
-                   in_center_highland ? "是" : "否", 
-                   engine_warning_level);
+        //if (prev_warning_level != engine_warning_level) {
+        //    if (engine_warning_level == 1) {
+        //        RCLCPP_WARN(this->get_logger(), "敌方工程机器人持续在中心高地1秒以上，发出预警");
+        //    } else {
+        //        RCLCPP_INFO(this->get_logger(), "敌方工程机器人已离开中心高地0.5秒以上，解除预警");
+        //    }
+        //}
+        //
+        //RCLCPP_INFO(this->get_logger(), "工程机器人: (%.2f, %.2f), 在高地: %s, 预警: %d", 
+        //           engine_position.x, engine_position.y, 
+        //           in_center_highland ? "是" : "否", 
+        //           engine_warning_level);
     }
     
     // 发布工程机器人预警消息
@@ -171,21 +199,43 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
     int prev_warning_level = warning_level;
     warning_level = 0;
     
-    // 获取敌方英雄机器人的位置（编号为1，在数组中索引为0）
+    // 添加英雄机器人位置持久化逻辑（从kalman_filter移植）
     cv::Point2f enemy_hero_position;
     bool enemy_hero_detected = false;
     
     if (self_color == radar_interface::team_color::C_BLUE) {
-        // 检查是否有红方英雄机器人坐标
+        // 红方英雄(索引为0)持久化
         if (msg->red_x[0] && msg->red_y[0]) {
+            // 更新红方英雄最后位置
+            red_robots_last_position[0].x = msg->red_x[0];
+            red_robots_last_position[0].y = msg->red_y[0];
+            red_robots_last_position[0].valid = true;
             enemy_hero_position = cv::Point2f(msg->red_x[0], msg->red_y[0]);
             enemy_hero_detected = true;
+        } else if (red_robots_last_position[0].valid) {
+            // 检查红方英雄是否在特定区域内
+            if (!(red_robots_last_position[0].x <= 4.3f && red_robots_last_position[0].y <= 3.7f)) {
+                // 使用保存的最后位置
+                enemy_hero_position = cv::Point2f(red_robots_last_position[0].x, red_robots_last_position[0].y);
+                enemy_hero_detected = true;
+            }
         }
     } else if (self_color == radar_interface::team_color::C_RED) {
-        // 检查是否有蓝方英雄机器人坐标
+        // 蓝方英雄(索引为0)持久化
         if (msg->blue_x[0] && msg->blue_y[0]) {
+            // 更新蓝方英雄最后位置
+            blue_robots_last_position[0].x = msg->blue_x[0];
+            blue_robots_last_position[0].y = msg->blue_y[0];
+            blue_robots_last_position[0].valid = true;
             enemy_hero_position = cv::Point2f(msg->blue_x[0], msg->blue_y[0]);
             enemy_hero_detected = true;
+        } else if (blue_robots_last_position[0].valid) {
+            // 检查蓝方英雄是否在特定区域内
+            if (!(blue_robots_last_position[0].x >= 10.7f && blue_robots_last_position[0].y >= 24.3f)) {
+                // 使用保存的最后位置
+                enemy_hero_position = cv::Point2f(blue_robots_last_position[0].x, blue_robots_last_position[0].y);
+                enemy_hero_detected = true;
+            }
         }
     }
     
@@ -227,20 +277,20 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
             if (!has_significant_movement && hero_history.size() >= 3 && 
                 current_time - hero_history.front().timestamp >= hero_history_duration) {
                 warning_level = 1;
-                if (prev_warning_level != warning_level) {
-                    RCLCPP_WARN(this->get_logger(), "敌方英雄机器人预警：在%.1f秒内最大移动距离为%.2f米，小于阈值%.2f米", 
-                               hero_history_duration, max_movement, min_movement_threshold);
-                }
+                //if (prev_warning_level != warning_level) {
+                //    RCLCPP_WARN(this->get_logger(), "敌方英雄机器人预警：在%.1f秒内最大移动距离为%.2f米，小于阈值%.2f米", 
+                //               hero_history_duration, max_movement, min_movement_threshold);
+                //}
             } else {
                 warning_level = 0;
-                if (prev_warning_level != warning_level && has_significant_movement) {
-                    RCLCPP_INFO(this->get_logger(), "敌方英雄机器人正常移动：在%.1f秒内最大移动距离为%.2f米，大于阈值%.2f米",
-                               hero_history_duration, max_movement, min_movement_threshold);
-                }
+                //if (prev_warning_level != warning_level && has_significant_movement) {
+                //    RCLCPP_INFO(this->get_logger(), "敌方英雄机器人正常移动：在%.1f秒内最大移动距离为%.2f米，大于阈值%.2f米",
+                //               hero_history_duration, max_movement, min_movement_threshold);
+                //}
             }
             
-            RCLCPP_INFO(this->get_logger(), "英雄机器人: (%.2f, %.2f), 最大移动: %.2f米, 预警: %d", 
-                       enemy_hero_position.x, enemy_hero_position.y, max_movement, warning_level);
+            //RCLCPP_INFO(this->get_logger(), "英雄机器人: (%.2f, %.2f), 最大移动: %.2f米, 预警: %d", 
+            //           enemy_hero_position.x, enemy_hero_position.y, max_movement, warning_level);
         }
     } else {
         // 未检测到敌方英雄机器人，不预警

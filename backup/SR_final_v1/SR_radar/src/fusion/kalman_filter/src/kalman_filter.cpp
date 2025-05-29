@@ -13,12 +13,6 @@ KalmanFilter::KalmanFilter(const rclcpp::NodeOptions& node_options):rclcpp::Node
     
     self_color = radar_interface::team_color::UNKNOWN;
     
-    // 初始化机器人最后位置
-    for (int i = 0; i < 2; i++) {
-        red_robots_last_position[i].valid = false;
-        blue_robots_last_position[i].valid = false;
-    }
-    
     //RCLCPP_INFO(this->get_logger(), "Kalman_filter_Node has been started.");
 }
 
@@ -186,37 +180,6 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
                 detect_msg.red_x[i]=28-detect_msg.red_x[i];
                 detect_msg.red_y[i]=15-detect_msg.red_y[i];
             }
-        }
-    }
-    
-    // 添加英雄机器人位置持久化逻辑 - 从radar_warn_node移植
-    // 红方英雄(索引为0)持久化
-    if (detect_msg.red_x[0] != 0 && detect_msg.red_y[0] != 0) {
-        // 更新红方英雄最后位置
-        red_robots_last_position[0].x = detect_msg.red_x[0];
-        red_robots_last_position[0].y = detect_msg.red_y[0];
-        red_robots_last_position[0].valid = true;
-    } else if (red_robots_last_position[0].valid) {
-        // 检查红方英雄是否在特定区域内
-        if (!(red_robots_last_position[0].x <= 4.3f && red_robots_last_position[0].y <= 3.7f)) {
-            // 使用保存的最后位置
-            detect_msg.red_x[0] = red_robots_last_position[0].x;
-            detect_msg.red_y[0] = red_robots_last_position[0].y;
-        }
-    }
-    
-    // 蓝方英雄(索引为0)持久化
-    if (detect_msg.blue_x[0] != 0 && detect_msg.blue_y[0] != 0) {
-        // 更新蓝方英雄最后位置
-        blue_robots_last_position[0].x = detect_msg.blue_x[0];
-        blue_robots_last_position[0].y = detect_msg.blue_y[0];
-        blue_robots_last_position[0].valid = true;
-    } else if (blue_robots_last_position[0].valid) {
-        // 检查蓝方英雄是否在特定区域内
-        if (!(blue_robots_last_position[0].x >= 10.7f && blue_robots_last_position[0].y >= 24.3f)) {
-            // 使用保存的最后位置
-            detect_msg.blue_x[0] = blue_robots_last_position[0].x;
-            detect_msg.blue_y[0] = blue_robots_last_position[0].y;
         }
     }
     

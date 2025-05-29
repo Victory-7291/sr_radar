@@ -125,13 +125,13 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
-    def get_kalman_filter_node(package, plugin):
-        return ComposableNode(
-            package=package,
-            plugin=plugin,
-            name='kalman_filter_node',
-            extra_arguments=[{'use_intra_process_comms': True}]
-        )
+    #def get_kalman_filter_node(package, plugin):
+    #    return ComposableNode(
+    #        package=package,
+    #        plugin=plugin,
+    #        name='kalman_filter_node',
+    #        extra_arguments=[{'use_intra_process_comms': True}]
+    #    )
         
     # 定义新的 C++ VideoStreamerNode 组件
     video_streamer_cpp_node = ComposableNode(
@@ -172,7 +172,7 @@ def generate_launch_description():
     radar_detect_node = get_radar_detect_node('tdt_vision', 'tdt_radar::Detect')
     radar_resolve_node = get_radar_resolve_node('tdt_vision', 'tdt_radar::Resolve')
     foxglove_node = get_foxglove_node('foxglove_bridge', 'foxglove_bridge::FoxgloveBridge')
-    kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
+    #kalman_filter_node = get_kalman_filter_node('kalman_filter', 'tdt_radar::KalmanFilter')
 
     # 创建节点容器，将 video_streamer_cpp_node 添加到列表中
     nodes_in_container = [
@@ -180,7 +180,7 @@ def generate_launch_description():
         radar_detect_node,
         radar_resolve_node,
         foxglove_node,
-        kalman_filter_node
+        #kalman_filter_node
     ]
     cam_detector_container = get_camera_detector_container(nodes_in_container)
 

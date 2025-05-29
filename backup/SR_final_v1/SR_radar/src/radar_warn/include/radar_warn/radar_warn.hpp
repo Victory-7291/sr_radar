@@ -74,6 +74,16 @@ private:
     
     // 预警相关
     int warning_level = 0; // 英雄预警等级：0-不预警，1-预警
+    
+    // 添加：存储机器人的最后位置
+    struct RobotPosition {
+        float x = 0.0f;
+        float y = 0.0f;
+        bool valid = false;
+    };
+    // 索引0-1分别对应英雄(0)和工程(1)机器人
+    RobotPosition red_robots_last_position[2];
+    RobotPosition blue_robots_last_position[2];
 };
 
 }  // namespace tdt_radar

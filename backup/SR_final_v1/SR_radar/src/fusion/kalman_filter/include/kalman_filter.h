@@ -36,17 +36,6 @@ class KalmanFilter :public rclcpp::Node
     //void lidar_callback(const vision_interface::msg::RadarWarn::SharedPtr msg);
     void color_callback(const radar_interface::team_color::msg::SharedPtr msg);
     
-    // 添加持久化机器人位置所需的结构体
-    struct RobotPosition {
-        float x = 0.0f;
-        float y = 0.0f;
-        bool valid = false;
-    };
-    
-    // 存储机器人的最后位置（索引0-1分别对应英雄(0)和工程(1)机器人）
-    RobotPosition red_robots_last_position[2];
-    RobotPosition blue_robots_last_position[2];
-    
     std::vector<Kalman_filter_plus> KFs;
     //vision_interface::msg::RadarWarn lidar_detect;
     radar_interface::team_color::ENUM self_color;
