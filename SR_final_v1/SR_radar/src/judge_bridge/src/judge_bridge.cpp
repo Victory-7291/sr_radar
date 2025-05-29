@@ -215,7 +215,7 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     map_robot_data_t map_robot_data;
     constexpr uint16_t default_red_x = 0, default_red_y = 0; // Removed unused variables
     constexpr uint16_t default_blue_x = 0, default_blue_y = 0;
-    RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
+    RCLCPP_INFO(this->get_logger(), "1111111111111111111111111");
     switch (color) {
     case team_color::C_RED:
         map_robot_data.sentry_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
