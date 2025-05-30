@@ -109,7 +109,8 @@ def generate_launch_description():
         if video_streamer_cpp_node:
             nodes.append(video_streamer_cpp_node)
         # 添加其他节点
-        nodes.extend([radar_calib_node])
+        nodes.append(hik_camera_node)
+        nodes.append(radar_calib_node)
         
         return ComposableNodeContainer(
             name='camera_detector_container',
