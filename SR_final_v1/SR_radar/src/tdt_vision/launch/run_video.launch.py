@@ -69,7 +69,7 @@ def generate_launch_description():
     )
     video_streamer_target_fps_arg = DeclareLaunchArgument(
         'video_streamer_target_fps',
-        default_value='60.0',
+        default_value='120.0',
         description='Target publishing FPS for C++ VideoStreamerNode.'
     )
     video_streamer_force_fps_arg = DeclareLaunchArgument(

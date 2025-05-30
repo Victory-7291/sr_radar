@@ -1,6 +1,6 @@
 #include "radar_utils.h"
 
-#define ARMOR_HEIGHT 0.12
+#define ARMOR_HEIGHT 0.15
 namespace tdt_radar
 {
     bool isPointInsideScreen(cv::Point2f point, int screenWidth, int screenHeight) {
