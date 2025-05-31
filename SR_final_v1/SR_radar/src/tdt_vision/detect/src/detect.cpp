@@ -113,6 +113,41 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
 void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   std::cout<<"time: "<<msg->header.stamp.sec<<"."<<msg->header.stamp.nanosec<<std::endl;
   auto img = cv_bridge::toCvShare(msg, "bgr8")->image;
+  
+  // 开始计时 - 图像预处理部分
+  std::chrono::steady_clock::time_point preprocess_begin = std::chrono::steady_clock::now();
+  
+  // 图像预处理：先降低高光，再提高曝光度
+  cv::Mat img_processed;
+  
+  // 转换到 LAB 颜色空间处理高光
+  cv::Mat lab;
+  cv::cvtColor(img, lab, cv::COLOR_BGR2Lab);
+  
+  // 分离通道，L通道包含亮度信息
+  std::vector<cv::Mat> lab_channels(3);
+  cv::split(lab, lab_channels);
+  
+  // 对L通道应用CLAHE (对比度受限的自适应直方图均衡化)来降低高光
+  cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
+  clahe->apply(lab_channels[0], lab_channels[0]);
+  
+  // 合并通道
+  cv::merge(lab_channels, lab);
+  
+  // 转回BGR颜色空间
+  cv::cvtColor(lab, img_processed, cv::COLOR_Lab2BGR);
+  
+  // 提高曝光度和对比度
+  img_processed.convertTo(img_processed, -1, 1.2, 15);
+  
+  img = img_processed;
+  
+  // 结束计时 - 图像预处理部分
+  std::chrono::steady_clock::time_point preprocess_end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> preprocess_time = std::chrono::duration_cast<std::chrono::duration<double>>(preprocess_end - preprocess_begin);
+  std::cout << "Image Preprocessing Time: " << preprocess_time.count()*1000 << "ms" << std::endl;
+  
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
   // 创建一个空的检测结果消息，所有坐标默认为0
