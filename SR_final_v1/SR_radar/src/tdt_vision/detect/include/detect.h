@@ -43,6 +43,11 @@ class Detect final : public rclcpp::Node {
   std::string armor_path;
   std::string classify_path;
   
+  // 图像预处理参数
+  int highlight_threshold;       // 高光区域的阈值 (0-255)
+  float highlight_factor;        // 高光区域亮度降低系数
+  float contrast_factor;         // 整体对比度提升系数
+  int brightness_increase;       // 整体亮度提升值
 
 };
 class Car{

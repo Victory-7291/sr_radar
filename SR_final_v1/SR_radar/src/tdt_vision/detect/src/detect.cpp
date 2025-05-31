@@ -64,6 +64,29 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     fs.open("./config/detect_params.yaml", cv::FileStorage::READ);
     fs["yolo_path"] >> yolo_path;
     fs["armor_path"] >> armor_path;
+    
+    // 读取图像预处理参数
+    cv::FileNode preprocess_node = fs["image_preprocess"];
+    if (!preprocess_node.empty()) {
+        preprocess_node["highlight_threshold"] >> highlight_threshold;
+        preprocess_node["highlight_factor"] >> highlight_factor;
+        preprocess_node["contrast_factor"] >> contrast_factor;
+        preprocess_node["brightness_increase"] >> brightness_increase;
+        
+        RCLCPP_INFO(this->get_logger(), "Image preprocessing parameters loaded: ");
+        RCLCPP_INFO(this->get_logger(), "  highlight_threshold: %d", highlight_threshold);
+        RCLCPP_INFO(this->get_logger(), "  highlight_factor: %.2f", highlight_factor);
+        RCLCPP_INFO(this->get_logger(), "  contrast_factor: %.2f", contrast_factor);
+        RCLCPP_INFO(this->get_logger(), "  brightness_increase: %d", brightness_increase);
+    } else {
+        // 默认值
+        highlight_threshold = 200;
+        highlight_factor = 0.5;
+        contrast_factor = 2.0;
+        brightness_increase = 35;
+        RCLCPP_WARN(this->get_logger(), "Image preprocessing parameters not found, using defaults.");
+    }
+    
     fs.release();
 
     std::ifstream file1(yolo_path.c_str());
@@ -133,11 +156,11 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   
   // 创建高光蒙版 (亮度值高于阈值的区域)
   cv::Mat highlight_mask;
-  cv::threshold(v_channel, highlight_mask, 200, 255, cv::THRESH_BINARY);
+  cv::threshold(v_channel, highlight_mask, highlight_threshold, 255, cv::THRESH_BINARY);
   
   // 对高光区域进行处理 - 降低亮度
   cv::Mat v_reduced;
-  v_channel.convertTo(v_reduced, -1, 0.5, 0); // 降低高光区域的亮度
+  v_channel.convertTo(v_reduced, -1, highlight_factor, 0); // 降低高光区域的亮度
   
   // 只在高光区域应用降低亮度的效果
   v_reduced.copyTo(v_channel, highlight_mask);
@@ -149,14 +172,20 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   cv::cvtColor(hsv, img_processed, cv::COLOR_HSV2BGR);
   
   // 整体提高曝光度和对比度
-  img_processed.convertTo(img_processed, -1, 2.0, 35);
+  img_processed.convertTo(img_processed, -1, contrast_factor, brightness_increase);
   
   img = img_processed;
+  
+  // 计算图像亮度均值
+  cv::Mat gray;
+  cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+  cv::Scalar mean_brightness = cv::mean(gray);
   
   // 结束计时 - 图像预处理部分
   std::chrono::steady_clock::time_point preprocess_end = std::chrono::steady_clock::now();
   std::chrono::duration<double> preprocess_time = std::chrono::duration_cast<std::chrono::duration<double>>(preprocess_end - preprocess_begin);
   std::cout << "Image Preprocessing Time: " << preprocess_time.count()*1000 << "ms" << std::endl;
+  std::cout << "Average Image Brightness: " << mean_brightness[0] << std::endl;
   
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
