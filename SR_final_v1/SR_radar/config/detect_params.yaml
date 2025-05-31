@@ -9,4 +9,4 @@ image_preprocess:
   highlight_threshold: 200      # 高光区域的阈值 (0-255)
   highlight_factor: 0.5         # 高光区域亮度降低系数
   contrast_factor: 2.0          # 整体对比度提升系数
-  brightness_increase: 35       # 整体亮度提升值
+  brightness_increase: 46       # 整体亮度提升值
