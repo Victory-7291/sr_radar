@@ -22,11 +22,11 @@ void JudgeBridgeNode::filter_handler(JudgeSerial::JudgePair message){
         auto mark_data = reinterpret_cast<radar_mark_data_t*>(message.second.data());
         pub_radar_mark_data->publish(decode_radar_mark_data(*mark_data));
         RCLCPP_INFO(get_logger(), "Radar Mark Data Received");
-        RCLCPP_INFO(get_logger(), "mark hero progress: %f" mark_data->mark_hero_progress);
-        RCLCPP_INFO(get_logger(), "mark engineer progress: %f" mark_data->mark_engineer_progress);
-        RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f" mark_data->mark_standard_3_progress);
-        RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f" mark_data->mark_standard_4_progress);
-        RCLCPP_INFO(get_logger(), "mark sentry progress: %f" mark_data->mark_sentry_progress);
+        RCLCPP_INFO(get_logger(), "mark hero progress: %f", mark_data->mark_hero_progress);
+        RCLCPP_INFO(get_logger(), "mark engineer progress: %f", mark_data->mark_engineer_progress);
+        RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f", mark_data->mark_standard_3_progress);
+        RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f", mark_data->mark_standard_4_progress);
+        RCLCPP_INFO(get_logger(), "mark sentry progress: %f", mark_data->mark_sentry_progress);
 
         }
         break;
