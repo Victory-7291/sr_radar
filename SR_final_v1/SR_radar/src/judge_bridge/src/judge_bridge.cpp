@@ -21,6 +21,13 @@ void JudgeBridgeNode::filter_handler(JudgeSerial::JudgePair message){
     case CMD_ID::DETECT_PROCESS:{
         auto mark_data = reinterpret_cast<radar_mark_data_t*>(message.second.data());
         pub_radar_mark_data->publish(decode_radar_mark_data(*mark_data));
+        RCLCPP_INFO(get_logger(), "Radar Mark Data Received");
+        RCLCPP_INFO(get_logger(), "mark hero progress: %f" mark_data->mark_hero_progress);
+        RCLCPP_INFO(get_logger(), "mark engineer progress: %f" mark_data->mark_engineer_progress);
+        RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f" mark_data->mark_standard_3_progress);
+        RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f" mark_data->mark_standard_4_progress);
+        RCLCPP_INFO(get_logger(), "mark sentry progress: %f" mark_data->mark_sentry_progress);
+
         }
         break;
     case CMD_ID::RADAR_INFO:{
@@ -59,7 +66,7 @@ void JudgeBridgeNode::send_radar_cmd(const std_msgs::msg::UInt8 &radar_cmd)
     dv_data.header.receiver_id = 0x8080;
     dv_data.radar_cmd = radar_cmd.data;
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&dv_data), sizeof(dv_data));
-    //RCLCPP_INFO(get_logger(), "DV: %d", radar_cmd.data);
+    RCLCPP_INFO(get_logger(), "DV: %d", radar_cmd.data);
 }
 
 //void JudgeBridgeNode::send_custom_info(const std::string& str)
@@ -98,16 +105,16 @@ void JudgeBridgeNode::robot_status_callback(const robot_status_t& robot_data)
     switch (radar_id) {
     case RADAR_ID::R_RED: {
         if (color != team_color::C_RED)
-            //RCLCPP_INFO(get_logger(), "WE ARE <<<RED>>>");
+            RCLCPP_INFO(get_logger(), "WE ARE <<<RED>>>");
         color = team_color::C_RED;
     } break;
     case RADAR_ID::R_BLUE: {
         if (color != team_color::C_BLUE)
-            //RCLCPP_INFO(get_logger(), "WE ARE <<<BLUE>>>");
+            RCLCPP_INFO(get_logger(), "WE ARE <<<BLUE>>>");
         color = team_color::C_BLUE;
     } break;
     default:
-        //RCLCPP_WARN(get_logger(), "Unknow the radar id");
+        RCLCPP_WARN(get_logger(), "Unknow the radar id");
         return;
     }
     color_msg.data = static_cast<bool>(color);
@@ -116,9 +123,9 @@ void JudgeBridgeNode::robot_status_callback(const robot_status_t& robot_data)
 
 void JudgeBridgeNode::game_status_callback(const game_status_t& status)
 {
-    //RCLCPP_INFO(get_logger(), "game_status: game_type_and_progress: %d, remain_time: %d", status.game_type_and_progress, status.stage_remain_time);
+    RCLCPP_INFO(get_logger(), "game_status: game_type_and_progress: %d, remain_time: %d", status.game_type_and_progress, status.stage_remain_time);
     if ((status.game_type_and_progress >> 4) == 4) {
-        //RCLCPP_INFO(get_logger(), "game in battle");
+        RCLCPP_INFO(get_logger(), "game in battle");
         auto remain_time_msg = std_msgs::msg::UInt16();
         remain_time_msg.data = status.stage_remain_time;
         pub_remain_time->publish(remain_time_msg);
@@ -149,6 +156,8 @@ void JudgeBridgeNode::game_robot_hp_callback(const game_robot_HP_t& hp)
     msg.blue_base = hp.blue_base_HP;
     msg.blue_outpost = hp.blue_outpost_HP;
     pub_game_robot_hp->publish(msg);
+    RCLCPP_INFO(get_logger(), "Game Robot HP: red_base: %d, red_outpost: %d, blue_base: %d, blue_outpost: %d",
+        hp.red_base_HP, hp.red_outpost_HP, hp.blue_base_HP, hp.blue_outpost_HP);
 }
 
 //void JudgeBridgeNode::interaction_data_callback(const std::vector<uint8_t>& data)
@@ -250,7 +259,7 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     }
     judge_serial->write(CMD_ID::ROBOT_MAP, reinterpret_cast<uint8_t*>(&map_robot_data), sizeof(map_robot_data));
     
-    //RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
+    RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
 }
 
 void JudgeBridgeNode::send_standard1_data(const vision_interface::msg::RadarWarn& msg) {

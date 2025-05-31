@@ -15,7 +15,7 @@ def generate_launch_description():
     # 定义rosbag文件路径参数
     rosbag_file_arg = DeclareLaunchArgument(
         'rosbag_file',
-        default_value='/home/wan/Documents/SR_final_v1/SR_radar/radar_data_20250530_162124/radar_data_20250530_162124_0.db3',
+        default_value='/home/wan/SR_final_v1/SR_radar/radar_data_20250530_162124/radar_data_20250530_162124_0.db3',
         description='Path to the rosbag file (.db3)'
     )
     

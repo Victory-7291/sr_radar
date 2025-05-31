@@ -6,11 +6,13 @@ Starting >>> libocsort
 Starting >>> video_player
 Starting >>> video_recorder
 Starting >>> video_streamer_cpp
-Finished <<< vision_interface [6.55s]                                    
-Finished <<< hik_camera [6.62s]
-Finished <<< video_streamer_cpp [8.18s]                                  
-Finished <<< libocsort [8.35s]                                            
-Finished <<< radar_interface [8.45s]                                   
+Finished <<< video_recorder [0.12s]                                                                                                      
+Finished <<< libocsort [0.13s]
+Finished <<< hik_camera [0.15s]
+Finished <<< video_streamer_cpp [0.15s]
+Finished <<< video_player [0.16s]
+Finished <<< vision_interface [0.28s]                                                                      
+Finished <<< radar_interface [0.30s]
 Starting >>> tdt_vision
 Starting >>> debug_map
 Starting >>> dv_trigger
@@ -18,63 +20,17 @@ Starting >>> judge_bridge
 Starting >>> kalman_filter
 Starting >>> radar_decision
 Starting >>> rosbag_player
-Finished <<< radar_decision [0.91s]                                   
-Finished <<< video_recorder [10.1s]                                     
-Finished <<< video_player [11.2s]                                        
---- stderr: rosbag_player                                            
-** WARNING ** io features related to pcap will be disabled
-CMake Warning (dev) at /opt/ros/humble/share/ament_cmake_auto/cmake/ament_auto_find_build_dependencies.cmake:67 (find_package):
-  Policy CMP0074 is not set: find_package uses <PackageName>_ROOT variables.
-  Run "cmake --help-policy CMP0074" for policy details.  Use the cmake_policy
-  command to set the policy and suppress this warning.
-
-  CMake variable PCL_ROOT is set to:
-
-    /usr
-
-  For compatibility, CMake is ignoring the variable.
-Call Stack (most recent call first):
-  CMakeLists.txt:37 (ament_auto_find_build_dependencies)
-This warning is for project developers.  Use -Wno-dev to suppress it.
-
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp: In member function ‘void RosbagPlayer::handle_bool_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage>, rclcpp::Time, rclcpp::Publisher<std_msgs::msg::Bool_<std::allocator<void> > >::SharedPtr)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:124:111: warning: unused parameter ‘ros_time’ [-Wunused-parameter]
-  124 | bag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time,
-      |                                                  ~~~~~~~~~~~~~^~~~~~~~
-
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp: In member function ‘void RosbagPlayer::handle_uint16_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage>, rclcpp::Time)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:134:113: warning: unused parameter ‘ros_time’ [-Wunused-parameter]
-  134 | g2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
-      |                                                ~~~~~~~~~~~~~^~~~~~~~
-
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp: In member function ‘void RosbagPlayer::handle_uint8_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage>, rclcpp::Time)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:143:112: warning: unused parameter ‘ros_time’ [-Wunused-parameter]
-  143 | g2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
-      |                                                ~~~~~~~~~~~~~^~~~~~~~
-
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp: In member function ‘void RosbagPlayer::handle_game_robot_hp_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage>, rclcpp::Time)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:152:120: warning: unused parameter ‘ros_time’ [-Wunused-parameter]
-  152 | g2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
-      |                                                ~~~~~~~~~~~~~^~~~~~~~
-
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp: In member function ‘void RosbagPlayer::handle_radar_info_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage>, rclcpp::Time)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:161:117: warning: unused parameter ‘ros_time’ [-Wunused-parameter]
-  161 | g2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
-      |                                                ~~~~~~~~~~~~~^~~~~~~~
-
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp: In member function ‘void RosbagPlayer::handle_radar_mark_data_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage>, rclcpp::Time)’:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:170:122: warning: unused parameter ‘ros_time’ [-Wunused-parameter]
-  170 | g2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
-      |                                                ~~~~~~~~~~~~~^~~~~~~~
-
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp: In member function ‘void RosbagPlayer::play_bag()’:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:218:82: error: no matching function for call to ‘rclcpp::Duration::Duration(int64_t&)’
-  218 |         auto target_time = start_time + rclcpp::Duration(wait_time_ns);
-      |                                                                      ^
-
-In file included from /opt/ros/humble/include/rclcpp/rclcpp/qos.hpp:20,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/node_interfaces/node_graph_interface.hpp:32,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:42,
+Finished <<< radar_decision [0.06s]
+Finished <<< debug_map [0.09s]
+Finished <<< dv_trigger [0.10s]                                                                                                 
+Finished <<< rosbag_player [0.10s]
+Finished <<< kalman_filter [0.12s]
+Finished <<< tdt_vision [0.16s]
+Starting >>> radar_warn
+Finished <<< radar_warn [0.08s]                                                              
+--- stderr: judge_bridge                               
+In file included from /opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40,
                  from /opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24,
                  from /opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20,
                  from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25,
@@ -84,18 +40,25 @@ In file included from /opt/ros/humble/include/rclcpp/rclcpp/qos.hpp:20,
                  from /opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25,
                  from /opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21,
                  from /opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155,
-                 from /home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:1:
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:48:3: note: candidate: ‘template<class Rep, class Period> rclcpp::Duration::Duration(const std::chrono::duration<_Rep1, _Period1>&)’
-   48 |   Duration(const std::chrono::duration<Rep, Period> & duration)  // NOLINT(runtime/explicit)
-      |   ^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:48:3: note:   template argument deduction/substitution failed:
-/home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:218:82: note:   mismatched types ‘const std::chrono::duration<_Rep1, _Period1>’ and ‘int64_t’ {aka ‘long int’}
-  218 |         auto target_time = start_time + rclcpp::Duration(wait_time_ns);
-      |                                                                      ^
-
-In file included from /opt/ros/humble/include/rclcpp/rclcpp/qos.hpp:20,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/node_interfaces/node_graph_interface.hpp:32,
-                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:42,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/judge_bridge.hpp:6,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp: In member function ‘void JudgeBridgeNode::filter_handler(JudgeBridge::JudgeSerial::JudgePair)’:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:25:60: error: expected ‘)’ before ‘mark_data’
+   25 |         RCLCPP_INFO(get_logger(), "mark hero progress: %f" mark_data->mark_hero_progress);
+      |                                                            ^~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:25:9: note: to match this ‘(’
+   25 |         RCLCPP_INFO(get_logger(), "mark hero progress: %f" mark_data->mark_hero_progress);
+      |         ^~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:25:35: warning: format ‘%f’ expects a matching ‘double’ argument [-Wformat=]
+   25 |         RCLCPP_INFO(get_logger(), "mark hero progress: %f" mark_data->mark_hero_progress);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:25:57: note: format string is defined here
+   25 |         RCLCPP_INFO(get_logger(), "mark hero progress: %f" mark_data->mark_hero_progress);
+      |                                                        ~^
+      |                                                         |
+      |                                                         double
+In file included from /opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40,
                  from /opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24,
                  from /opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20,
                  from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25,
@@ -105,55 +68,112 @@ In file included from /opt/ros/humble/include/rclcpp/rclcpp/qos.hpp:20,
                  from /opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25,
                  from /opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21,
                  from /opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155,
-                 from /home/wan/SR_final_v1/SR_radar/src/utils/rosbag_player/rosbag_player.cpp:1:
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:151:3: note: candidate: ‘rclcpp::Duration::Duration()’
-  151 |   Duration() = default;
-      |   ^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:151:3: note:   candidate expects 0 arguments, 1 provided
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:61:3: note: candidate: ‘rclcpp::Duration::Duration(const rclcpp::Duration&)’
-   61 |   Duration(const Duration & rhs);
-      |   ^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:61:29: note:   no known conversion for argument 1 from ‘int64_t’ {aka ‘long int’} to ‘const rclcpp::Duration&’
-   61 |   Duration(const Duration & rhs);
-      |            ~~~~~~~~~~~~~~~~~^~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:59:12: note: candidate: ‘rclcpp::Duration::Duration(const rcl_duration_t&)’
-   59 |   explicit Duration(const rcl_duration_t & duration);
-      |            ^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:59:44: note:   no known conversion for argument 1 from ‘int64_t’ {aka ‘long int’} to ‘const rcl_duration_t&’ {aka ‘const rcl_duration_s&’}
-   59 |   explicit Duration(const rcl_duration_t & duration);
-      |                     ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:53:3: note: candidate: ‘rclcpp::Duration::Duration(const Duration&)’
-   53 |   Duration(const builtin_interfaces::msg::Duration & duration_msg);  // NOLINT(runtime/explicit)
-      |   ^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:53:54: note:   no known conversion for argument 1 from ‘int64_t’ {aka ‘long int’} to ‘const Duration&’ {aka ‘const builtin_interfaces::msg::Duration_<std::allocator<void> >&’}
-   53 |   Duration(const builtin_interfaces::msg::Duration & duration_msg);  // NOLINT(runtime/explicit)
-      |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:42:12: note: candidate: ‘rclcpp::Duration::Duration(std::chrono::nanoseconds)’
-   42 |   explicit Duration(std::chrono::nanoseconds nanoseconds);
-      |            ^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:42:46: note:   no known conversion for argument 1 from ‘int64_t’ {aka ‘long int’} to ‘std::chrono::nanoseconds’ {aka ‘std::chrono::duration<long int, std::ratio<1, 1000000000> >’}
-   42 |   explicit Duration(std::chrono::nanoseconds nanoseconds);
-      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:39:3: note: candidate: ‘rclcpp::Duration::Duration(int32_t, uint32_t)’
-   39 |   Duration(int32_t seconds, uint32_t nanoseconds);
-      |   ^~~~~~~~
-/opt/ros/humble/include/rclcpp/rclcpp/duration.hpp:39:3: note:   candidate expects 2 arguments, 1 provided
-gmake[2]: *** [CMakeFiles/rosbag_player.dir/build.make:76: CMakeFiles/rosbag_player.dir/rosbag_player.cpp.o] Error 1
-gmake[1]: *** [CMakeFiles/Makefile2:139: CMakeFiles/rosbag_player.dir/all] Error 2
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/judge_bridge.hpp:6,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:26:64: error: expected ‘)’ before ‘mark_data’
+   26 |         RCLCPP_INFO(get_logger(), "mark engineer progress: %f" mark_data->mark_engineer_progress);
+      |                                                                ^~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:26:9: note: to match this ‘(’
+   26 |         RCLCPP_INFO(get_logger(), "mark engineer progress: %f" mark_data->mark_engineer_progress);
+      |         ^~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:26:35: warning: format ‘%f’ expects a matching ‘double’ argument [-Wformat=]
+   26 |         RCLCPP_INFO(get_logger(), "mark engineer progress: %f" mark_data->mark_engineer_progress);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:26:61: note: format string is defined here
+   26 |         RCLCPP_INFO(get_logger(), "mark engineer progress: %f" mark_data->mark_engineer_progress);
+      |                                                            ~^
+      |                                                             |
+      |                                                             double
+In file included from /opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategies.hpp:18,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor_options.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor.hpp:37,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/judge_bridge.hpp:6,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:27:66: error: expected ‘)’ before ‘mark_data’
+   27 |         RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f" mark_data->mark_standard_3_progress);
+      |                                                                  ^~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:27:9: note: to match this ‘(’
+   27 |         RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f" mark_data->mark_standard_3_progress);
+      |         ^~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:27:35: warning: format ‘%f’ expects a matching ‘double’ argument [-Wformat=]
+   27 |         RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f" mark_data->mark_standard_3_progress);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:27:63: note: format string is defined here
+   27 |         RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f" mark_data->mark_standard_3_progress);
+      |                                                              ~^
+      |                                                               |
+      |                                                               double
+In file included from /opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategies.hpp:18,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor_options.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor.hpp:37,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/judge_bridge.hpp:6,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:28:66: error: expected ‘)’ before ‘mark_data’
+   28 |         RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f" mark_data->mark_standard_4_progress);
+      |                                                                  ^~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:28:9: note: to match this ‘(’
+   28 |         RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f" mark_data->mark_standard_4_progress);
+      |         ^~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:28:35: warning: format ‘%f’ expects a matching ‘double’ argument [-Wformat=]
+   28 |         RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f" mark_data->mark_standard_4_progress);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:28:63: note: format string is defined here
+   28 |         RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f" mark_data->mark_standard_4_progress);
+      |                                                              ~^
+      |                                                               |
+      |                                                               double
+In file included from /opt/ros/humble/include/rclcpp/rclcpp/logging.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/client.hpp:40,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/callback_group.hpp:24,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/any_executable.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategy.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/memory_strategies.hpp:18,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor_options.hpp:20,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executor.hpp:37,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors/multi_threaded_executor.hpp:25,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/executors.hpp:21,
+                 from /opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp:155,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/include/judge_bridge/judge_bridge.hpp:6,
+                 from /home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:1:
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:29:62: error: expected ‘)’ before ‘mark_data’
+   29 |         RCLCPP_INFO(get_logger(), "mark sentry progress: %f" mark_data->mark_sentry_progress);
+      |                                                              ^~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:29:9: note: to match this ‘(’
+   29 |         RCLCPP_INFO(get_logger(), "mark sentry progress: %f" mark_data->mark_sentry_progress);
+      |         ^~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:29:35: warning: format ‘%f’ expects a matching ‘double’ argument [-Wformat=]
+   29 |         RCLCPP_INFO(get_logger(), "mark sentry progress: %f" mark_data->mark_sentry_progress);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/wan/SR_final_v1/SR_radar/src/judge_bridge/src/judge_bridge.cpp:29:59: note: format string is defined here
+   29 |         RCLCPP_INFO(get_logger(), "mark sentry progress: %f" mark_data->mark_sentry_progress);
+      |                                                          ~^
+      |                                                           |
+      |                                                           double
+gmake[2]: *** [CMakeFiles/judge_bridge.dir/build.make:76: CMakeFiles/judge_bridge.dir/src/judge_bridge.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/judge_bridge.dir/all] Error 2
 gmake: *** [Makefile:146: all] Error 2
 ---
-Failed   <<< rosbag_player [9.30s, exited with code 2]
-Aborted  <<< dv_trigger [10.1s]                   
-Aborted  <<< debug_map [14.7s]                     
-Aborted  <<< kalman_filter [15.4s]                 
-Aborted  <<< judge_bridge [15.6s]                  
-Aborted  <<< tdt_vision [40.8s]                                    
+Failed   <<< judge_bridge [5.20s, exited with code 2]
 
-Summary: 8 packages finished [49.4s]
-  1 package failed: rosbag_player
-  5 packages aborted: debug_map dv_trigger judge_bridge kalman_filter tdt_vision
-  2 packages had stderr output: rosbag_player tdt_vision
-  1 package not processed
+Summary: 14 packages finished [5.67s]
+  1 package failed: judge_bridge
+  1 package had stderr output: judge_bridge
 wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ 
 
 
