@@ -46,6 +46,16 @@ def generate_launch_description():
             extra_arguments=[{'use_intra_process_comms': True}]
         )
 
+    judge_bridge_node = Node(
+        package='judge_bridge',
+        executable='judge_bridge',
+        name='judge_bridge_node',
+        output='screen',
+        parameters=[{
+            'serial_port': '/dev/ttyUSB0',
+            'enable_recorder': False
+        }]
+    )
     # 定义RadarWarn节点
     radar_warn_node = Node(
         package='radar_warn',
@@ -127,6 +137,7 @@ def generate_launch_description():
     container = get_container(nodes)
 
     return LaunchDescription([
+        judge_bridge_node,
         rosbag_file_arg,
         use_original_timestamps_arg,
         playback_rate_arg,

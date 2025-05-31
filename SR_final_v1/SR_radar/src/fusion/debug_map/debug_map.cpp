@@ -55,6 +55,11 @@ namespace tdt_radar {
                 mark_progress[i] = msg->mark_progress[i];
             }
             RCLCPP_INFO(this->get_logger(), "Radar mark data received");
+            RCLCPP_INFO(this->get_logger(), "mark hero progress: %f", msg->mark_progress[0]);
+            RCLCPP_INFO(this->get_logger(), "mark engineer progress: %f", msg->mark_progress[1]);
+            RCLCPP_INFO(this->get_logger(), "mark standard 3 progress: %f", msg->mark_progress[2]);
+            RCLCPP_INFO(this->get_logger(), "mark standard 4 progress: %f", msg->mark_progress[3]);
+            RCLCPP_INFO(this->get_logger(), "mark sentry progress: %f", msg->mark_progress[5]);
         }
         
         void color_callback(const radar_interface::team_color::msg::SharedPtr msg)
