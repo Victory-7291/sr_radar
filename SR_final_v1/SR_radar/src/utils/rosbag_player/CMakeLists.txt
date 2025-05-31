@@ -22,6 +22,18 @@ add_definitions(-DROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions" ) 
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(vision_interface REQUIRED)
+find_package(radar_interface REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(rosbag2_cpp REQUIRED)
+find_package(rosbag2_storage REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(PCL REQUIRED)
+
 ament_auto_find_build_dependencies()
 
 set(ROSBAG_PLAYER "rosbag_player")
@@ -31,12 +43,28 @@ ament_auto_add_library(${ROSBAG_PLAYER} SHARED
     ${ROSBAG_PLAYER_SRCS}
 )
 
-target_link_libraries(${ROSBAG_PLAYER} ${PCL_LIBRARIES})
+target_include_directories(${ROSBAG_PLAYER} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${std_msgs_INCLUDE_DIRS}
+  ${sensor_msgs_INCLUDE_DIRS}
+  ${vision_interface_INCLUDE_DIRS}
+  ${radar_interface_INCLUDE_DIRS}
+  ${cv_bridge_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+)
+
+target_link_libraries(${ROSBAG_PLAYER} 
+  ${PCL_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${cv_bridge_LIBRARIES}
+)
 
 rclcpp_components_register_node(${ROSBAG_PLAYER}
     PLUGIN "RosbagPlayer"
     EXECUTABLE ${ROSBAG_PLAYER}_node
 )
 
-target_link_libraries(rosbag_player_node ${PCL_LIBRARIES})
+target_link_libraries(rosbag_player_node ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} ${cv_bridge_LIBRARIES})
 ament_auto_package()

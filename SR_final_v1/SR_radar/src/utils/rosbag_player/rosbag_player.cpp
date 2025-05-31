@@ -4,8 +4,8 @@
 #include <sensor_msgs/msg/compressed_image.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <std_msgs/msg/bool.hpp>
-#include <std_msgs/msg/uint16.hpp>
-#include <std_msgs/msg/uint8.hpp>
+#include <std_msgs/msg/u_int16.hpp>
+#include <std_msgs/msg/u_int8.hpp>
 #include <rosbag2_cpp/reader.hpp>
 #include <rosbag2_cpp/readers/sequential_reader.hpp>
 #include <rosbag2_storage/serialized_bag_message.hpp>
