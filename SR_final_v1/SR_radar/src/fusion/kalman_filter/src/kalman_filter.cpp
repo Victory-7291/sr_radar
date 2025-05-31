@@ -37,108 +37,112 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
         kf.has_updated = false;
     }
     
-    // 仅处理英雄机器人（索引为0）的卡尔曼滤波
+    // 处理所有机器人的卡尔曼滤波
     
-    // 处理红色英雄
-    if(msg->red_x[0] != 0 && msg->red_y[0] != 0) {
-        pcl::PointXY red_point;
-        red_point.x = msg->red_x[0];
-        red_point.y = msg->red_y[0];
-        
-        // 匹配过程
-        std::vector<int> match_kf_indexs;
-        for(int j = 0; j < this->KFs.size(); j++)
-        {
-            if(KFs[j].match(red_point) && KFs[j].get_color() == 2 && KFs[j].get_number() == 0){
-                match_kf_indexs.push_back(j);
-            }
-        }
-        
-        // 处理三种匹配情况
-        if(match_kf_indexs.size() == 0)
-        {
-            // 无匹配：创建新滤波器
-            Kalman_filter_plus kf(red_point, time);
-            kf.camera_match(time, red_point, 2, 0); // 设置为红色英雄
-            KFs.push_back(kf);
-        }
-        else if(match_kf_indexs.size() == 1)
-        {
-            // 单一匹配：直接更新
-            KFs[match_kf_indexs[0]].update(red_point, time);
-            KFs[match_kf_indexs[0]].camera_match(time, red_point, 2, 0);
-        }
-        else
-        {
-            // 多重匹配：选择最近点更新
-            float min_distance = 1000000;
-            int min_index = 0;
-            for(auto index : match_kf_indexs)
+    // 处理红色机器人
+    for(int robot_idx = 0; robot_idx < 6; robot_idx++) {
+        if(msg->red_x[robot_idx] != 0 && msg->red_y[robot_idx] != 0) {
+            pcl::PointXY red_point;
+            red_point.x = msg->red_x[robot_idx];
+            red_point.y = msg->red_y[robot_idx];
+            
+            // 匹配过程
+            std::vector<int> match_kf_indexs;
+            for(int j = 0; j < this->KFs.size(); j++)
             {
-                float distance = KFs[index].Distance(KFs[index].predict_point, red_point);
-                if(distance < min_distance)
-                {
-                    min_distance = distance;
-                    min_index = index;
+                if(KFs[j].match(red_point) && KFs[j].get_color() == 2 && KFs[j].get_number() == robot_idx){
+                    match_kf_indexs.push_back(j);
                 }
             }
-            KFs[min_index].update(red_point, time);
-            KFs[min_index].camera_match(time, red_point, 2, 0);
+            
+            // 处理三种匹配情况
+            if(match_kf_indexs.size() == 0)
+            {
+                // 无匹配：创建新滤波器
+                Kalman_filter_plus kf(red_point, time);
+                kf.camera_match(time, red_point, 2, robot_idx); // 设置为红色机器人
+                KFs.push_back(kf);
+            }
+            else if(match_kf_indexs.size() == 1)
+            {
+                // 单一匹配：直接更新
+                KFs[match_kf_indexs[0]].update(red_point, time);
+                KFs[match_kf_indexs[0]].camera_match(time, red_point, 2, robot_idx);
+            }
+            else
+            {
+                // 多重匹配：选择最近点更新
+                float min_distance = 1000000;
+                int min_index = 0;
+                for(auto index : match_kf_indexs)
+                {
+                    float distance = KFs[index].Distance(KFs[index].predict_point, red_point);
+                    if(distance < min_distance)
+                    {
+                        min_distance = distance;
+                        min_index = index;
+                    }
+                }
+                KFs[min_index].update(red_point, time);
+                KFs[min_index].camera_match(time, red_point, 2, robot_idx);
+            }
         }
     }
     
-    // 处理蓝色英雄
-    if(msg->blue_x[0] != 0 && msg->blue_y[0] != 0) {
-        pcl::PointXY blue_point;
-        blue_point.x = msg->blue_x[0];
-        blue_point.y = msg->blue_y[0];
-        
-        // 匹配过程
-        std::vector<int> match_kf_indexs;
-        for(int j = 0; j < this->KFs.size(); j++)
-        {
-            if(KFs[j].match(blue_point) && KFs[j].get_color() == 0 && KFs[j].get_number() == 0){
-                match_kf_indexs.push_back(j);
-            }
-        }
-        
-        // 处理三种匹配情况
-        if(match_kf_indexs.size() == 0)
-        {
-            // 无匹配：创建新滤波器
-            Kalman_filter_plus kf(blue_point, time);
-            kf.camera_match(time, blue_point, 0, 0); // 设置为蓝色英雄
-            KFs.push_back(kf);
-        }
-        else if(match_kf_indexs.size() == 1)
-        {
-            // 单一匹配：直接更新
-            KFs[match_kf_indexs[0]].update(blue_point, time);
-            KFs[match_kf_indexs[0]].camera_match(time, blue_point, 0, 0);
-        }
-        else
-        {
-            // 多重匹配：选择最近点更新
-            float min_distance = 1000000;
-            int min_index = 0;
-            for(auto index : match_kf_indexs)
+    // 处理蓝色机器人
+    for(int robot_idx = 0; robot_idx < 6; robot_idx++) {
+        if(msg->blue_x[robot_idx] != 0 && msg->blue_y[robot_idx] != 0) {
+            pcl::PointXY blue_point;
+            blue_point.x = msg->blue_x[robot_idx];
+            blue_point.y = msg->blue_y[robot_idx];
+            
+            // 匹配过程
+            std::vector<int> match_kf_indexs;
+            for(int j = 0; j < this->KFs.size(); j++)
             {
-                float distance = KFs[index].Distance(KFs[index].predict_point, blue_point);
-                if(distance < min_distance)
-                {
-                    min_distance = distance;
-                    min_index = index;
+                if(KFs[j].match(blue_point) && KFs[j].get_color() == 0 && KFs[j].get_number() == robot_idx){
+                    match_kf_indexs.push_back(j);
                 }
             }
-            KFs[min_index].update(blue_point, time);
-            KFs[min_index].camera_match(time, blue_point, 0, 0);
+            
+            // 处理三种匹配情况
+            if(match_kf_indexs.size() == 0)
+            {
+                // 无匹配：创建新滤波器
+                Kalman_filter_plus kf(blue_point, time);
+                kf.camera_match(time, blue_point, 0, robot_idx); // 设置为蓝色机器人
+                KFs.push_back(kf);
+            }
+            else if(match_kf_indexs.size() == 1)
+            {
+                // 单一匹配：直接更新
+                KFs[match_kf_indexs[0]].update(blue_point, time);
+                KFs[match_kf_indexs[0]].camera_match(time, blue_point, 0, robot_idx);
+            }
+            else
+            {
+                // 多重匹配：选择最近点更新
+                float min_distance = 1000000;
+                int min_index = 0;
+                for(auto index : match_kf_indexs)
+                {
+                    float distance = KFs[index].Distance(KFs[index].predict_point, blue_point);
+                    if(distance < min_distance)
+                    {
+                        min_distance = distance;
+                        min_index = index;
+                    }
+                }
+                KFs[min_index].update(blue_point, time);
+                KFs[min_index].camera_match(time, blue_point, 0, robot_idx);
+            }
         }
     }
     
     // 清理过时的卡尔曼滤波器
     for(int i = KFs.size() - 1; i >= 0; i--)
     {
-        if((KFs[i].last_time) > 0.5){
+        if((KFs[i].last_time) > 0.35){
             KFs.erase(KFs.begin() + i);
         }
     }
@@ -148,30 +152,29 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
     {
         for(int i=kf.history.size() - 1; i >= 0; i--)
         {
-            if(Kalman_filter_plus::GetTimeByRosTime(time)-kf.history[i].first > 0.5)
+            if(Kalman_filter_plus::GetTimeByRosTime(time)-kf.history[i].first > 0.35)
             {
                 kf.history.erase(kf.history.begin() + i);
             }
         }
     }
     
-    // 只更新英雄机器人的卡尔曼滤波结果（索引为0）
+    // 更新所有机器人的卡尔曼滤波结果
     for(auto kf : KFs)
     {
         if(kf.detect_history.size()==0) continue;
         
-        // 只处理英雄机器人（索引为0）
-        if(kf.get_number() == 0) {
-            if(kf.get_color() == 0) // 蓝色英雄
-            {
-                detect_msg.blue_x[0] = kf.predict_point.x;
-                detect_msg.blue_y[0] = kf.predict_point.y;
-            }
-            else if(kf.get_color() == 2) // 红色英雄
-            {
-                detect_msg.red_x[0] = kf.predict_point.x;
-                detect_msg.red_y[0] = kf.predict_point.y;
-            }
+        int robot_idx = kf.get_number();
+        
+        if(kf.get_color() == 0) // 蓝色机器人
+        {
+            detect_msg.blue_x[robot_idx] = kf.predict_point.x;
+            detect_msg.blue_y[robot_idx] = kf.predict_point.y;
+        }
+        else if(kf.get_color() == 2) // 红色机器人
+        {
+            detect_msg.red_x[robot_idx] = kf.predict_point.x;
+            detect_msg.red_y[robot_idx] = kf.predict_point.y;
         }
     }
     
