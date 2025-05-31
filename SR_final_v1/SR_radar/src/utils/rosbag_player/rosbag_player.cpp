@@ -180,6 +180,12 @@ private:
         serialization.deserialize_message(&serialized_msg, msg.get());
         judge_radar_mark_data_publisher_->publish(*msg);
         RCLCPP_DEBUG(this->get_logger(), "Published RadarMarkData message");
+        RCLCPP_INFO(get_logger(), "Radar Mark Data Received");
+        RCLCPP_INFO(get_logger(), "mark hero progress: %f", msg->mark_hero_progress);
+        RCLCPP_INFO(get_logger(), "mark engineer progress: %f", msg->mark_engineer_progress);
+        RCLCPP_INFO(get_logger(), "mark standard 3 progress: %f", msg->mark_standard_3_progress);
+        RCLCPP_INFO(get_logger(), "mark standard 4 progress: %f", msg->mark_standard_4_progress);
+        RCLCPP_INFO(get_logger(), "mark sentry progress: %f", msg->mark_sentry_progress);
         (void)ros_time; // 避免未使用参数警告
     }
 
