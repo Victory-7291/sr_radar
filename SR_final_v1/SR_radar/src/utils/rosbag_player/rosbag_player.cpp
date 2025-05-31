@@ -19,6 +19,7 @@
 #include <thread>
 #include <unordered_map>
 #include <functional>
+#include <chrono>
 
 using namespace std::chrono_literals;
 
@@ -121,7 +122,7 @@ private:
         RCLCPP_DEBUG(this->get_logger(), "Published image message");
     }
     
-    void handle_bool_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time, 
+    void handle_bool_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time,
                             rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr publisher) {
         auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
         rclcpp::Serialization<std_msgs::msg::Bool> serialization;
@@ -129,6 +130,7 @@ private:
         serialization.deserialize_message(&serialized_msg, bool_msg.get());
         publisher->publish(*bool_msg);
         RCLCPP_DEBUG(this->get_logger(), "Published bool message");
+        (void)ros_time; // 避免未使用参数警告
     }
     
     void handle_uint16_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
@@ -138,6 +140,7 @@ private:
         serialization.deserialize_message(&serialized_msg, uint16_msg.get());
         judge_remain_time_publisher_->publish(*uint16_msg);
         RCLCPP_DEBUG(this->get_logger(), "Published UInt16 message");
+        (void)ros_time; // 避免未使用参数警告
     }
     
     void handle_uint8_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
@@ -147,6 +150,7 @@ private:
         serialization.deserialize_message(&serialized_msg, uint8_msg.get());
         judge_radar_cmd_publisher_->publish(*uint8_msg);
         RCLCPP_DEBUG(this->get_logger(), "Published UInt8 message");
+        (void)ros_time; // 避免未使用参数警告
     }
     
     void handle_game_robot_hp_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
@@ -156,6 +160,7 @@ private:
         serialization.deserialize_message(&serialized_msg, msg.get());
         judge_game_robot_hp_publisher_->publish(*msg);
         RCLCPP_DEBUG(this->get_logger(), "Published GameRobotHP message");
+        (void)ros_time; // 避免未使用参数警告
     }
     
     void handle_radar_info_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
@@ -165,6 +170,7 @@ private:
         serialization.deserialize_message(&serialized_msg, msg.get());
         judge_radar_info_publisher_->publish(*msg);
         RCLCPP_DEBUG(this->get_logger(), "Published RadarInfo message");
+        (void)ros_time; // 避免未使用参数警告
     }
     
     void handle_radar_mark_data_message(std::shared_ptr<rosbag2_storage::SerializedBagMessage> bag_message, rclcpp::Time ros_time) {
@@ -174,6 +180,7 @@ private:
         serialization.deserialize_message(&serialized_msg, msg.get());
         judge_radar_mark_data_publisher_->publish(*msg);
         RCLCPP_DEBUG(this->get_logger(), "Published RadarMarkData message");
+        (void)ros_time; // 避免未使用参数警告
     }
 
     void play_bag() {
@@ -212,18 +219,15 @@ private:
                     int64_t bag_time_diff = bag_message->time_stamp - bag_start_time;
                     
                     // 转换为实际的等待时间，考虑播放速率
-                    int64_t wait_time_ns = bag_time_diff / playback_rate_;
+                    int64_t wait_time_ns = static_cast<int64_t>(bag_time_diff / playback_rate_);
                     
-                    // 计算目标时间点
-                    auto target_time = start_time + rclcpp::Duration(wait_time_ns);
+                    // 计算目标时间点，使用std::chrono::nanoseconds
+                    auto target_time = start_time + rclcpp::Duration(std::chrono::nanoseconds(wait_time_ns));
                     
                     // 如果还没到发布时间，则等待
                     if (current_time < target_time) {
                         auto wait_duration = target_time - current_time;
-                        
-                        // 将wait_duration转换为std::chrono可以使用的格式
-                        int64_t wait_ns = wait_duration.nanoseconds();
-                        std::this_thread::sleep_for(std::chrono::nanoseconds(wait_ns));
+                        std::this_thread::sleep_for(std::chrono::nanoseconds(wait_duration.nanoseconds()));
                     }
                 }
                 
