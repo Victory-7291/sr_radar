@@ -120,26 +120,36 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   // 图像预处理：先降低高光，再提高曝光度
   cv::Mat img_processed;
   
-  // 转换到 LAB 颜色空间处理高光
-  cv::Mat lab;
-  cv::cvtColor(img, lab, cv::COLOR_BGR2Lab);
+  // 转换到HSV颜色空间
+  cv::Mat hsv;
+  cv::cvtColor(img, hsv, cv::COLOR_BGR2HSV);
   
-  // 分离通道，L通道包含亮度信息
-  std::vector<cv::Mat> lab_channels(3);
-  cv::split(lab, lab_channels);
+  // 分离通道，V通道包含亮度信息
+  std::vector<cv::Mat> hsv_channels(3);
+  cv::split(hsv, hsv_channels);
   
-  // 对L通道应用CLAHE (对比度受限的自适应直方图均衡化)来降低高光
-  cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
-  clahe->apply(lab_channels[0], lab_channels[0]);
+  // 获取V通道
+  cv::Mat& v_channel = hsv_channels[2];
+  
+  // 创建高光蒙版 (亮度值高于阈值的区域)
+  cv::Mat highlight_mask;
+  cv::threshold(v_channel, highlight_mask, 180, 255, cv::THRESH_BINARY);
+  
+  // 对高光区域进行处理 - 降低亮度
+  cv::Mat v_reduced;
+  v_channel.convertTo(v_reduced, -1, 0.7, 0); // 降低高光区域的亮度
+  
+  // 只在高光区域应用降低亮度的效果
+  v_reduced.copyTo(v_channel, highlight_mask);
   
   // 合并通道
-  cv::merge(lab_channels, lab);
+  cv::merge(hsv_channels, hsv);
   
   // 转回BGR颜色空间
-  cv::cvtColor(lab, img_processed, cv::COLOR_Lab2BGR);
+  cv::cvtColor(hsv, img_processed, cv::COLOR_HSV2BGR);
   
-  // 提高曝光度和对比度
-  img_processed.convertTo(img_processed, -1, 1.2, 15);
+  // 整体提高曝光度和对比度
+  img_processed.convertTo(img_processed, -1, 1.3, 25);
   
   img = img_processed;
   
