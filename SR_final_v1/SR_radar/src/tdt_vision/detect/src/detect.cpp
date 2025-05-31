@@ -103,7 +103,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
     TDT_INFO("Load yolo engine success!");
 
   image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-      "video_image", rclcpp::SensorDataQoS(),
+      "camera_image", rclcpp::SensorDataQoS(),
       std::bind(&Detect::callback, this, std::placeholders::_1));
   image_pub = this->create_publisher<sensor_msgs::msg::Image>("detect_image", rclcpp::SensorDataQoS());
   pub = this->create_publisher<vision_interface::msg::DetectResult>("detect_result", rclcpp::SensorDataQoS());
@@ -133,11 +133,11 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   
   // 创建高光蒙版 (亮度值高于阈值的区域)
   cv::Mat highlight_mask;
-  cv::threshold(v_channel, highlight_mask, 180, 255, cv::THRESH_BINARY);
+  cv::threshold(v_channel, highlight_mask, 200, 255, cv::THRESH_BINARY);
   
   // 对高光区域进行处理 - 降低亮度
   cv::Mat v_reduced;
-  v_channel.convertTo(v_reduced, -1, 0.7, 0); // 降低高光区域的亮度
+  v_channel.convertTo(v_reduced, -1, 0.5, 0); // 降低高光区域的亮度
   
   // 只在高光区域应用降低亮度的效果
   v_reduced.copyTo(v_channel, highlight_mask);
@@ -149,7 +149,7 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   cv::cvtColor(hsv, img_processed, cv::COLOR_HSV2BGR);
   
   // 整体提高曝光度和对比度
-  img_processed.convertTo(img_processed, -1, 1.3, 25);
+  img_processed.convertTo(img_processed, -1, 2.0, 35);
   
   img = img_processed;
   
