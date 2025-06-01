@@ -13,6 +13,12 @@ KalmanFilter::KalmanFilter(const rclcpp::NodeOptions& node_options):rclcpp::Node
     
     self_color = radar_interface::team_color::UNKNOWN;
     
+    // 初始化时间戳和频率计算变量
+    last_callback_time_ = this->now();
+    callback_count_ = 0;
+    frequency_update_interval_ = 100; // 每100次回调更新一次频率
+    last_msg_time_ = rclcpp::Time(0, 0); // 初始化为0
+    
     //RCLCPP_INFO(this->get_logger(), "Kalman_filter_Node has been started.");
 }
 
@@ -24,6 +30,32 @@ void KalmanFilter::color_callback(const radar_interface::team_color::msg::Shared
 
 void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::SharedPtr msg)
 {
+    // 计算调用频率
+    rclcpp::Time current_time = this->now();
+    callback_count_++;
+    
+    if (callback_count_ >= frequency_update_interval_) {
+        double elapsed_seconds = (current_time - last_callback_time_).seconds();
+        if (elapsed_seconds > 0) {
+            double frequency = callback_count_ / elapsed_seconds;
+            std::cout << "Kalman Filter 调用频率: " << frequency << " Hz" << std::endl;
+        }
+        
+        // 重置计数器和时间戳
+        callback_count_ = 0;
+        last_callback_time_ = current_time;
+    }
+    
+    // 计算消息间的时间间隔
+    rclcpp::Time msg_time = msg->header.stamp;
+    if (last_msg_time_.nanoseconds() != 0) {
+        double dt = (msg_time - last_msg_time_).seconds();
+        if (dt > 0) {
+            std::cout << "消息时间间隔: " << dt * 1000 << " ms" << std::endl;
+        }
+    }
+    last_msg_time_ = msg_time;
+    
     //RCLCPP_INFO(this->get_logger(), "Detect_callback");
     rclcpp::Time time = msg->header.stamp;
     

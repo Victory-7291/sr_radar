@@ -39,5 +39,11 @@ class KalmanFilter :public rclcpp::Node
     std::vector<Kalman_filter_plus> KFs;
     //vision_interface::msg::RadarWarn lidar_detect;
     radar_interface::team_color::ENUM self_color;
+    
+    // 用于计算回调频率的变量
+    rclcpp::Time last_callback_time_;
+    int callback_count_;
+    int frequency_update_interval_;
+    rclcpp::Time last_msg_time_; // 上一条消息的时间戳
 };
 }//namespace tdt_radar

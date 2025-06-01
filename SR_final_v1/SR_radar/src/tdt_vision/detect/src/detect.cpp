@@ -138,7 +138,9 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   auto img = cv_bridge::toCvShare(msg, "bgr8")->image;
   
   // 开始计时 - 图像预处理部分
+  /*
   std::chrono::steady_clock::time_point preprocess_begin = std::chrono::steady_clock::now();
+  */
   
   // 图像预处理：先降低高光，再提高曝光度
   cv::Mat img_processed;
@@ -182,12 +184,16 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
   cv::Scalar mean_brightness = cv::mean(gray);
   
   // 结束计时 - 图像预处理部分
+  /*
   std::chrono::steady_clock::time_point preprocess_end = std::chrono::steady_clock::now();
   std::chrono::duration<double> preprocess_time = std::chrono::duration_cast<std::chrono::duration<double>>(preprocess_end - preprocess_begin);
   std::cout << "Image Preprocessing Time: " << preprocess_time.count()*1000 << "ms" << std::endl;
   std::cout << "Average Image Brightness: " << mean_brightness[0] << std::endl;
+  */
   
+  /*
   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+  */
 
   // 创建一个空的检测结果消息，所有坐标默认为0
   vision_interface::msg::DetectResult detect_result;
@@ -344,9 +350,11 @@ void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
     pub->publish(detect_result);
   }
 
+  /*
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
   std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(end - begin);
   std::cout<<"Detect Time: "<<time_used.count()*1000<<"ms"<<std::endl;
+  */
   
   // 确保在所有情况下都显示图像
   //cv::Mat final_img;
