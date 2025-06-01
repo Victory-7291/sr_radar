@@ -301,8 +301,8 @@ void RadarWarn::detect_callback(const std::shared_ptr<vision_interface::msg::Det
                 //}
             }
             
-            RCLCPP_INFO(this->get_logger(), "英雄机器人: (%.2f, %.2f), 最大移动: %.2f米, 预警: %d", 
-                       enemy_hero_position.x, enemy_hero_position.y, max_movement, warning_level);
+            //RCLCPP_INFO(this->get_logger(), "英雄机器人: (%.2f, %.2f), 最大移动: %.2f米, 预警: %d", 
+            //           enemy_hero_position.x, enemy_hero_position.y, max_movement, warning_level);
         }
     } else {
         // 未检测到敌方英雄机器人，不预警

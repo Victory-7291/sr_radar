@@ -155,8 +155,8 @@ void JudgeBridgeNode::game_robot_hp_callback(const game_robot_HP_t& hp)
     msg.blue_base = hp.blue_base_HP;
     msg.blue_outpost = hp.blue_outpost_HP;
     pub_game_robot_hp->publish(msg);
-    RCLCPP_INFO(get_logger(), "Game Robot HP: red_base: %d, red_outpost: %d, blue_base: %d, blue_outpost: %d",
-        hp.red_base_HP, hp.red_outpost_HP, hp.blue_base_HP, hp.blue_outpost_HP);
+    //RCLCPP_INFO(get_logger(), "Game Robot HP: red_base: %d, red_outpost: %d, blue_base: %d, blue_outpost: %d",
+    //    hp.red_base_HP, hp.red_outpost_HP, hp.blue_base_HP, hp.blue_outpost_HP);
 }
 
 //void JudgeBridgeNode::interaction_data_callback(const std::vector<uint8_t>& data)
@@ -223,7 +223,7 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     map_robot_data_t map_robot_data;
     constexpr uint16_t default_red_x = 0, default_red_y = 0; // Removed unused variables
     constexpr uint16_t default_blue_x = 0, default_blue_y = 0;
-    RCLCPP_INFO(this->get_logger(), "1111111111111111111111111");
+    //RCLCPP_INFO(this->get_logger(), "1111111111111111111111111");
     switch (color) {
     case team_color::C_RED:
         map_robot_data.sentry_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;

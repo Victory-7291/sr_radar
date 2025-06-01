@@ -134,7 +134,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
 }
 
 void Detect::callback(const std::shared_ptr<sensor_msgs::msg::Image> msg) {
-  std::cout<<"time: "<<msg->header.stamp.sec<<"."<<msg->header.stamp.nanosec<<std::endl;
+  //std::cout<<"time: "<<msg->header.stamp.sec<<"."<<msg->header.stamp.nanosec<<std::endl;
   auto img = cv_bridge::toCvShare(msg, "bgr8")->image;
   
   // 开始计时 - 图像预处理部分
