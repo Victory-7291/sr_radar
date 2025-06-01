@@ -37,20 +37,6 @@ def generate_launch_description():
     #        extra_arguments=[{'use_intra_process_comms': True}]
     #    )  
 
-  
-    #def get_video_player_node(package, plugin):
-    #    # 使用相对于工作空间的路径
-    #    workspace_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    #    video_path = os.path.join(workspace_path, 'test.mp4')
-    #    
-    #    return ComposableNode(
-    #        package=package,
-    #        plugin=plugin,
-    #        name='video_player_node',
-    #        parameters=[{'video_file_path': video_path}],
-    #        extra_arguments=[{'use_intra_process_comms': True}]
-    #    )
-
     def get_radar_calib_node(package, plugin):
         return ComposableNode(
             package=package,
@@ -79,7 +65,6 @@ def generate_launch_description():
     # 创建节点描述
     hik_camera_node = get_hik_camera_node('hik_camera', 'hik_camera::HikCameraNode')
     radar_calib_node = get_radar_calib_node('tdt_vision', 'tdt_radar::Calibrate')
-    #video_player_node = get_video_player_node('video_player', 'video_player::VideoPlayerNode') # 包名和插件名已更正
     #ros_bag_player_node = get_rosbag_player_node('rosbag_player', 'RosbagPlayer')
 
     # 创建节点容器

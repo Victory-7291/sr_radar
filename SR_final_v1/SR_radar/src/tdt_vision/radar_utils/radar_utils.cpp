@@ -33,8 +33,8 @@ namespace tdt_radar
         points_map["Enemy_Fortress"]  = new Parser_Points("Enemy_Fortress");
 
         points_map["Center_Highland"]         ->Height=0.3;
-        points_map["Self_Highland"]        ->Height=0.6;
-        points_map["Enemy_Highland"]    ->Height=0.6;
+        points_map["Self_Highland"]        ->Height=0.2;
+        points_map["Enemy_Highland"]    ->Height=0.2;
         points_map["Right_Road"]   ->Height=0.2;
         points_map["Left_Road"]   ->Height=0.2;
         points_map["Self_Fortress"]  ->Height=0.15;

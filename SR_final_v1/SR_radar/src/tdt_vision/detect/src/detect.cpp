@@ -83,7 +83,7 @@ Detect::Detect(const rclcpp::NodeOptions& node_options)
         highlight_threshold = 200;
         highlight_factor = 0.5;
         contrast_factor = 2.0;
-        brightness_increase = 35;
+        brightness_increase = 46;
         RCLCPP_WARN(this->get_logger(), "Image preprocessing parameters not found, using defaults.");
     }
     
