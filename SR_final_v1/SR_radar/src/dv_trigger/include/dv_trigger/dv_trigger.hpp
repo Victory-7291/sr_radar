@@ -22,9 +22,11 @@ private:
     bool dv_available();
     void trigger_dv(const std::string_view& reason = "");
     void radar_info_callback(const radar_interface::msg::RadarInfo& info);
+    void time_callback(const std_msgs::msg::UInt16& time);
 
     rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr pub_radar_cmd;
     rclcpp::Subscription<radar_interface::msg::RadarInfo>::SharedPtr sub_radar_info;
+    rclcpp::Subscription<std_msgs::msg::UInt16>::SharedPtr sub_time;
 
 public:
     DvTriggerNode();

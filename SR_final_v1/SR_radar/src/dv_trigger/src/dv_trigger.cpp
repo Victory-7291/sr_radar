@@ -13,6 +13,7 @@ DvTriggerNode::DvTriggerNode()
     pub_radar_cmd = create_publisher<std_msgs::msg::UInt8>("judge/radar_cmd", rclcpp::SystemDefaultsQoS());
     
     sub_radar_info = create_subscription<radar_interface::msg::RadarInfo>("judge/radar_info", rclcpp::SystemDefaultsQoS(), std::bind(&DvTriggerNode::radar_info_callback, this, std::placeholders::_1));
+    sub_time = create_subscription<std_msgs::msg::UInt16>("judge/remain_time", rclcpp::SystemDefaultsQoS(), std::bind(&DvTriggerNode::time_callback, this, std::placeholders::_1));
 }
 
 bool DvTriggerNode::dv_available()
@@ -54,4 +55,12 @@ void DvTriggerNode::radar_info_callback(const radar_interface::msg::RadarInfo& i
     if (!dv_context.is_dv_trigered && dv_context.now_chances > dv_context.used_chances && dv_context.waiting_for_check == 0) {
         trigger_dv("自动触发");
     }
+}
+
+void DvTriggerNode::time_callback(const std_msgs::msg::UInt16& time)
+{
+    static uint16_t last_time = 0;
+    if (time.data > last_time || time.data > 400)
+        dv_context.used_chances = 0;    // 重置 used_chances
+    last_time = time.data;
 }

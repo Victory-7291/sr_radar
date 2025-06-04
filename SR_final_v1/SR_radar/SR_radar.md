@@ -1,29 +1,8 @@
 <div align="center">
 
-# T-DT 2024 Radar
+# SR Radar 2025
 
-> 2024年东北大学T-DT实验室 RoboMaster超级对抗赛 雷达代码
-
-<a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow"></a>
-<a href="https://neutdt.cn"><img alt="Home Page" src="https://img.shields.io/badge/Home%20Page-T--DT-green"></a>
-
-<p align="center">
-  <!-- <img src=".github/NEU.jpg" width="300"/> -->
-
-<img src=".github/T-DT.jpg" width="300"/>
-</p>
-
-</div>
-
-<br>
-
---------
-
-<br>
-
-<div align="left">
-
-# 版本和发布记录
+# # 版本和发布记录
 
 **v0.0.1beta**
 
@@ -41,17 +20,7 @@
 
 # 项目介绍
 
-东北大学RM2024雷达技术报告 [https://bbs.robomaster.com/wiki/260375/27115](https://bbs.robomaster.com/wiki/260375/27115)
-
-本项目通过激光雷达和单目相机的目标检测，进行传感器后融合，实现了传感器之间的完全解耦合，避免了联合标定带来的误差，同时开发难度不随传感器数量增加而增加。~~(如果和你关系好的队伍不幸被淘汰了，可以把相机/雷达直接借过来用。)~~
-
 **如果你没有激光雷达，也可以直接使用本项目的单目相机方案 (在RM2023的0.6m误差规则下取得了最高91%的准确率，荣获2023年雷达MVP)**
-
-<p align="center">
-  <img src=".github/icp.png" alt="配准效果">
-  <br>
-  <em>图1：配准效果</em>
-</p>
 
 ## 项目优势
 
@@ -66,22 +35,20 @@
 - 5.低耦合，易于维护和扩展
 
 - 6.雷达全自动配准，节约3分钟部署时间
-  
-  ## 硬件条件
 
-- 激光雷达 Livox Avia
+## 硬件条件
 
-- 单目相机 Hikvision CH-120-10UC
+- 海康工业相机/USB直驱相机
 
-- CPU i7-12700KF
+- USB串口（另一头需接裁判系统user串口）
 
-- GPU RTX A4000 * 2
+- 有GPU的运算端，推荐RTX3060以上
+
+- 推荐配置：相机MV-CS060-10UC-PRO（USB款），镜头5-12ｍｍ（6ｍｍ最佳）
 
 ## 项目结构说明
 
 **本项目提供了除串口、相机驱动、模型训练外雷达站的全部功能**
-
-![项目结构](.github/processon.png)
 
 ### 单目相机
 
@@ -90,13 +57,12 @@
 
 ### 识别
 
-- 三层神经网络结构
+- 两层神经网络结构
 
-| 名称       | 大小        | 用途    |
-| -------- | --------- | ----- |
-| yolov5s  | 1280x1280 | 识别机器人 |
-| yolov5s  | 192x192   | 识别装甲板 |
-| resnet18 | 224x224   | 数字分类  |
+| 名称      | 大小      | 用途    |
+| ------- | ------- | ----- |
+| yolov5s | 640x640 | 识别机器人 |
+| yolov5s | 640x640 | 识别装甲板 |
 
 建议根据相机分辨率调整模型大小，以提高推理速度。
 
@@ -109,19 +75,11 @@
 
 - 提供了onnx自动转换trt，如果没有检测到TensorRT编译的模型，会自动编译对应模型。
 
-### 激光雷达
-
-- GICP配准 **RM2024场地地图(有墙版)存储在config/RM2024.pcd**
-- KdTree离群点检测
-- 欧几里得聚类
-- 飞镖检测
-- 空中机器人检测
+### 
 
 ### 传感器融合
 
-- 使用卡尔曼滤波器对激光雷达识别到的目标进行跟踪，同时将相机识别结果向卡尔曼轨迹进行匹配，最后融合卡尔曼滤波器结果和相机识别结果，输出最终结果。
-
-### 工具包
+- ### 工具包
 
 - 进程内播放rosbag (ros2 jazzy已支持)
 
@@ -129,7 +87,6 @@
 
 | 模块                                        | 说明          |
 | ----------------------------------------- | ----------- |
-| [`lidar`](./src/lidar/)                   | 激光雷达模块      |
 | [`camera`](./src/tdt_vision/)             | 相机模块（无相机驱动） |
 | [`interface`](./src/interface/)           | 自定义消息接口     |
 | [~~`llm_decision`~~](./src/llm_decision/) | ~~大模型决策模块~~ |
@@ -158,16 +115,6 @@ sudo apt-get install libstdc++12-dev
 
 ### 1. ROS2 通信 （注意QoS）
 
-#### 激光雷达
-
-| 名称                  | 类型                                        | 用途        |
-| ------------------- | ----------------------------------------- | --------- |
-| livox/lidar         | topic< sensor_msgs::msg::PointCloud2 >    | Livox驱动接口 |
-| livox/map           | topic< sensor_msgs::msg::PointCloud2 >    | 3D地图可视化   |
-| livox/lidar_dynamic | topic< sensor_msgs::msg::PointCloud2 >    | 动态点云      |
-| livox/cluster       | topic< sensor_msgs::msg::PointCloud2 >    | 聚类结果      |
-| livox/lidar_detect  | topic< vision_interface::msg::RadarWarn > | 激光雷达预警    |
-
 #### 相机
 
 | 名称             | 类型                                           | 用途     |
@@ -178,11 +125,10 @@ sudo apt-get install libstdc++12-dev
 
 #### 传感器融合
 
-| 名称            | 类型                                         | 用途         |
-| ------------- | ------------------------------------------ | ---------- |
-| kalman_detect | topic<vision_interface::msg::DetectResult> | 卡尔曼节点输出    |
-| match_info    | topic<vision_interface::msg::MatchInfo >   | 当前比赛的实时信息  |
-| Radar2Sentry  | topic<vision_interface::msg::Radar2Sentry> | 发送给串口的最终结果 |
+| 名称            | 类型                                         | 用途        |
+| ------------- | ------------------------------------------ | --------- |
+| kalman_detect | topic<vision_interface::msg::DetectResult> | 卡尔曼节点输出   |
+| match_info    | topic<vision_interface::msg::MatchInfo >   | 当前比赛的实时信息 |
 
 ## 工具
 
@@ -197,10 +143,10 @@ colcon build --packages-select 功能包名称
 ## 测试
 
 ```bash
-ros2 launch tdt_vision run_rosbag.launch.py #通过rosbag启动相机
-ros2 launch dynamic_cloud lidar.launch.py #启动激光雷达识别
+ros2 launch tdt_vision run_camera.launch.py #订阅相机画面，启动雷达
+ros2 launch tdt_vision run_rosbag_player.launch.py #2025东部赛区rosbag detect节点订阅camera_image话题
+ros2 launch tdt_vision run_video.launch.py #2025东部赛区mp4，detect节点订阅video_image
 ros2 run debug_map debug_map #启动地图可视化
-ros2 launch livox_ros2_driver livox_lidar_launch.py #启动Livox驱动
 ```
 
 测试ros2bag下载
@@ -211,10 +157,59 @@ ros2 launch livox_ros2_driver livox_lidar_launch.py #启动Livox驱动
 ### 相机外参标定
 
 ```bash
-ros2 run tdt_vision calib_rosbag.launch.py
+ros2 launch tdt_vision calib_rosbag.launch.py #订阅相机画面进行标定
+ros2 launch tdt_vision calib_video.launch.py #启动video_streamer_node对mp4画面进行标定，测试用
 ```
 
-按Enter键开始标定,依次点击R0/B0左上，右上，己方前哨站血条最高点(满血)，敌方基地引导灯，敌方前哨站引导灯。
+按Enter键开始标定,按照以下图片顺序依次点击赛场对应的真实点
+
+<p align="center">
+  <img src="./asset/images/6501749052464_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定点1</em>
+</p>
+
+<p align="center">
+  <img src="./asset/images/6511749052467_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定点2</em>
+</p>
+
+<p align="center">
+  <img src="./asset/images/6521749052470_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定点3</em>
+</p>
+
+<p align="center">
+  <img src="./asset/images/6531749052473_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定点4</em>
+</p>
+
+<p align="center">
+  <img src="./asset/images/6541749052475_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定点5</em>
+</p>
+
+<p align="center">
+  <img src="./asset/images/6571749052588_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定细节1</em>
+</p>
+
+<p align="center">
+  <img src="./asset/images/6561749052586_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定细节2</em>
+</p>
+
+<p align="center">
+  <img src="./asset/images/6551749052583_.pic.jpg" alt="配准效果" width="300">
+  <br>
+  <em>标定细节3</em>
+</p>
 
 每次点击后可使用wasd调节上下左右，按n键保存当前点，保存5个点后自动计算外参并保存在config/out_matrix.yaml
 
