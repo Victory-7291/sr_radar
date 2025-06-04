@@ -142,7 +142,7 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
     // 清理过时的卡尔曼滤波器
     for(int i = KFs.size() - 1; i >= 0; i--)
     {
-        if((KFs[i].last_time) > 0.35){
+        if((KFs[i].last_time) > 0.20){
             KFs.erase(KFs.begin() + i);
         }
     }
@@ -152,7 +152,7 @@ void KalmanFilter::detect_callback(const vision_interface::msg::DetectResult::Sh
     {
         for(int i=kf.history.size() - 1; i >= 0; i--)
         {
-            if(Kalman_filter_plus::GetTimeByRosTime(time)-kf.history[i].first > 0.35)
+            if(Kalman_filter_plus::GetTimeByRosTime(time)-kf.history[i].first > 0.20)
             {
                 kf.history.erase(kf.history.begin() + i);
             }
