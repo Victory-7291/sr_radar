@@ -193,7 +193,7 @@ void JudgeBridgeNode::game_robot_hp_callback(const game_robot_HP_t& hp)
 void JudgeBridgeNode::send_sentry_data(const vision_interface::msg::RadarWarn& topic_message)
 {
     if (color == team_color::UNKNOWN) {
-        //RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送哨兵数据");
+        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送哨兵数据");
         return;
     }
     
@@ -215,7 +215,7 @@ void JudgeBridgeNode::send_sentry_data(const vision_interface::msg::RadarWarn& t
     
     // 发送数据
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(robot_interaction_sentry_data_t));
-    //RCLCPP_INFO(this->get_logger(), "发送工程机器人状态给哨兵: %d", topic_message.engine_state);
+    RCLCPP_INFO(this->get_logger(), "发送工程机器人状态给哨兵: %d", topic_message.engine_state);
 }
 
 void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResult& msg)
@@ -226,6 +226,7 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
     //RCLCPP_INFO(this->get_logger(), "1111111111111111111111111");
     switch (color) {
     case team_color::C_RED:
+        RCLCPP_INFO(this->get_logger(), "send_map_robot_data: C_RED");
         map_robot_data.sentry_position_x = msg.blue[5].id != -1 ? msg.blue[5].position[0] * 100 : default_blue_x;
         map_robot_data.sentry_position_y = msg.blue[5].id != -1 ? msg.blue[5].position[1] * 100 : default_blue_y;
         map_robot_data.hero_position_x = msg.blue[0].id != -1 ? msg.blue[0].position[0] * 100 : default_blue_x;
@@ -240,30 +241,31 @@ void JudgeBridgeNode::send_map_robot_data(const radar_interface::msg::MatchResul
         map_robot_data.infantry_5_position_y = msg.blue[4].id != -1 ? msg.blue[4].position[1] * 100 : default_blue_y;
         break;
     case team_color::C_BLUE:
-        map_robot_data.sentry_position_x = msg.red[5].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
-        map_robot_data.sentry_position_y = msg.red[5].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
-        map_robot_data.hero_position_x = msg.red[0].id != -1 ? msg.red[1].position[0] * 100 : default_red_x;
-        map_robot_data.hero_position_y = msg.red[0].id != -1 ? msg.red[1].position[1] * 100 : default_red_y;
-        map_robot_data.engineer_position_x = msg.red[1].id != -1 ? msg.red[2].position[0] * 100 : default_red_x;
-        map_robot_data.engineer_position_y = msg.red[1].id != -1 ? msg.red[2].position[1] * 100 : default_red_y;
-        map_robot_data.infantry_3_position_x = msg.red[2].id != -1 ? msg.red[3].position[0] * 100 : default_red_x;
-        map_robot_data.infantry_3_position_y = msg.red[2].id != -1 ? msg.red[3].position[1] * 100 : default_red_y;
-        map_robot_data.infantry_4_position_x = msg.red[3].id != -1 ? msg.red[4].position[0] * 100 : default_red_x;
-        map_robot_data.infantry_4_position_y = msg.red[3].id != -1 ? msg.red[4].position[1] * 100 : default_red_y;
-        map_robot_data.infantry_5_position_x = msg.red[4].id != -1 ? msg.red[5].position[0] * 100 : default_red_x;
-        map_robot_data.infantry_5_position_y = msg.red[4].id != -1 ? msg.red[5].position[1] * 100 : default_red_y;
+        RCLCPP_INFO(this->get_logger(), "send_map_robot_data: C_BLUE"); 
+        map_robot_data.sentry_position_x = msg.red[5].id != -1 ? msg.red[5].position[0] * 100 : default_red_x;
+        map_robot_data.sentry_position_y = msg.red[5].id != -1 ? msg.red[5].position[1] * 100 : default_red_y;
+        map_robot_data.hero_position_x = msg.red[0].id != -1 ? msg.red[0].position[0] * 100 : default_red_x;
+        map_robot_data.hero_position_y = msg.red[0].id != -1 ? msg.red[0].position[1] * 100 : default_red_y;
+        map_robot_data.engineer_position_x = msg.red[1].id != -1 ? msg.red[1].position[0] * 100 : default_red_x;
+        map_robot_data.engineer_position_y = msg.red[1].id != -1 ? msg.red[1].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_3_position_x = msg.red[2].id != -1 ? msg.red[2].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_3_position_y = msg.red[2].id != -1 ? msg.red[2].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_4_position_x = msg.red[3].id != -1 ? msg.red[3].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_4_position_y = msg.red[3].id != -1 ? msg.red[3].position[1] * 100 : default_red_y;
+        map_robot_data.infantry_5_position_x = msg.red[4].id != -1 ? msg.red[4].position[0] * 100 : default_red_x;
+        map_robot_data.infantry_5_position_y = msg.red[4].id != -1 ? msg.red[4].position[1] * 100 : default_red_y;
         break;
     default:
         return;
     }
     judge_serial->write(CMD_ID::ROBOT_MAP, reinterpret_cast<uint8_t*>(&map_robot_data), sizeof(map_robot_data));
     
-    RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
+    //RCLCPP_INFO(this->get_logger(), "send_map_robot_data");
 }
 
 void JudgeBridgeNode::send_standard1_data(const vision_interface::msg::RadarWarn& msg) {
     if (color == team_color::UNKNOWN) {
-        //RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵1数据");
+        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵1数据");
         return;
     }
     
@@ -286,12 +288,12 @@ void JudgeBridgeNode::send_standard1_data(const vision_interface::msg::RadarWarn
     
     // 发送数据
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(robot_interaction_standard_data_t));
-    //RCLCPP_INFO(this->get_logger(), "发送hero_state给标准步兵1: %d", msg.hero_state);
+    RCLCPP_INFO(this->get_logger(), "发送hero_state给标准步兵1: %d", msg.hero_state);
 }
 
 void JudgeBridgeNode::send_standard2_data(const vision_interface::msg::RadarWarn& msg) {
     if (color == team_color::UNKNOWN) {
-        //RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵2数据");
+        RCLCPP_WARN(get_logger(), "未知团队颜色，无法发送标准步兵2数据");
         return;
     }
     
@@ -314,7 +316,7 @@ void JudgeBridgeNode::send_standard2_data(const vision_interface::msg::RadarWarn
 
     // 发送数据
     judge_serial->write(CMD_ID::INTERACTION_DATA, reinterpret_cast<uint8_t*>(&interaction_data), sizeof(robot_interaction_standard_data_t));
-    //RCLCPP_INFO(this->get_logger(), "发送hero_state给标准步兵2: %d", msg.hero_state);
+    RCLCPP_INFO(this->get_logger(), "发送hero_state给标准步兵2: %d", msg.hero_state);
 }
 
 void JudgeBridgeNode::init_serial()
