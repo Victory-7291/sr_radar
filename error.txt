@@ -1,128 +1,25 @@
-wan@wan-Predator-PHN16-71:~/SR_final_v1/SR_radar$ ros2 launch tdt_vision run_camera.launch.py 
-[INFO] [launch]: All log files can be found below /home/wan/.ros/log/2025-07-21-03-50-26-844700-wan-Predator-PHN16-71-128059
-[INFO] [launch]: Default logging verbosity is set to INFO
-[INFO] [component_container-4]: process started with pid [128077]
-[INFO] [judge_bridge-1]: process started with pid [128071]
-[INFO] [radar_warn_node-2]: process started with pid [128073]
-[INFO] [dv_trigger-3]: process started with pid [128075]
-[judge_bridge-1] [WARN] [1753041026.889903589] [judge_bridge_node]: Connect to Serial /dev/ttyUSB0 failed, e.what(): open: No such file or directory
-[radar_warn_node-2] [-9.351087202980256;
-[radar_warn_node-2]  2.903229551358001;
-[radar_warn_node-2]  3.629521771949531]
-[radar_warn_node-2] [1.492703679557442;
-[radar_warn_node-2]  -1.229829352098816;
-[radar_warn_node-2]  0.9849229430728735]
-[radar_warn_node-2] Resolve camera[2544.251158, 0, 1520.268576;
-[radar_warn_node-2]  0, 2543.853021, 1082.406629;
-[radar_warn_node-2]  0, 0, 1]
-[radar_warn_node-2] Resolve dist[]
-[component_container-4] [INFO] [1753041027.129721204] [camera_detector_container]: Load Library: /home/wan/SR_final_v1/SR_radar/install/hik_camera/lib/libhik_camera.so
-[component_container-4] [INFO] [1753041027.137031033] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<hik_camera::HikCameraNode>
-[component_container-4] [INFO] [1753041027.137043569] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<hik_camera::HikCameraNode>
-[component_container-4] [INFO] [1753041027.138539025] [hik_camera]: Starting HikCameraNode!
-[component_container-4] [INFO] [1753041027.140607678] [hik_camera]: Found camera count = 1
-[component_container-4] [WARN] [1753041027.889232762] [hik_camera]: Failed to get exposure_time parameter. Using default value.
-[judge_bridge-1] [WARN] [1753041027.890065472] [judge_bridge_node]: Connect to Serial /dev/ttyUSB0 failed, e.what(): open: No such file or directory
-[component_container-4] [INFO] [1753041027.891482489] [hik_camera]: Exposure time: 18000.000000
-[component_container-4] [INFO] [1753041027.892565746] [hik_camera]: Frame rate: 55.000000
-[component_container-4] [INFO] [1753041027.894018888] [hik_camera]: Gain: 23.000000
-[component_container-4] [INFO] [1753041027.914569345] [hik_camera]: camera calibration URL: package://hik_camera/config/camera_info.yaml
-[component_container-4] [INFO] [1753041027.915789157] [hik_camera]: Publishing image!
-[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/hik_camera' in container '/camera_detector_container'
-[component_container-4] [INFO] [1753041027.919182604] [camera_detector_container]: Load Library: /home/wan/SR_final_v1/SR_radar/install/tdt_vision/lib/libradar_detect.so
-[component_container-4] [INFO] [1753041027.932963358] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Detect>
-[component_container-4] [INFO] [1753041027.932995773] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Detect>
-[component_container-4] Checking CUDA with nvidia-smi...
-[judge_bridge-1] [WARN] [1753041028.890307862] [judge_bridge_node]: Connect to Serial /dev/ttyUSB0 failed, e.what(): open: No such file or directory
-[component_container-4] Mon Jul 21 03:50:29 2025       
-[component_container-4] +-----------------------------------------------------------------------------------------+
-[component_container-4] | NVIDIA-SMI 570.133.07             Driver Version: 570.133.07     CUDA Version: 12.8     |
-[component_container-4] |-----------------------------------------+------------------------+----------------------+
-[component_container-4] | GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-[component_container-4] | Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-[component_container-4] |                                         |                        |               MIG M. |
-[component_container-4] |=========================================+========================+======================|
-[component_container-4] |   0  NVIDIA GeForce RTX 4050 ...    Off |   00000000:01:00.0 Off |                  N/A |
-[component_container-4] | N/A   37C    P0            590W /   80W |      12MiB /   6141MiB |     17%      Default |
-[component_container-4] |                                         |                        |                  N/A |
-[component_container-4] +-----------------------------------------+------------------------+----------------------+
-[component_container-4]                                                                                          
-[component_container-4] +-----------------------------------------------------------------------------------------+
-[component_container-4] | Processes:                                                                              |
-[component_container-4] |  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
-[component_container-4] |        ID   ID                                                               Usage      |
-[component_container-4] |=========================================================================================|
-[component_container-4] |    0   N/A  N/A            2083      G   /usr/bin/gnome-shell                      1MiB |
-[component_container-4] +-----------------------------------------------------------------------------------------+
-[judge_bridge-1] [WARN] [1753041029.890579517] [judge_bridge_node]: Connect to Serial /dev/ttyUSB0 failed, e.what(): open: No such file or directory
-[component_container-4] [INFO] [1753041029.931621056] [radar_detect_node]: CUDA is available.
-[component_container-4] [INFO] [1753041029.931756838] [radar_detect_node]: Image preprocessing parameters loaded: 
-[component_container-4] [INFO] [1753041029.931763325] [radar_detect_node]:   highlight_threshold: 200
-[component_container-4] [INFO] [1753041029.931767698] [radar_detect_node]:   highlight_factor: 0.50
-[component_container-4] [INFO] [1753041029.931774216] [radar_detect_node]:   contrast_factor: 2.10
-[component_container-4] [INFO] [1753041029.931778324] [radar_detect_node]:   brightness_increase: 50
-[component_container-4] Load yolo engine!
-[component_container-4] Load armor_yolo engine!
-[component_container-4] yolo_path:/home/wan/SR_final_v1/SR_radar/model/TensorRT/car.engine
-[component_container-4] armor_path:/home/wan/SR_final_v1/SR_radar/model/TensorRT/armor.engine
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:430]: Infer 0x56947c1684b0 [DynamicShape]
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:447]: Inputs: 1
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:451]: 	0.images : shape {-1x3x640x640}
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:454]: Outputs: 1
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:458]: 	0.output0 : shape {-1x25200x17}
-[component_container-4] Load armor_yolo engine success!
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:430]: Infer 0x56947e9140d0 [StaticShape]
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:447]: Inputs: 1
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:451]: 	0.images : shape {1x3x640x640}
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:454]: Outputs: 1
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/infer.cu:458]: 	0.output0 : shape {1x25200x10}
-[component_container-4] Load yolo engine success!
-[component_container-4] [INFO] [1753041030.126430580] [radar_detect_node]: Detect node has been started.
-[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/radar_detect_node' in container '/camera_detector_container'
-[component_container-4] [INFO] [1753041030.127925880] [camera_detector_container]: Load Library: /home/wan/SR_final_v1/SR_radar/install/tdt_vision/lib/libradar_resolve.so
-[component_container-4] [INFO] [1753041030.129479932] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Resolve>
-[component_container-4] [INFO] [1753041030.129492310] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<tdt_radar::Resolve>
-[component_container-4] [-9.351087202980256;
-[component_container-4]  2.903229551358001;
-[component_container-4]  3.629521771949531]
-[component_container-4] [1.492703679557442;
-[component_container-4]  -1.229829352098816;
-[component_container-4]  0.9849229430728735]
-[component_container-4] Resolve camera[2544.251158, 0, 1520.268576;
-[component_container-4]  0, 2543.853021, 1082.406629;
-[component_container-4]  0, 0, 1]
-[component_container-4] Resolve dist[]
-[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/radar_resolve_node' in container '/camera_detector_container'
-[component_container-4] [INFO] [1753041030.134472242] [camera_detector_container]: Load Library: /opt/ros/humble/lib/libfoxglove_bridge_component.so
-[component_container-4] [INFO] [1753041030.136390089] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<foxglove_bridge::FoxgloveBridge>
-[component_container-4] [INFO] [1753041030.136414790] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<foxglove_bridge::FoxgloveBridge>
-[component_container-4] [INFO] [1753041030.138647704] [foxglove_bridge_node]: Starting foxglove_bridge (humble, 0.8.5@) with WebSocket++/0.8.2
-[component_container-4] [INFO] [1753041030.139281381] [foxglove_bridge_node]: [WS] Server running without TLS
-[component_container-4] [INFO] [1753041030.139550569] [foxglove_bridge_node]: [WS] WebSocket server listening at ws://0.0.0.0:8765
-[component_container-4] [INFO] [1753041030.139572535] [foxglove_bridge_node]: [WS] WebSocket server run loop started
-[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/foxglove_bridge_node' in container '/camera_detector_container'
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/yolo.cu:764]: forward and decode_kernel_invoker time: 53.021813
-[component_container-4] [INFO] [1753041030.215316246] [camera_detector_container]: Load Library: /home/wan/SR_final_v1/SR_radar/install/rosbag_player/lib/librosbag_player.so
-[component_container-4] [INFO] [1753041030.216130037] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<RosbagPlayer>
-[component_container-4] [INFO] [1753041030.216142812] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<RosbagPlayer>
-[component_container-4] [INFO] [1753041030.218522036] [rosbag_player_node]: Starting RosbagPlayer node
-[component_container-4] [INFO] [1753041030.218593627] [rosbag_player_node]: Rosbag file: /home/wan/rosbag_test/merged_bag_0.db3
-[component_container-4] [INFO] [1753041030.218599368] [rosbag_player_node]: Use original timestamps: true
-[component_container-4] [INFO] [1753041030.218603434] [rosbag_player_node]: Playback rate: 1.00
-[component_container-4] [INFO] [1753041030.219987355] [rosbag_player_node]: Opening rosbag file...
-[component_container-4] 
-[component_container-4] closing.
-[component_container-4] 
-[component_container-4] closing.
-[component_container-4] [ERROR] [1753041030.220444059] [rosbag2_storage]: No storage id specified, and no plugin found that could open URI
-[ERROR] [launch_ros.actions.load_composable_nodes]: Failed to load node 'rosbag_player_node' of type 'RosbagPlayer' in container '/camera_detector_container': Component constructor threw an exception: No storage could be initialized from the inputs.
-[component_container-4] [ERROR] [1753041030.223089601] [camera_detector_container]: Component constructor threw an exception: No storage could be initialized from the inputs.
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/yolo.cu:764]: forward and decode_kernel_invoker time: 8.283264
-[component_container-4] [INFO] [1753041030.242380196] [camera_detector_container]: Load Library: /home/wan/SR_final_v1/SR_radar/install/kalman_filter/lib/libkalman_filter.so
-[component_container-4] [INFO] [1753041030.245474305] [camera_detector_container]: Found class: rclcpp_components::NodeFactoryTemplate<tdt_radar::KalmanFilter>
-[component_container-4] [INFO] [1753041030.245505882] [camera_detector_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<tdt_radar::KalmanFilter>
-[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/kalman_filter_node' in container '/camera_detector_container'
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/yolo.cu:764]: forward and decode_kernel_invoker time: 7.016690
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/yolo.cu:764]: forward and decode_kernel_invoker time: 6.649933
-[component_container-4] [/home/wan/SR_final_v1/SR_radar/src/tdt_vision/yolo/yolo.cu:764]: forward and decode_kernel_invoker time: 7.680678
+wan@wan-Predator-PHN16-71:~/PFA_radar-2025$ python3 onnx2engine.py
+
+TensorRT: starting export with TensorRT 10.7.0...
+[07/23/2025-10:15:22] [TRT] [I] [MemUsageChange] Init CUDA: CPU +19, GPU +0, now: CPU 156, GPU 99 (MiB)
+[07/23/2025-10:15:24] [TRT] [I] [MemUsageChange] Init builder kernel library: CPU +2283, GPU +440, now: CPU 2595, GPU 539 (MiB)
+[07/23/2025-10:15:24] [TRT] [I] ----------------------------------------------------------------
+[07/23/2025-10:15:24] [TRT] [I] Input filename:   models/armor.onnx
+[07/23/2025-10:15:24] [TRT] [I] ONNX IR version:  0.0.7
+[07/23/2025-10:15:24] [TRT] [I] Opset version:    12
+[07/23/2025-10:15:24] [TRT] [I] Producer name:    pytorch
+[07/23/2025-10:15:24] [TRT] [I] Producer version: 1.13.1
+[07/23/2025-10:15:24] [TRT] [I] Domain:           
+[07/23/2025-10:15:24] [TRT] [I] Model version:    0
+[07/23/2025-10:15:24] [TRT] [I] Doc string:       
+[07/23/2025-10:15:24] [TRT] [I] ----------------------------------------------------------------
+TensorRT: input "images" with shape(1, 3, 640, 640) DataType.HALF
+TensorRT: output "output0" with shape(1, 25200, 17) DataType.HALF
+TensorRT: building FP16 engine as models/armor.engine
+Traceback (most recent call last):
+  File "/home/wan/PFA_radar-2025/onnx2engine.py", line 55, in <module>
+    export_engine('models/armor', half=True)
+  File "/home/wan/PFA_radar-2025/onnx2engine.py", line 50, in export_engine
+    with builder.build_engine(network, config) as engine, open(f, 'wb') as t:
+AttributeError: 'tensorrt.tensorrt.Builder' object has no attribute 'build_engine'
 
