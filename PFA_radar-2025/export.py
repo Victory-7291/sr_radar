@@ -295,8 +295,10 @@ def export_engine(model, im, file, half, dynamic, simplify, workspace=4, verbose
     LOGGER.info(f'{prefix} building FP{16 if builder.platform_has_fast_fp16 and half else 32} engine as {f}')
     if builder.platform_has_fast_fp16 and half:
         config.set_flag(trt.BuilderFlag.FP16)
-    with builder.build_engine(network, config) as engine, open(f, 'wb') as t:
-        t.write(engine.serialize())
+    # 替换旧API
+    serialized_engine = builder.build_serialized_network(network, config)
+    with open(f, 'wb') as t:
+        t.write(serialized_engine)
     return f, None
 
 
