@@ -2,8 +2,8 @@ import cv2
 import os
 
 # 硬编码参数 - 可以在这里直接修改
-input_path = "./images-2025/map_blue.jpg"  # 输入图像路径
-output_path = "./images/map_blue.jpg"      # 输出图像路径
+input_path = "./Image 2025-7-23 at 12.23.jpeg"  # 输入图像路径
+output_path = "./map.jpg"      # 输出图像路径
 target_width = 2800                        # 目标宽度
 target_height = 1500                       # 目标高度
 
