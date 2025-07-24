@@ -7,8 +7,8 @@ def extract_frames_from_video():
     从MP4视频中提取每一帧并保存为JPG图像
     """
     # 硬编码的视频路径和输出目录
-    video_path = "input_video.mp4"  # 请修改为您的视频文件路径
-    output_dir = "extracted_frames"  # 输出目录
+    video_path = "/home/wan/radar_video/video_recording_20250528_094527.mp4"  # 请修改为您的视频文件路径
+    output_dir = "/home/wan/radar_video/"  # 输出目录
     
     # 创建输出目录（如果不存在）
     Path(output_dir).mkdir(parents=True, exist_ok=True)
