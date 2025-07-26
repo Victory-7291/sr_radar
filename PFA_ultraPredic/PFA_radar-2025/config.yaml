@@ -1,0 +1,68 @@
+global:
+  state: 'B'  # 队伍颜色 R/B
+  camera_mode: 'hik'  # 'test':测试模式,'hik':海康相机,'video':USB相机（videocapture）
+  use_serial: True  # 串口启用开关  保证了无串口时能正常调试，虽然没什么影响（有try）
+  save_img: False  # 是否保存图像
+  map_size: [2800, 1500]  # 战场地图尺寸
+
+serial: # 串口
+  port: '/dev/ttyUSB0'
+  baudrate: 115200
+  timeout: 1
+
+filter:
+  type: "sliding_window"  # 可选值：kalman/sliding_window
+  sliding_window:
+    window_size: 5  # 滑动窗口大小
+    max_inactive_time: 2.0 # 滤波器最大不活跃时间(秒)
+    threshold: 100000.0
+  kalman:
+    max_inactive_time: 2.0
+
+paths:
+  test_img: 'images-2025/test_image.jpg' # 测试图片
+  calibration:
+    red: 'arrays_test_red.npy' # 加载标定好的仿射变换矩阵
+    blue: 'arrays_test_blue.npy'
+  map_images:
+    red: 'images-2025/map_red.jpg'  # 加载红方视角地图
+    blue: 'images-2025/map_blue.jpg'
+    mask: 'images-2025/map_mask.jpg' # 加载落点判断掩码
+    backup: 'images-2025/map.jpg'
+  models:
+    car: 'models/car.engine'
+    armor: 'models/armor.engine'
+
+camera_params:
+  exposure_time: 16000.0 # 曝光时间
+  gain: 17.9 # 增益值
+
+kalman:
+  process_noise: 1e-5
+  measurement_noise: 1e-1
+
+blind_zone:
+  base_time: 3.0  # 基础预测时间
+  offset_time: 1.7  # 时间偏移量(根据上一帧的信道占用数动态调整单点预测时间)
+  
+  # 智能预测算法开关
+  intelligent_prediction:
+    enabled: True  # 启用智能预测算法（算法参数固定为ultra_radar的值）
+  
+  points:
+    R1: [[1000, 400], [960, 1000], [1123, 1195], [800, 1225], [946, 1341], [457, 1232]]
+    R2: [[200, 100], [900, 900], [900, 600], [1335, 821], [1469, 687]]
+    R3: [[998, 1059], [1186, 1266], [1663, 246]]
+    R4: [[998, 1059], [1186, 1266], [1663, 246]]
+    R7: [[386, 812], [1356, 1093], [1179, 858]]
+    
+    B1: [[1821, 1092], [1851, 513], [1754, 403], [2050, 347], [1800, 200]]
+    B2: [[2600, 1400], [1900, 636], [1900, 878], [1500, 750], [1410, 654]]
+    B3: [[1814, 475], [784, 1372], [1646, 270]]
+    B4: [[1814, 475], [784, 1372], [1646, 270]]
+    B7: [[1979, 652]]
+
+ui:
+  info_panel_size: [420, 500]  # 信息面板尺寸
+  map_display_size: [900, 480]  # 地图显示尺寸
+  img_display_size: [1300, 900] # 画面显示尺寸
