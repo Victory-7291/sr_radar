@@ -1,18 +1,16 @@
-wan@wan-Predator-PHN16-71:~/PFA_radar-2025$ python3 main.py
-串口连接失败：[Errno 2] could not open port COM13: [Errno 2] No such file or directory: 'COM13'
-已启用滤波器类型: sliding_window
-YOLOv5 🚀 2025-7-22 Python-3.10.12 torch-2.4.0+cu124 CUDA:0 (NVIDIA GeForce RTX 4050 Laptop GPU, 5782MiB)
+(pfa) wan@wan-Predator-PHN16-71:~/ultra_radar$ python main.py
+YOLOv5 🚀 2025-7-26 Python-3.8.20 torch-2.4.0 CUDA:0 (NVIDIA GeForce RTX 4050 Laptop GPU, 5782MiB)
 
 Loading models/car.engine for TensorRT inference...
-[07/23/2025-10:55:14] [TRT] [I] Loaded engine size: 16 MiB
-[07/23/2025-10:55:15] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +0, GPU +16, now: CPU 0, GPU 29 (MiB)
+[07/26/2025-20:03:08] [TRT] [I] Loaded engine size: 16 MiB
+[07/26/2025-20:03:08] [TRT] [I] [MemUsageChange] TensorRT-managed allocation in IExecutionContext creation: CPU +0, GPU +16, now: CPU 0, GPU 29 (MiB)
 Traceback (most recent call last):
-  File "/home/wan/PFA_radar-2025/main.py", line 796, in <module>
+  File "main.py", line 808, in <module>
     detector = YOLOv5Detector(weights_path, data='yaml/car.yaml', conf_thres=0.1, iou_thres=0.5, max_det=14, ui=True)
-  File "/home/wan/PFA_radar-2025/detect_function.py", line 39, in __init__
+  File "/home/wan/ultra_radar/detect_function.py", line 39, in __init__
     self.model = DetectMultiBackend(weights_path, device=self.device, dnn=dnn, fp16=half, data=data)
-  File "/home/wan/PFA_radar-2025/models/common.py", line 404, in __init__
+  File "/home/wan/ultra_radar/models/common.py", line 404, in __init__
     for i in range(model.num_bindings):
 AttributeError: 'tensorrt.tensorrt.ICudaEngine' object has no attribute 'num_bindings'
-wan@wan-Predator-PHN16-71:~/PFA_radar-2025$ 
+(pfa) wan@wan-Predator-PHN16-71:~/ultra_radar$ 
 
