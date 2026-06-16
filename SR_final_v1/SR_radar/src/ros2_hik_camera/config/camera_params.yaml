@@ -1,8 +1,0 @@
-/hik_camera:
-  ros__parameters:
-    camera_name: narrow_stereo
-
-    exposure_time: 18000
-    gain: 23.0
-    frame_rate: 55.0
- 
